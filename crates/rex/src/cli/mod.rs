@@ -1,0 +1,253 @@
+//! The main module for the rex CLI, providing command line interface functionality
+
+use std::{ops::Deref, path::Path};
+
+use anyhow::Context as _;
+use etcetera::{AppStrategy as _, AppStrategyArgs, choose_app_strategy};
+
+#[cfg(windows)]
+use etcetera::app_strategy::Windows;
+#[cfg(unix)]
+use etcetera::app_strategy::Xdg;
+
+use serde_json::json;
+use tracing::{debug, trace};
+
+use serde::{Deserialize, Serialize};
+
+use crate::config::{Config, generate_default_config, load_config};
+
+pub mod config;
+
+pub const CONFIG_FILE_NAME: &str = "config.json";
+
+/// A trait that defines the interface for all CLI commands
+pub trait CliCommand {
+    /// Execute the command with the provided context, returning a structured output
+    fn handle(&self, ctx: &CliContext) -> impl Future<Output = anyhow::Result<CommandOutput>>;
+}
+
+impl<T: CliCommand + ?Sized> CliCommandExt for T {}
+
+/// Extension trait to provide implementations for pre_hook and post_hook.
+pub trait CliCommandExt: CliCommand {}
+
+/// Used for displaying human-readable output vs JSON format
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum OutputKind {
+    Text,
+    Json,
+}
+
+impl std::str::FromStr for OutputKind {
+    type Err = OutputParseErr;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s {
+            "json" => Ok(Self::Json),
+            "plain" | "text" => Ok(Self::Text),
+            _ => Err(OutputParseErr),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OutputParseErr;
+
+impl std::error::Error for OutputParseErr {}
+
+impl std::fmt::Display for OutputParseErr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "error parsing output type, see help for the list of accepted outputs"
+        )
+    }
+}
+
+/// The final output for a rex CLI command
+#[derive(Debug, Clone, Serialize)]
+pub struct CommandOutput {
+    /// The message to display to the user
+    message: String,
+    /// Whether or not the command was successful
+    success: bool,
+    /// Additional data that can be included in JSON output
+    data: Option<serde_json::Value>,
+    /// The kind of output requested (text or JSON)
+    #[serde(skip_serializing)]
+    output_kind: OutputKind,
+}
+
+impl CommandOutput {
+    pub fn ok(message: impl ToString, data: Option<serde_json::Value>) -> Self {
+        Self {
+            message: message.to_string(),
+            success: true,
+            data,
+            output_kind: OutputKind::Text, // Default to Text, can be overridden later
+        }
+    }
+
+    pub fn error(message: impl ToString, data: Option<serde_json::Value>) -> Self {
+        Self {
+            message: message.to_string(),
+            success: false,
+            data,
+            output_kind: OutputKind::Text, // Default to Text, can be overridden later
+        }
+    }
+
+    pub fn with_output_kind(self, output_kind: OutputKind) -> Self {
+        Self {
+            output_kind,
+            ..self
+        }
+    }
+
+    /// Check if the command was successful
+    pub fn is_success(&self) -> bool {
+        self.success
+    }
+
+    /// Get the text message from the output
+    pub fn text(&self) -> &str {
+        &self.message
+    }
+
+    /// Get the JSON data from the output
+    pub fn json(&self) -> Option<&serde_json::Value> {
+        self.data.as_ref()
+    }
+
+    /// Render the output as a string, returning the CLI message and whether it was successful
+    pub fn render(self) -> (String, bool) {
+        (
+            match self.output_kind {
+                OutputKind::Json => serde_json::to_string_pretty(&self).unwrap_or_else(|e| {
+                    // Note that this matches the same structure as the CommandOutput
+                    json!({
+                        "message": "failed to serialize output",
+                        "success": false,
+                        "data": {
+                            "error": e.to_string(),
+                        }
+                    })
+                    .to_string()
+                }),
+                OutputKind::Text => self.message,
+            },
+            self.success,
+        )
+    }
+}
+
+/// CliContext holds the global context for the rex CLI, including output kind and directories
+///
+/// It is used to manage configuration, data, and cache directories based on the XDG Base Directory Specification,
+/// or a custom configuration if needed.
+#[derive(Debug, Clone)]
+pub struct CliContext {
+    // TODO(#25): Just store an Arc-ed trait object
+    #[cfg(unix)]
+    app_strategy: Xdg,
+    #[cfg(windows)]
+    app_strategy: Windows,
+}
+
+#[cfg(unix)]
+impl Deref for CliContext {
+    type Target = Xdg;
+
+    fn deref(&self) -> &Xdg {
+        &self.app_strategy
+    }
+}
+#[cfg(windows)]
+impl Deref for CliContext {
+    type Target = Windows;
+
+    fn deref(&self) -> &Windows {
+        &self.app_strategy
+    }
+}
+
+impl CliContext {
+    /// Creates a new [CliContext] with the specified output kind and directory paths.
+    pub async fn new() -> anyhow::Result<Self> {
+        let app_strategy = choose_app_strategy(AppStrategyArgs {
+            top_level_domain: "com.gurv".to_string(),
+            author: "Vladimir Gurinovich".to_string(),
+            app_name: "rex".to_string(),
+        })
+        .context("failed to to determine file system strategy")?;
+
+        if app_strategy.data_dir().exists() {
+            trace!(
+                dir = ?app_strategy.data_dir(),
+                "data directory already exists, skipping creation"
+            );
+        } else {
+            debug!(
+                dir = ?app_strategy.data_dir(),
+                "creating data directory for rex CLI"
+            );
+            tokio::fs::create_dir_all(app_strategy.data_dir())
+                .await
+                .context("failed to create data directory")?;
+        }
+
+        if app_strategy.cache_dir().exists() {
+            trace!(
+                dir = ?app_strategy.cache_dir(),
+                "cache directory already exists, skipping creation"
+            );
+        } else {
+            debug!(
+                dir = ?app_strategy.cache_dir(),
+                "creating cache directory for rex CLI"
+            );
+            tokio::fs::create_dir_all(app_strategy.cache_dir())
+                .await
+                .context("failed to create cache directory")?;
+        }
+
+        if app_strategy.config_dir().exists() {
+            trace!(
+                dir = ?app_strategy.config_dir(),
+                "config directory already exists, skipping creation"
+            );
+        } else {
+            debug!(
+                dir = ?app_strategy.config_dir(),
+                "creating config directory for rex CLI"
+            );
+            tokio::fs::create_dir_all(app_strategy.config_dir())
+                .await
+                .context("failed to create config directory")?;
+        }
+
+        Ok(Self { app_strategy })
+    }
+    pub fn config_path(&self) -> std::path::PathBuf {
+        self.app_strategy.in_config_dir(CONFIG_FILE_NAME)
+    }
+
+    /// Fetches the rex configuration from the config file located in the XDG config directory,
+    /// creating it with default values if it does not exist.
+    pub async fn ensure_config(&self, project_dir: Option<&Path>) -> anyhow::Result<Config> {
+        let config_path = self.config_path();
+
+        // Check if the config file exists, if not create it with defaults
+        if !config_path.exists() {
+            debug!(
+                ?config_path,
+                "config file not found, creating with defaults"
+            );
+            generate_default_config(&config_path, false).await?;
+        }
+
+        // Load the configuration using the hierarchical configuration system
+        load_config(&self.config_path(), project_dir, None::<Config>)
+    }
+}

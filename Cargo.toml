@@ -1,0 +1,42 @@
+[package]
+name = "rex"
+version = "0.1.0"
+categories = ["wasm", "command-line-utilities"]
+description = "CLI extensible by WASM components"
+keywords = ["rex", "cli", "webassembly", "wasm"]
+readme = "README.md"
+authors = ["Vladimir Gurinovich <vladimir.gurinovich@gmail.com>"]
+edition = "2024"
+repository = "https://github.com/gurv/rex"
+
+[lib]
+name = "rex"
+path = "crates/rex/src/lib.rs"
+
+[[bin]]
+name = "rex"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = { version = "1.0.98", default-features = false }
+clap = { version = "4.5.40", default-features = false, features = ["derive", "env", "help", "color", "suggestions", "wrap_help", "cargo", "string"] }
+clap-markdown = { version = "0.1.5", default-features = false }
+ctrlc = { version = "3.4.7", default-features = false }
+dialoguer = { version = "0.11.0", default-features = false, features = ["editor", "password", "zeroize", "fuzzy-select", "fuzzy-matcher"] }
+etcetera = { version = "0.10.0", default-features = false }
+figment = { version = "0.10.19", default-features = false, features = ["json", "env"] }
+serde = { version = "1.0.219", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0.140", default-features = false, features = ["std"] }
+tempfile = { version = "3.15.0", default-features = false }
+tokio = { version = "1.45.1", default-features = false, features = ["full"] }
+tracing = { version = "0.1.41", default-features = false, features = ["attributes"] }
+tracing-subscriber = { version = "0.3.19", default-features = false, features = ["env-filter", "ansi", "time", "json"] }
+
+[dev-dependencies]
+bytes = { version = "1", default-features = false }
+tempfile = { version = "3.0", default-features = false }
+tokio = { version = "1.45.1", default-features = false, features = ["full"] }
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/{name}-v{version}/rex-{ target }{ binary-ext }"
+pkg-fmt = "bin"
