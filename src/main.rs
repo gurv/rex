@@ -58,9 +58,9 @@ enum RexCliCommand {
     /// View configuration for rex
     #[clap(name = "config", subcommand)]
     Config(rex::cli::config::ConfigCommand),
-    /// Push or pull Wasm components to/from an OCI registry
-    #[clap(name = "oci", alias = "docker", subcommand)]
-    Oci(rex::cli::oci::OciCommand),
+    // /// Push or pull Wasm components to/from an OCI registry
+    // #[clap(name = "oci", alias = "docker", subcommand)]
+    // Oci(rex::cli::oci::OciCommand),
     /// Manage rex plugins
     #[clap(name = "plugin", subcommand)]
     Plugin(rex::cli::plugin::PluginCommand),
@@ -72,7 +72,7 @@ impl CliCommand for RexCliCommand {
     async fn handle(&self, ctx: &CliContext) -> anyhow::Result<CommandOutput> {
         match self {
             RexCliCommand::Config(cmd) => cmd.handle(ctx).await,
-            RexCliCommand::Oci(cmd) => cmd.handle(ctx).await,
+            // RexCliCommand::Oci(cmd) => cmd.handle(ctx).await,
             RexCliCommand::Plugin(cmd) => cmd.handle(ctx).await,
         }
     }
@@ -81,7 +81,7 @@ impl CliCommand for RexCliCommand {
     ) -> Option<rex::runtime::bindings::plugin::exports::vg::rex::plugin::HookType> {
         match self {
             RexCliCommand::Config(cmd) => cmd.enable_pre_hook(),
-            RexCliCommand::Oci(cmd) => cmd.enable_pre_hook(),
+            // RexCliCommand::Oci(cmd) => cmd.enable_pre_hook(),
             RexCliCommand::Plugin(cmd) => cmd.enable_pre_hook(),
         }
     }
@@ -91,7 +91,7 @@ impl CliCommand for RexCliCommand {
     ) -> Option<rex::runtime::bindings::plugin::exports::vg::rex::plugin::HookType> {
         match self {
             RexCliCommand::Config(cmd) => cmd.enable_post_hook(),
-            RexCliCommand::Oci(cmd) => cmd.enable_post_hook(),
+            // RexCliCommand::Oci(cmd) => cmd.enable_post_hook(),
             RexCliCommand::Plugin(cmd) => cmd.enable_post_hook(),
         }
     }

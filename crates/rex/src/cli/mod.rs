@@ -32,7 +32,7 @@ use crate::{
 pub mod config;
 pub mod component_build;
 pub mod dev;
-pub mod oci;
+// pub mod oci;
 pub mod plugin;
 
 pub const CONFIG_FILE_NAME: &str = "config.json";
