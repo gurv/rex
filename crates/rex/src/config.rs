@@ -12,7 +12,10 @@ use figment::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use crate::cli::CONFIG_FILE_NAME;
+use crate::{
+    cli::CONFIG_FILE_NAME,
+    wit::WitConfig,
+};
 
 pub const PROJECT_CONFIG_DIR: &str = ".rex";
 
@@ -23,7 +26,11 @@ pub const PROJECT_CONFIG_DIR: &str = ".rex";
 /// is stored in the project's `.rex/config.json` file. This allows for both reasonable
 /// global defaults and project-specific overrides.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct Config {}
+pub struct Config {
+    /// WIT dependency management configuration (default: empty/optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wit: Option<WitConfig>,
+}
 
 /// Load configuration with hierarchical merging
 /// Order of precedence (lowest to highest):
