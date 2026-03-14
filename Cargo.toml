@@ -1,0 +1,15 @@
+[package]
+name = "rex"
+version = "0.1.0"
+edition = "2024"
+description = "rex - CLI tool"
+keywords = ["rex", "cli"]
+readme = "README.md"
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+clap = { version = "4", features = ["cargo", "derive", "env"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+serde_with = { version = "3", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
