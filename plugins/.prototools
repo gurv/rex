@@ -1,0 +1,2 @@
+[plugins.tools]
+Zig = "github://konomae/zig-plugin"
