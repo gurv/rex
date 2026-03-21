@@ -12,10 +12,10 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
-use system_env::find_command_on_path;
+use rex_system_env::find_command_on_path;
 use tokio::runtime::Handle;
 use tracing::{debug, error, instrument, trace, warn};
-use warpgate_api::{
+use rex_warpgate_api::{
     ExecCommandInput, ExecCommandOutput, HostLogInput, HostLogTarget, SendRequestInput,
     SendRequestOutput,
 };
@@ -212,7 +212,7 @@ fn exec_command(
     };
 
     // Determine the shell
-    let shell_type = match input.shell.or_else(|| env::var("PROTO_SHELL").ok()) {
+    let shell_type = match input.shell.or_else(|| env::var("REX_SHELL").ok()) {
         Some(name) => Some(ShellType::from_str(&name)?),
         None => get_default_shell(),
     };

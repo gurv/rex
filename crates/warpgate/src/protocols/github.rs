@@ -8,7 +8,7 @@ use std::env;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tracing::trace;
-use warpgate_api::{GitHubLocator, Id};
+use rex_warpgate_api::{GitHubLocator, Id};
 
 #[derive(Clone)]
 pub struct GitHubLoader {

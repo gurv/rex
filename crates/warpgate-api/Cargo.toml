@@ -1,15 +1,14 @@
 [package]
-name = "warpgate_api"
-version = "0.17.3"
-edition = "2024"
-license = "MIT"
-description = "APIs for working with Warpgate plugins."
-homepage = "https://moonrepo.dev/proto"
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.85.0"
+name = "rex_warpgate_api"
+version = "0.1.0"
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-system_env = { version = "0.9.1", path = "../system-env" }
+rex_system_env = { path = "../system-env" }
 anyhow = { workspace = true }
 derive_setters = { workspace = true }
 rustc-hash = { workspace = true }
@@ -21,4 +20,4 @@ thiserror = { workspace = true }
 
 [features]
 default = []
-schematic = ["dep:schematic", "system_env/schematic", "starbase_id/schematic"]
+schematic = ["dep:schematic", "rex_system_env/schematic", "starbase_id/schematic"]

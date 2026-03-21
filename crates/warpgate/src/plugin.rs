@@ -10,11 +10,11 @@ use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
-use system_env::{SystemArch, SystemLibc, SystemOS};
+use rex_system_env::{SystemArch, SystemLibc, SystemOS};
 use tokio::sync::RwLock;
 use tokio::task::block_in_place;
 use tracing::{instrument, trace};
-use warpgate_api::{HostEnvironment, Id, VirtualPath};
+use rex_warpgate_api::{HostEnvironment, Id, VirtualPath};
 
 fn is_incompatible_runtime(error: &Error) -> bool {
     let check = |message: String| {

@@ -1,0 +1,21 @@
+[package]
+name = "rex_process_augment"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rex_app_context = { path = "../app-context" }
+rex_common = { path = "../common" }
+rex_env_var = { path = "../env-var" }
+rex_pdk_api = { path = "../pdk-api" }
+rex_process = { path = "../process" }
+# rex_project = { path = "../project" }
+# rex_task = { path = "../task" }
+# rex_toolchain = { path = "../toolchain" }
+rustc-hash = { workspace = true }
+miette = { workspace = true }

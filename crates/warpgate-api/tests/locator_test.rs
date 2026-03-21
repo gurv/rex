@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use warpgate_api::{FileLocator, GitHubLocator, PluginLocator, RegistryLocator, UrlLocator};
+use rex_warpgate_api::{FileLocator, GitHubLocator, PluginLocator, RegistryLocator, UrlLocator};
 
 mod locator {
     use super::*;
@@ -25,42 +25,42 @@ mod locator {
 
         assert_eq!(
             PluginLocator::GitHub(Box::new(GitHubLocator {
-                repo_slug: "moonrepo/proto".into(),
+                repo_slug: "gurv/rex".into(),
                 tag: None,
                 project_name: None,
             }))
             .to_string(),
-            "github://moonrepo/proto"
+            "github://gurv/rex"
         );
 
         assert_eq!(
             PluginLocator::GitHub(Box::new(GitHubLocator {
-                repo_slug: "moonrepo/proto".into(),
+                repo_slug: "gurv/rex".into(),
                 tag: None,
                 project_name: Some("tool".into()),
             }))
             .to_string(),
-            "github://moonrepo/proto/tool"
+            "github://gurv/rex/tool"
         );
 
         assert_eq!(
             PluginLocator::GitHub(Box::new(GitHubLocator {
-                repo_slug: "moonrepo/proto".into(),
+                repo_slug: "gurv/rex".into(),
                 tag: Some("latest".into()),
                 project_name: None,
             }))
             .to_string(),
-            "github://moonrepo/proto@latest"
+            "github://gurv/rex@latest"
         );
 
         assert_eq!(
             PluginLocator::GitHub(Box::new(GitHubLocator {
-                repo_slug: "moonrepo/proto".into(),
+                repo_slug: "gurv/rex".into(),
                 tag: Some("latest".into()),
                 project_name: Some("tool".into()),
             }))
             .to_string(),
-            "github://moonrepo/proto/tool@latest"
+            "github://gurv/rex/tool@latest"
         );
     }
 
@@ -125,10 +125,10 @@ mod locator {
         #[test]
         fn parses_slug() {
             assert_eq!(
-                PluginLocator::try_from("registry://moonrepo/java".to_string()).unwrap(),
+                PluginLocator::try_from("registry://gurv/java".to_string()).unwrap(),
                 PluginLocator::Registry(Box::new(RegistryLocator {
                     registry: None,
-                    namespace: Some("moonrepo".into()),
+                    namespace: Some("gurv".into()),
                     tag: None,
                     image: "java".into(),
                 }))
@@ -139,12 +139,12 @@ mod locator {
         fn parses_deep_slug() {
             assert_eq!(
                 PluginLocator::try_from(
-                    "registry://moonrepo/org/namespace1/namspace2/java".to_string()
+                    "registry://gurv/org/namespace1/namspace2/java".to_string()
                 )
                 .unwrap(),
                 PluginLocator::Registry(Box::new(RegistryLocator {
                     registry: None,
-                    namespace: Some("moonrepo/org/namespace1/namspace2".into()),
+                    namespace: Some("gurv/org/namespace1/namspace2".into()),
                     tag: None,
                     image: "java".into(),
                 }))
@@ -155,11 +155,11 @@ mod locator {
         fn parses_deep_slug_with_domain() {
             assert_eq!(
                 PluginLocator::try_from(
-                    "registry://registry.moonrepo.dev/org/namespace1/namspace2/java".to_string()
+                    "registry://registry.gurv.dev/org/namespace1/namspace2/java".to_string()
                 )
                 .unwrap(),
                 PluginLocator::Registry(Box::new(RegistryLocator {
-                    registry: Some("registry.moonrepo.dev".into()),
+                    registry: Some("registry.gurv.dev".into()),
                     namespace: Some("org/namespace1/namspace2".into()),
                     tag: None,
                     image: "java".into(),
@@ -171,12 +171,12 @@ mod locator {
         fn parses_tag_data() {
             assert_eq!(
                 PluginLocator::try_from(
-                    "registry://moonrepo/org/namespace1/namspace2/java:something".to_string()
+                    "registry://gurv/org/namespace1/namspace2/java:something".to_string()
                 )
                 .unwrap(),
                 PluginLocator::Registry(Box::new(RegistryLocator {
                     registry: None,
-                    namespace: Some("moonrepo/org/namespace1/namspace2".into()),
+                    namespace: Some("gurv/org/namespace1/namspace2".into()),
                     tag: Some("something".into()),
                     image: "java".into(),
                 }))
@@ -187,13 +187,13 @@ mod locator {
         fn parses_tag_data_with_domain() {
             assert_eq!(
                 PluginLocator::try_from(
-                    "registry://ghcr.io/moonrepo/org/namespace1/namspace2/java:something"
+                    "registry://ghcr.io/gurv/org/namespace1/namspace2/java:something"
                         .to_string()
                 )
                 .unwrap(),
                 PluginLocator::Registry(Box::new(RegistryLocator {
                     registry: Some("ghcr.io".into()),
-                    namespace: Some("moonrepo/org/namespace1/namspace2".into()),
+                    namespace: Some("gurv/org/namespace1/namspace2".into()),
                     tag: Some("something".into()),
                     image: "java".into(),
                 }))
@@ -269,15 +269,15 @@ mod locator {
         #[test]
         #[should_panic(expected = "MissingGitHubOrg")]
         fn errors_no_slug() {
-            PluginLocator::try_from("github://moonrepo".to_string()).unwrap();
+            PluginLocator::try_from("github://gurv".to_string()).unwrap();
         }
 
         #[test]
         fn parses_slug_legacy() {
             assert_eq!(
-                PluginLocator::try_from("github:moonrepo/bun".to_string()).unwrap(),
+                PluginLocator::try_from("github:gurv/bun".to_string()).unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/bun".into(),
+                    repo_slug: "gurv/bun".into(),
                     tag: None,
                     project_name: None,
                 }))
@@ -287,9 +287,9 @@ mod locator {
         #[test]
         fn parses_slug() {
             assert_eq!(
-                PluginLocator::try_from("github://moonrepo/bun".to_string()).unwrap(),
+                PluginLocator::try_from("github://gurv/bun".to_string()).unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/bun".into(),
+                    repo_slug: "gurv/bun".into(),
                     tag: None,
                     project_name: None,
                 }))
@@ -299,9 +299,9 @@ mod locator {
         #[test]
         fn parses_slug_with_file() {
             assert_eq!(
-                PluginLocator::try_from("github://moonrepo/plugins/bun_tool".to_string()).unwrap(),
+                PluginLocator::try_from("github://gurv/plugins/bun_tool".to_string()).unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/plugins".into(),
+                    repo_slug: "gurv/plugins".into(),
                     tag: None,
                     project_name: Some("bun_tool".into()),
                 }))
@@ -311,9 +311,9 @@ mod locator {
         #[test]
         fn parses_latest() {
             assert_eq!(
-                PluginLocator::try_from("github://moonrepo/bun-plugin@latest".to_string()).unwrap(),
+                PluginLocator::try_from("github://gurv/bun-plugin@latest".to_string()).unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/bun-plugin".into(),
+                    repo_slug: "gurv/bun-plugin".into(),
                     tag: Some("latest".into()),
                     project_name: None,
                 }))
@@ -323,9 +323,9 @@ mod locator {
         #[test]
         fn parses_tag() {
             assert_eq!(
-                PluginLocator::try_from("github://moonrepo/bun_plugin@v1.2.3".to_string()).unwrap(),
+                PluginLocator::try_from("github://gurv/bun_plugin@v1.2.3".to_string()).unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/bun_plugin".into(),
+                    repo_slug: "gurv/bun_plugin".into(),
                     tag: Some("v1.2.3".into()),
                     project_name: None,
                 }))
@@ -335,10 +335,10 @@ mod locator {
         #[test]
         fn parses_tag_with_file() {
             assert_eq!(
-                PluginLocator::try_from("github://moonrepo/plugins/bun_tool@v1.2.3".to_string())
+                PluginLocator::try_from("github://gurv/plugins/bun_tool@v1.2.3".to_string())
                     .unwrap(),
                 PluginLocator::GitHub(Box::new(GitHubLocator {
-                    repo_slug: "moonrepo/plugins".into(),
+                    repo_slug: "gurv/plugins".into(),
                     tag: Some("v1.2.3".into()),
                     project_name: Some("bun_tool".into()),
                 }))

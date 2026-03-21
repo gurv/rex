@@ -1,6 +1,6 @@
 use starbase_styles::{Style, Stylize, apply_style_tags};
 use thiserror::Error;
-use warpgate_api::Id;
+use rex_warpgate_api::Id;
 
 /// Plugin/runtime errors.
 #[derive(Debug, Error)]

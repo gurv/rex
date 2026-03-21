@@ -1,5 +1,5 @@
-use proto_core::{Tool, ToolSpec};
-use proto_pdk_api::*;
+use rex_old_core::{Tool, ToolSpec};
+use rex_pdk_api::*;
 
 #[derive(Debug)]
 pub struct WasmTestWrapper {

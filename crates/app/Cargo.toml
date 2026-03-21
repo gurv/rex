@@ -1,0 +1,46 @@
+[package]
+name = "rex_app"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+clap.workspace = true
+miette = { workspace = true }
+tracing.workspace = true
+rex_api = { path = "../api" }
+rex_app_context = { path = "../app-context" }
+rex_cache = { path = "../cache" }
+# rex_old_core = { path = "../old_core", features = ["clap"] }
+# rex_old_cli = { path = "../old_cli" }
+rex_common = { path = "../common" }
+rex_config = { path = "../config", features = ["loader", "tracing"] }
+rex_console = { path = "../console" }
+rex_old_core = { path = "../old_core" }
+rex_env = { path = "../env" }
+rex_env_var = { path = "../env-var" }
+rex_feature_flags = { path = "../feature-flags" }
+rex_process = { path = "../process" }
+rex_process_augment = { path = "../process-augment" }
+semver = { workspace = true }
+starbase = { workspace = true }
+starbase_archive = { workspace = true }
+starbase_shell = { workspace = true }
+starbase_styles = { workspace = true }
+starbase_utils = { workspace = true, features = [
+    "editor-config",
+    "json",
+    "toml",
+    "yaml",
+] }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+serial_test = { workspace = true }
+starbase_sandbox = { workspace = true }

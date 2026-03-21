@@ -1,0 +1,17 @@
+{
+  "$schema": "../schema.json",
+  "version": 1,
+  "plugins": [
+    {
+      "id": "debug",
+      "locator": "github://gurv/rex-plugins/debug_action",
+      "format": "wasm",
+      "name": "debug",
+      "description": "...",
+      "author": "gurv",
+      "bins": [
+        "debug"
+      ]
+    }
+  ]
+}

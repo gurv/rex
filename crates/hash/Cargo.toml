@@ -1,0 +1,16 @@
+[package]
+name = "rex_hash"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+miette = { workspace = true }
+serde = { workspace = true }
+sha2 = { workspace = true }
+starbase_utils = { workspace = true, features = ["json"] }
+tracing = { workspace = true }

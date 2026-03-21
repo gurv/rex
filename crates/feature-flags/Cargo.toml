@@ -1,0 +1,9 @@
+[package]
+name = "rex_feature_flags"
+version = "0.1.0"
+publish = true
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true

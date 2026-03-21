@@ -7,8 +7,8 @@ use derive_setters::Setters;
 use rustc_hash::FxHashMap;
 use schematic::Schema;
 use std::path::PathBuf;
-use version_spec::{CalVer, SemVer, SpecError, UnresolvedVersionSpec, VersionSpec};
-use warpgate_api::*;
+use rex_version_spec::{CalVer, SemVer, SpecError, UnresolvedVersionSpec, VersionSpec};
+use rex_warpgate_api::*;
 
 pub use build::*;
 pub use checksum::*;
@@ -22,9 +22,9 @@ pub use source::*;
 /// a specific plugin function with its associated input/output types.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PluginFunction {
-    /// Register and configure a tool with proto.
+    /// Register and configure a tool with rex.
     ///
-    /// Called when proto first loads a plugin to get basic metadata about the tool
+    /// Called when rex first loads a plugin to get basic metadata about the tool
     /// including its name, type, and configuration schema.
     ///
     /// **Input:** [`RegisterToolInput`] | **Output:** [`RegisterToolOutput`]
@@ -35,7 +35,7 @@ pub enum PluginFunction {
     /// **Input:** [`DefineToolConfigInput`] | **Output:** [`DefineToolConfigOutput`]
     DefineToolConfig,
 
-    /// Register a backend with proto.
+    /// Register a backend with rex.
     ///
     /// Allows plugins to define custom backends for sourcing tools from locations
     /// other than the default registry.
@@ -125,7 +125,7 @@ pub enum PluginFunction {
     /// Native tool installation.
     ///
     /// Handles tool installation using the tool's own installation methods rather
-    /// than proto's standard process.
+    /// than rex's standard process.
     ///
     /// **Input:** [`NativeInstallInput`] | **Output:** [`NativeInstallOutput`]
     NativeInstall,
@@ -141,14 +141,14 @@ pub enum PluginFunction {
     /// Locate tool executables.
     ///
     /// Identifies where executables are located within an installed tool and
-    /// configures them for proto's shim system.
+    /// configures them for rex's shim system.
     ///
     /// **Input:** [`LocateExecutablesInput`] | **Output:** [`LocateExecutablesOutput`]
     LocateExecutables,
 
     /// Sync the tool manifest.
     ///
-    /// Allows plugins to update proto's inventory of installed versions with
+    /// Allows plugins to update rex's inventory of installed versions with
     /// external changes.
     ///
     /// **Input:** [`SyncManifestInput`] | **Output:** [`SyncManifestOutput`]
@@ -217,9 +217,9 @@ api_struct!(
     /// Information about the current state of the plugin,
     /// after a version has been resolved.
     pub struct PluginContext {
-        /// The version of proto (the core crate) calling plugin functions.
+        /// The version of rex (the core crate) calling plugin functions.
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        pub proto_version: Option<Version>,
+        pub rex_version: Option<Version>,
 
         /// Virtual path to the tool's temporary directory.
         pub temp_dir: VirtualPath,
@@ -236,9 +236,9 @@ api_struct!(
     /// Information about the current state of the plugin,
     /// before a version has been resolved.
     pub struct PluginUnresolvedContext {
-        /// The version of proto (the core crate) calling plugin functions.
+        /// The version of rex (the core crate) calling plugin functions.
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        pub proto_version: Option<Version>,
+        pub rex_version: Option<Version>,
 
         /// Virtual path to the tool's temporary directory.
         pub temp_dir: VirtualPath,
@@ -352,9 +352,9 @@ api_struct!(
         #[serde(default, skip_serializing_if = "is_default")]
         pub lock_options: ToolLockOptions,
 
-        /// Minimum version of proto required to execute this plugin.
+        /// Minimum version of rex required to execute this plugin.
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        pub minimum_proto_version: Option<Version>,
+        pub minimum_rex_version: Option<Version>,
 
         /// Human readable name of the tool.
         pub name: String,
@@ -415,7 +415,7 @@ api_struct!(
         pub backend_id: Id,
 
         /// List of executables, relative from the backend directory,
-        /// that will be executed in the context of proto.
+        /// that will be executed in the context of rex.
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         pub exes: Vec<PathBuf>,
 
@@ -734,11 +734,11 @@ api_struct!(
         #[serde(skip_serializing_if = "Option::is_none")]
         pub exe_link_path: Option<PathBuf>,
 
-        /// Do not symlink a binary in `~/.proto/bin`.
+        /// Do not symlink a binary in `~/.rex/bin`.
         #[serde(skip_serializing_if = "is_false")]
         pub no_bin: bool,
 
-        /// Do not generate a shim in `~/.proto/shims`.
+        /// Do not generate a shim in `~/.rex/shims`.
         #[serde(skip_serializing_if = "is_false")]
         pub no_shim: bool,
 
@@ -807,7 +807,7 @@ api_struct!(
     /// Output returned by the `locate_executables` function.
     #[serde(default)]
     pub struct LocateExecutablesOutput {
-        /// Configures executable information to be used as proto bins/shims.
+        /// Configures executable information to be used as rex bins/shims.
         /// The map key will be the name of the executable file.
         #[serde(skip_serializing_if = "FxHashMap::is_empty")]
         pub exes: FxHashMap<String, ExecutableConfig>,
@@ -818,7 +818,7 @@ api_struct!(
 
         /// Relative directory path from the tool install directory in which
         /// pre-installed executables can be located. This directory path
-        /// will be used during `proto activate`, but not for bins/shims.
+        /// will be used during `rex activate`, but not for bins/shims.
         #[serde(skip_serializing_if = "Vec::is_empty")]
         pub exes_dirs: Vec<PathBuf>,
 

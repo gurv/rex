@@ -1,7 +1,7 @@
 use serde::Serialize;
-use warpgate::test_utils::ConfigBuilder;
+use rex_warpgate::test_utils::ConfigBuilder;
 
-pub trait ProtoConfigBuilder {
+pub trait RexConfigBuilder {
     fn schema_config(&mut self, schema: serde_json::Value) -> &mut Self;
     fn backend_config(&mut self, config: impl Serialize) -> &mut Self;
     fn backend_id(&mut self, id: String) -> &mut Self;
@@ -9,7 +9,7 @@ pub trait ProtoConfigBuilder {
     fn tool_id(&mut self, id: String) -> &mut Self;
 }
 
-impl ProtoConfigBuilder for ConfigBuilder {
+impl RexConfigBuilder for ConfigBuilder {
     fn schema_config(&mut self, schema: serde_json::Value) -> &mut Self {
         self.insert("proto_schema", schema)
     }

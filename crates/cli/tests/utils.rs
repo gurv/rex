@@ -1,135 +1,75 @@
 #![allow(dead_code)]
 
-use proto_core::{ProtoConfig, ProtoFileManager};
-use proto_shim::get_exe_file_name;
-use starbase_sandbox::{Sandbox, assert_cmd};
-use std::collections::HashMap;
-use std::fs;
-use std::ops::Deref;
-use std::path::{Path, PathBuf};
+use moon_common::{Id, is_ci};
+use moon_config::PartialToolchainPluginConfig;
+use moon_test_utils2::{MoonSandbox, create_moon_sandbox};
+use proto_core::UnresolvedVersionSpec;
 
-pub struct ProtoSandbox {
-    pub sandbox: Sandbox,
-}
-
-impl ProtoSandbox {
-    pub fn new(mut sandbox: Sandbox) -> Self {
-        apply_settings(&mut sandbox);
-
-        Self { sandbox }
-    }
-}
-
-impl Deref for ProtoSandbox {
-    type Target = Sandbox;
-
-    fn deref(&self) -> &Self::Target {
-        &self.sandbox
-    }
-}
-
-fn apply_settings(sandbox: &mut Sandbox) {
-    let root = sandbox.path().to_path_buf();
-    let home_dir = sandbox.path().join(".home");
-    let proto_dir = sandbox.path().join(".proto");
-
-    // Folders must exist or tests fail!
-    fs::create_dir_all(&home_dir).unwrap();
-    fs::create_dir_all(&proto_dir).unwrap();
-
-    let mut env = HashMap::new();
-    env.insert("RUST_BACKTRACE", "1");
-    env.insert("WASMTIME_BACKTRACE_DETAILS", "1");
-    env.insert("NO_COLOR", "1");
-    env.insert("PROTO_SANDBOX", root.to_str().unwrap());
-    env.insert("PROTO_HOME", proto_dir.to_str().unwrap());
-    env.insert("PROTO_LOG", "trace");
-    env.insert("PROTO_TEST", "true");
-
-    sandbox.settings.bin = "proto".into();
-    sandbox.settings.timeout = 300;
-
-    sandbox
-        .settings
-        .env
-        .extend(env.into_iter().map(|(k, v)| (k.to_owned(), v.to_owned())));
-}
-
-pub fn create_empty_proto_sandbox() -> ProtoSandbox {
-    ProtoSandbox::new(starbase_sandbox::create_empty_sandbox())
-}
-
-pub fn create_empty_proto_sandbox_with_tools(ext: &str) -> ProtoSandbox {
-    let sandbox = create_empty_proto_sandbox();
-    let schema_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("./tests/__fixtures__")
-        .join(format!("moon-schema.{ext}"));
-
-    sandbox.create_file(
-        ".prototools",
-        format!(
-            r#"
-moon-test = "1.0.0"
-
-[plugins.tools]
-moon-test = "file://{}"
-"#,
-            schema_path.to_string_lossy().replace("\\", "/")
-        ),
-    );
-
+pub fn create_projects_sandbox() -> MoonSandbox {
+    let sandbox = create_moon_sandbox("projects");
+    sandbox.with_default_projects();
     sandbox
 }
 
-pub fn create_proto_sandbox<N: AsRef<str>>(fixture: N) -> ProtoSandbox {
-    ProtoSandbox::new(starbase_sandbox::create_sandbox(fixture))
+pub fn create_tasks_sandbox() -> MoonSandbox {
+    let sandbox = create_moon_sandbox("tasks");
+    sandbox.with_default_projects();
+    sandbox.update_toolchains_config(|config| {
+        let plugins = config.plugins.get_or_insert_default();
+        plugins.insert(
+            Id::raw("javascript"),
+            PartialToolchainPluginConfig::default(),
+        );
+        plugins.insert(
+            Id::raw("node"),
+            PartialToolchainPluginConfig {
+                version: Some(UnresolvedVersionSpec::parse("24.0.0").unwrap()),
+                ..Default::default()
+            },
+        );
+    });
+    sandbox
 }
 
-pub fn load_config<T: AsRef<Path>>(dir: T) -> ProtoConfig {
-    let manager = ProtoFileManager::load(dir, None, None).unwrap();
-    let config = manager.get_merged_config().unwrap();
-    config.to_owned()
+pub fn create_pipeline_sandbox() -> MoonSandbox {
+    let sandbox = create_moon_sandbox("pipeline");
+    sandbox.with_default_projects();
+    sandbox.enable_git();
+    sandbox
 }
 
-pub fn create_shim_command<T: AsRef<Path>>(path: T, name: &str) -> assert_cmd::Command {
-    let mut cmd = assert_cmd::Command::from_std(create_shim_command_std(path, name));
-    cmd.timeout(std::time::Duration::from_secs(240));
-    cmd
+pub fn create_query_sandbox() -> MoonSandbox {
+    let sandbox = create_projects_sandbox();
+    sandbox.enable_git();
+    sandbox
 }
 
-pub fn create_shim_command_std<T: AsRef<Path>>(path: T, name: &str) -> std::process::Command {
-    let path = path.as_ref();
-
-    let mut cmd = std::process::Command::new(get_shim_path(path, name));
-    cmd.env("PROTO_LOG", "trace");
-    cmd.env("PROTO_HOME", path.join(".proto"));
-    cmd.env("PROTO_NODE_VERSION", "latest");
-    cmd.env(format!("PROTO_{}_VERSION", name.to_uppercase()), "latest");
-    cmd
+pub fn change_branch<T: AsRef<str>>(sandbox: &MoonSandbox, branch: T) {
+    sandbox.run_git(|cmd| {
+        cmd.args(["checkout", "-b", branch.as_ref()]);
+    });
 }
 
-pub fn get_bin_path<T: AsRef<Path>>(path: T, name: &str) -> PathBuf {
-    path.as_ref()
-        .join(".proto/bin")
-        .join(get_exe_file_name(name))
-}
+pub fn change_files<I: IntoIterator<Item = V>, V: AsRef<str>>(sandbox: &MoonSandbox, files: I) {
+    let files = files
+        .into_iter()
+        .map(|file| file.as_ref().to_string())
+        .collect::<Vec<_>>();
 
-pub fn get_shim_path<T: AsRef<Path>>(path: T, name: &str) -> PathBuf {
-    path.as_ref()
-        .join(".proto/shims")
-        .join(get_exe_file_name(name))
-}
-
-pub fn link_bin(input_path: &Path, output_path: &Path) {
-    fs::create_dir_all(output_path.parent().unwrap()).unwrap();
-
-    #[cfg(windows)]
-    {
-        fs::copy(input_path, output_path).unwrap();
+    for file in &files {
+        sandbox.create_file(file, "contents");
     }
 
-    #[cfg(not(windows))]
-    {
-        std::os::unix::fs::symlink(input_path, output_path).unwrap();
+    // CI uses `git diff` while local uses `git status`
+    if is_ci() {
+        change_branch(sandbox, "branch");
+
+        sandbox.run_git(|cmd| {
+            cmd.arg("add").args(files);
+        });
+
+        sandbox.run_git(|cmd| {
+            cmd.args(["commit", "-m", "Change"]);
+        });
     }
 }

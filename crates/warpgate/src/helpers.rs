@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use tracing::instrument;
-use warpgate_api::{PluginLocator, UrlLocator, VirtualPath};
+use rex_warpgate_api::{PluginLocator, UrlLocator, VirtualPath};
 
 /// Create a SHA256 hash key based on the provided value and seed.
 pub fn create_cache_key(value: &str, seed: Option<&str>) -> String {
@@ -102,7 +102,7 @@ pub fn move_or_unpack_download(
         Some("wasm" | "toml" | "json" | "jsonc" | "yaml" | "yml") => {
             // Plugins can be downloaded in parallel, which means
             // that his temp file can also be moved by another process.
-            // Because of this, proto constantly runs into "Failed to rename"
+            // Because of this, rex constantly runs into "Failed to rename"
             // errors when hitting this block, so let's avoid the failure
             // if the condition is met and assume all is good!
             if temp_file.exists() && !dest_file.exists() {
@@ -208,7 +208,7 @@ fn prepare_from_path(path: &Path) -> PathBuf {
 #[cfg(any(debug_assertions, test))]
 pub fn find_debug_locator(name: &str) -> Option<PluginLocator> {
     use crate::test_utils::find_wasm_file_with_name;
-    use warpgate_api::FileLocator;
+    use rex_warpgate_api::FileLocator;
 
     find_wasm_file_with_name(name).map(|wasm_path| {
         PluginLocator::File(Box::new(FileLocator {
@@ -229,7 +229,7 @@ pub fn find_debug_locator_with_url_fallback(name: &str, version: &str) -> Plugin
     find_debug_locator(name).unwrap_or_else(|| {
         PluginLocator::Url(Box::new(UrlLocator {
             url: format!(
-                "https://github.com/moonrepo/plugins/releases/download/{name}-v{version}/{name}.wasm"
+                "https://github.com/gurv/rex-plugins/releases/download/{name}-v{version}/{name}.wasm"
             ),
         }))
     })

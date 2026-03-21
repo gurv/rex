@@ -1,0 +1,62 @@
+use rex_api::Launchpad;
+use rex_cache::CacheEngine;
+// use rex_common::{color, is_formatted_output, is_test_env};
+use rex_common::{is_formatted_output, is_test_env};
+// use rex_console::{Checkpoint, Console};
+use rex_console::{Console};
+use starbase::AppResult;
+use tracing::{debug, instrument};
+
+#[instrument(skip_all)]
+pub async fn check_for_new_version(
+    console: &Console,
+    cache_engine: &CacheEngine,
+    manifest_url: &str,
+) -> AppResult {
+    if is_test_env() || is_formatted_output() {
+        return Ok(None);
+    }
+
+    let Some(launchpad) = Launchpad::instance() else {
+        return Ok(None);
+    };
+
+    match launchpad
+        .check_version(cache_engine, false, manifest_url)
+        .await
+    {
+        Ok(Some(result)) => {
+            if !result.update_available {
+                return Ok(None);
+            }
+
+            // console.print_checkpoint(
+            //     Checkpoint::Announcement,
+            //     format!(
+            //         "There's a new version of rex available, {} (currently on {})!",
+            //         color::hash(result.remote_version.to_string()),
+            //         result.local_version,
+            //     ),
+            // )?;
+
+            // if let Some(newer_message) = result.message {
+            //     console.print_checkpoint(Checkpoint::Announcement, newer_message)?;
+            // }
+
+            // console.print_checkpoint(
+            //     Checkpoint::Announcement,
+            //     format!(
+            //         "Run {} or install from {}",
+            //         color::success("rex upgrade"),
+            //         color::url("https://rexrepo.dev/docs/install"),
+            //     ),
+            // )?;
+        }
+        Err(error) => {
+            debug!("Failed to check for current version: {}", error);
+        }
+        _ => {}
+    };
+
+    Ok(None)
+}

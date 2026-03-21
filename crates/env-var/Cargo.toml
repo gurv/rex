@@ -1,0 +1,19 @@
+[package]
+name = "rex_env_var"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rex_common = { path = "../common" }
+indexmap = { workspace = true }
+miette = { workspace = true }
+regex = { workspace = true }
+rustc-hash = { workspace = true }
+scc = { workspace = true }
+starbase_utils = { workspace = true }
+thiserror = { workspace = true }

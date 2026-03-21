@@ -4,8 +4,8 @@ use derive_setters::Setters;
 use rustc_hash::FxHashMap;
 use semver::VersionReq;
 use std::path::PathBuf;
-use system_env::SystemDependency;
-use warpgate_api::{Id, VirtualPath, api_enum, api_struct};
+use rex_system_env::SystemDependency;
+use rex_warpgate_api::{Id, VirtualPath, api_enum, api_struct};
 
 api_struct!(
     /// Input passed to the `build_instructions` function.

@@ -1,0 +1,21 @@
+[package]
+name = "rex_console"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# moon_action = { path = "../action" }
+# moon_common = { path = "../common" }
+# moon_config = { path = "../config" }
+# moon_target = { path = "../target" }
+rex_time = { path = "../time" }
+iocraft = { workspace = true }
+miette = { workspace = true }
+starbase_console = { workspace = true, features = ["ui"] }
+starbase_styles = { workspace = true }
+tracing = { workspace = true }

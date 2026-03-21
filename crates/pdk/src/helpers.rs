@@ -1,5 +1,5 @@
 use extism_pdk::*;
-use proto_pdk_api::{AnyResult, HostArch, HostEnvironment, HostLibc, HostOS, PluginError};
+use rex_pdk_api::{AnyResult, HostArch, HostEnvironment, HostLibc, HostOS, PluginError};
 use rustc_hash::FxHashMap;
 use serde::de::DeserializeOwned;
 
@@ -52,9 +52,9 @@ pub fn get_target_triple(env: &HostEnvironment, name: &str) -> Result<String, Pl
     }
 }
 
-/// Get proto backend configuration that was configured in a `.prototools` file.
+/// Get rex backend configuration that was configured in a `.rextools` file.
 pub fn get_backend_config<T: Default + DeserializeOwned>() -> AnyResult<T> {
-    let config: T = if let Some(value) = config::get("proto_backend_config")? {
+    let config: T = if let Some(value) = config::get("rex_backend_config")? {
         json::from_str(&value)?
     } else {
         T::default()
@@ -63,9 +63,9 @@ pub fn get_backend_config<T: Default + DeserializeOwned>() -> AnyResult<T> {
     Ok(config)
 }
 
-/// Get proto tool configuration that was configured in a `.prototools` file.
+/// Get rex tool configuration that was configured in a `.rextools` file.
 pub fn get_tool_config<T: Default + DeserializeOwned>() -> AnyResult<T> {
-    let config: T = if let Some(value) = config::get("proto_tool_config")? {
+    let config: T = if let Some(value) = config::get("rex_tool_config")? {
         json::from_str(&value)?
     } else {
         T::default()

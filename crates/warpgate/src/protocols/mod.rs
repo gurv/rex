@@ -10,7 +10,7 @@ pub use oci::*;
 
 use crate::loader_error::WarpgateLoaderError;
 use std::path::PathBuf;
-use warpgate_api::Id;
+use rex_warpgate_api::Id;
 
 pub trait LoaderProtocol<T> {
     type Data;

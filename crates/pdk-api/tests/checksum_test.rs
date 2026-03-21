@@ -1,4 +1,4 @@
-use proto_pdk_api::Checksum;
+use rex_pdk_api::Checksum;
 use std::str::FromStr;
 
 #[test]

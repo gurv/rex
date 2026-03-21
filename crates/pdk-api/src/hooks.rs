@@ -1,11 +1,11 @@
 use crate::api::PluginContext;
 use rustc_hash::FxHashMap;
 use std::path::PathBuf;
-use warpgate_api::*;
+use rex_warpgate_api::*;
 
 /// Enumeration of all available hook functions that can be implemented by plugins.
 ///
-/// Hook functions are called at specific points during proto operations to allow
+/// Hook functions are called at specific points during rex operations to allow
 /// plugins to customize behavior, perform setup/cleanup, or modify the environment.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HookFunction {
@@ -56,7 +56,7 @@ impl AsRef<str> for HookFunction {
 
 api_struct!(
     /// Input passed to the `pre_install` and `post_install` hooks,
-    /// while a `proto install` command is running.
+    /// while a `rex install` command is running.
     pub struct InstallHook {
         /// Current tool context.
         pub context: PluginContext,
@@ -76,7 +76,7 @@ api_struct!(
 );
 
 api_struct!(
-    /// Input passed to the `pre_run` hook, before a `proto run` command
+    /// Input passed to the `pre_run` hook, before a `rex run` command
     /// or language executable is ran.
     pub struct RunHook {
         /// Current tool context.

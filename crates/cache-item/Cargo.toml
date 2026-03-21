@@ -1,0 +1,20 @@
+[package]
+name = "rex_cache_item"
+version = "0.0.1"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rex_env_var = { path = "../env-var" }
+miette = { workspace = true }
+serde = { workspace = true }
+starbase_utils = { workspace = true, features = ["json"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+serial_test = { workspace = true }
+starbase_sandbox = { workspace = true }

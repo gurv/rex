@@ -18,8 +18,8 @@ pub use plugin_error::*;
 pub use registry::*;
 
 pub use extism::{Manifest as PluginManifest, Wasm};
-pub use warpgate_api as api;
-pub use warpgate_api::{
+pub use rex_warpgate_api as api;
+pub use rex_warpgate_api::{
     FileLocator, GitHubLocator, Id, IdError, PluginLocator, PluginLocatorError, RegistryLocator,
     UrlLocator, VirtualPath,
 };

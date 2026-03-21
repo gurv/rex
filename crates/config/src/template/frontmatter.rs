@@ -1,0 +1,47 @@
+use crate::{config_struct, is_false};
+use schematic::Config;
+
+config_struct!(
+    /// Configures the leading frontmatter within a template file.
+    /// Docs: https://rexrepo.dev/docs/config/template#frontmatter
+    #[derive(Config)]
+    pub struct TemplateFrontmatterConfig {
+        #[setting(rename = "$schema")]
+        pub schema: String,
+
+        /// Force overwrite a file at the destination if there is a conflict.
+        #[serde(default, skip_serializing_if = "is_false")]
+        pub force: bool,
+
+        /// Override the destination using a relative file path.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub to: Option<String>,
+
+        /// Skip writing this file to the destination.
+        #[serde(default, skip_serializing_if = "is_false")]
+        pub skip: bool,
+    }
+);
+
+#[cfg(feature = "loader")]
+impl TemplateFrontmatterConfig {
+    pub fn parse<T: AsRef<str>>(content: T) -> miette::Result<TemplateFrontmatterConfig> {
+        use rex_common::color;
+        use schematic::ConfigLoader;
+
+        let mut content = content.as_ref();
+
+        if content.is_empty() {
+            content = "{}";
+        }
+
+        let result = ConfigLoader::<TemplateFrontmatterConfig>::new()
+            .set_help(color::muted_light(
+                "https://rexrepo.dev/docs/config/template",
+            ))
+            .code(content, "frontmatter.yml")?
+            .load()?;
+
+        Ok(result.config)
+    }
+}

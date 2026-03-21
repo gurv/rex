@@ -1,0 +1,6 @@
+inheritedBy:
+  toolchains: 'python'
+
+tasks:
+  python:
+    command: python

@@ -1,23 +1,28 @@
 [package]
-name = "proto_pdk"
-version = "0.32.7"
-edition = "2024"
-license = "MIT"
-description = "A plugin development kit for creating proto WASM plugins."
-homepage = "https://moonrepo.dev/proto"
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.85.0"
+name = "rex_pdk"
+version = "0.1.0"
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-proto_pdk_api = { version = "0.31.8", path = "../pdk-api" }
-warpgate_pdk = { version = "0.16.2", path = "../warpgate-pdk" }
+clap = { workspace = true }
 extism-pdk = { workspace = true }
+rex_pdk_api = { path = "../pdk-api" }
+rex_warpgate_pdk = { path = "../warpgate-pdk" }
 rustc-hash = { workspace = true }
+schematic = { workspace = true, optional = true, features = [
+	"config",
+	"json",
+	"validate",
+] }
 serde = { workspace = true }
 
 [dev-dependencies]
-proto_pdk = { path = ".", features = ["tracing"] }
+rex_pdk = { path = ".", features = ["tracing"] }
 
 [features]
 default = []
-tracing = ["warpgate_pdk/tracing"]
+tracing = ["rex_warpgate_pdk/tracing"]

@@ -1,0 +1,27 @@
+[package]
+name = "rex_api"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rex_cache = { path = "../cache" }
+rex_common = { path = "../common" }
+rex_old_core = { path = "../old_core" }
+rex_env = { path = "../env" }
+rex_env_var = { path = "../env-var" }
+rex_time = { path = "../time" }
+cd_env = { workspace = true }
+ci_env = { workspace = true }
+md5 = { workspace = true }
+miette = { workspace = true }
+reqwest = { workspace = true, features = ["json", "multipart", "stream"] }
+semver = { workspace = true }
+serde = { workspace = true }
+starbase_utils = { workspace = true, features = ["json"] }
+tracing = { workspace = true }
+uuid = { workspace = true }
