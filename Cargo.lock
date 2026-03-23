@@ -4507,7 +4507,7 @@ dependencies = [
  "moon_test_utils2",
  "moon_vcs",
  "proto_core",
- "proto_shim 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "proto_shim",
  "rustc-hash",
  "serial_test",
  "sigpipe",
@@ -6220,6 +6220,7 @@ dependencies = [
 name = "proto_core"
 version = "0.55.5"
 dependencies = [
+ "clap",
  "convert_case",
  "docker_credential",
  "dotenvy",
@@ -6229,8 +6230,9 @@ dependencies = [
  "minisign-verify",
  "oci-client",
  "once_cell",
+ "proto_core",
  "proto_pdk_api",
- "proto_shim 0.8.0",
+ "proto_shim",
  "regex",
  "reqwest",
  "rustc-hash",
@@ -6243,6 +6245,7 @@ dependencies = [
  "shell-words",
  "starbase_archive",
  "starbase_console",
+ "starbase_sandbox",
  "starbase_shell",
  "starbase_styles",
  "starbase_utils",
@@ -6262,6 +6265,7 @@ name = "proto_pdk_api"
 version = "0.31.8"
 dependencies = [
  "derive_setters",
+ "proto_pdk_api",
  "rustc-hash",
  "schematic",
  "semver",
@@ -6289,16 +6293,6 @@ dependencies = [
 [[package]]
 name = "proto_shim"
 version = "0.8.0"
-dependencies = [
- "dirs",
- "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "proto_shim"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d761ecdee5ce31ba2ada1eb4f70688ea45806819a378fb4481cdcdc83fe53e4e"
 dependencies = [
  "dirs",
  "windows-sys 0.61.2",
@@ -7575,7 +7569,6 @@ version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8fefa77102f7862e7a77a86199628065374f5153670c3be5b20ca2216886b521"
 dependencies = [
- "miette 7.6.0",
  "regex",
  "shell-quote",
  "sysinfo",
@@ -8627,6 +8620,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "starbase_archive",
+ "starbase_sandbox",
  "starbase_shell",
  "starbase_styles",
  "starbase_utils",
@@ -8659,7 +8653,10 @@ version = "0.16.2"
 dependencies = [
  "extism-pdk",
  "serde",
+ "tracing",
+ "tracing-subscriber",
  "warpgate_api",
+ "warpgate_pdk",
 ]
 
 [[package]]

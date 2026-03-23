@@ -1,0 +1,37 @@
+[package]
+name = "proto_pdk_api"
+version = "0.31.8"
+edition = "2024"
+license = "MIT"
+description = "Core APIs for creating proto WASM plugins."
+homepage = "https://moonrepo.dev/proto"
+repository = "https://github.com/moonrepo/proto"
+rust-version = "1.85.0"
+
+[dependencies]
+system_env = { version = "0.9.1", path = "../system-env" }
+version_spec = { version = "0.10.2", path = "../version-spec" }
+warpgate_api = { version = "0.17.3", path = "../warpgate-api" }
+derive_setters = { workspace = true }
+rustc-hash = { workspace = true }
+schematic = { workspace = true, features = [
+	"schema",
+	"schema_serde",
+	"type_semver",
+] }
+semver = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+default = []
+schematic = [
+	"system_env/schematic",
+	"version_spec/schematic",
+	"warpgate_api/schematic",
+]
+
+# Ensures everything still works with schematic
+[dev-dependencies]
+proto_pdk_api = { path = ".", features = ["schematic"] }

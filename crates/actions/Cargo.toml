@@ -33,7 +33,7 @@ moon_workspace_graph = { path = "../workspace-graph" }
 convert_case = { workspace = true }
 futures = { workspace = true }
 miette = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 rustc-hash = { workspace = true }
 scc = { workspace = true }
 serde = { workspace = true }

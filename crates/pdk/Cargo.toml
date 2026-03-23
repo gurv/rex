@@ -22,7 +22,7 @@ schematic = { workspace = true, optional = true, features = [
 ] }
 serde = { workspace = true }
 rustc-hash = { workspace = true }
-warpgate_pdk = { workspace = true }
+warpgate_pdk = { path = "../../proto/warpgate-pdk" }
 
 [features]
 default = []

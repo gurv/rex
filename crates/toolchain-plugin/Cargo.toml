@@ -20,7 +20,7 @@ moon_toolchain = { path = "../toolchain" }
 async-trait = { workspace = true }
 futures = { workspace = true }
 miette = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 rustc-hash = { workspace = true }
 starbase_utils = { workspace = true, features = ["glob", "json"] }
 tokio = { workspace = true }

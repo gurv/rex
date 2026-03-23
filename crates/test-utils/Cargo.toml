@@ -28,7 +28,7 @@ moon_vcs = { path = "../vcs" }
 moon_workspace = { path = "../workspace" }
 moon_workspace_graph = { path = "../workspace-graph" }
 extism = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 starbase_sandbox = { workspace = true }
 starbase_utils = { workspace = true, features = ["yaml"] }
 

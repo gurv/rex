@@ -14,7 +14,7 @@ cd_env = { workspace = true }
 ci_env = { workspace = true }
 md5 = { workspace = true }
 miette = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 reqwest = { workspace = true, features = ["json", "multipart", "stream"] }
 semver = { workspace = true }
 serde = { workspace = true }

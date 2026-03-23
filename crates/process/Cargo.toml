@@ -16,7 +16,7 @@ cached = { workspace = true }
 miette = { workspace = true }
 rustc-hash = { workspace = true }
 starbase_shell = { workspace = true }
-system_env = { workspace = true }
+system_env = { path = "../../proto/system-env" }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true, features = ["io-util", "signal", "sync"] }

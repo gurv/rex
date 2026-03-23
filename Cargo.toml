@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "legacy/core/*"]
+members = ["crates/*", "legacy/core/*", "proto/*"]
 exclude = ["tests/fixtures", "wasm/test-plugin"]
 default-members = ["crates/cli"]
 
@@ -90,32 +90,21 @@ uuid = { version = "1.22.0", features = ["v4"] }
 extism = "=1.13.0"
 extism-pdk = "1.4.1"
 
-# proto_core = "0.55.5"
-# proto_pdk_api = "0.31.8"
-# proto_pdk_test_utils = "0.43.7"
-# system_env = "0.9.1"
-# version_spec = "0.10.2"
-# warpgate = "0.29.3"
-# warpgate_api = "0.17.3"
-# warpgate_pdk = "0.16.2"
-
-# proto_core = { path = "../proto/crates/core" }
-# proto_pdk_api = { path = "../proto/crates/pdk-api" }
-# proto_pdk_test_utils = { path = "../proto/crates/pdk-test-utils" }
-# system_env = { path = "../proto/crates/system-env" }
-# version_spec = { path = "../proto/crates/version-spec" }
-# warpgate = { path = "../proto/crates/warpgate" }
-# warpgate_api = { path = "../proto/crates/warpgate-api" }
-# warpgate_pdk = { path = "../proto/crates/warpgate-pdk" }
-
-proto_core = { path = "../-examples/moonrepo-proto/crates/core" }
-proto_pdk_api = { path = "../-examples/moonrepo-proto/crates/pdk-api" }
-proto_pdk_test_utils = { path = "../-examples/moonrepo-proto/crates/pdk-test-utils" }
-system_env = { path = "../-examples/moonrepo-proto/crates/system-env" }
-version_spec = { path = "../-examples/moonrepo-proto/crates/version-spec" }
-warpgate = { path = "../-examples/moonrepo-proto/crates/warpgate" }
-warpgate_api = { path = "../-examples/moonrepo-proto/crates/warpgate-api" }
-warpgate_pdk = { path = "../-examples/moonrepo-proto/crates/warpgate-pdk" }
+# proto
+docker_credential = { version = "1.3.2" }
+oci-client = "0.16.1"
+once_cell = "1.21.3"
+shell-words = "1.1.1"
+toml_edit = "0.23.9"
+derive_setters = "0.1.9"
+human-sort = "0.2.2"
+anyhow = "1.0.102"
+http-cache-reqwest = "1.0.0-alpha.4"
+reqwest-middleware = { version = "0.5.1", default-features = false, features = [
+    "charset",
+    "http2",
+] }
+tracing-subscriber = { version = "0.3.22", default-features = false }
 
 [workspace.lints.clippy]
 # Very noisy, lots of false positives!

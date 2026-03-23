@@ -19,7 +19,7 @@ async-trait = { workspace = true }
 convert_case = { workspace = true }
 extism = { workspace = true }
 miette = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 rustc-hash = { workspace = true }
 scc = { workspace = true }
 serde = { workspace = true, features = ["rc"] }
@@ -28,7 +28,7 @@ starbase_styles = { workspace = true }
 starbase_utils = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
-warpgate = { workspace = true }
+warpgate = { path = "../../proto/warpgate" }
 
 [dev-dependencies]
 starbase_sandbox = { workspace = true }

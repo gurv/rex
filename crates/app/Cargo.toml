@@ -60,7 +60,7 @@ convert_case = { workspace = true }
 diff = "0.1.13"
 iocraft = { workspace = true }
 miette = { workspace = true }
-proto_core = { workspace = true }
+proto_core = { path = "../../proto/core" }
 regex = { workspace = true }
 reqwest = { workspace = true }
 rustc-hash = { workspace = true }
