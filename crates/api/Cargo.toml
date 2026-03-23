@@ -1,0 +1,26 @@
+[package]
+name = "moon_api"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+moon_cache = { path = "../cache" }
+moon_common = { path = "../common" }
+moon_env = { path = "../env" }
+moon_env_var = { path = "../env-var" }
+moon_time = { path = "../time" }
+cd_env = { workspace = true }
+ci_env = { workspace = true }
+md5 = { workspace = true }
+miette = { workspace = true }
+proto_core = { workspace = true }
+reqwest = { workspace = true, features = ["json", "multipart", "stream"] }
+semver = { workspace = true }
+serde = { workspace = true }
+starbase_utils = { workspace = true, features = ["json"] }
+tracing = { workspace = true }
+uuid = { workspace = true }
+
+[lints]
+workspace = true

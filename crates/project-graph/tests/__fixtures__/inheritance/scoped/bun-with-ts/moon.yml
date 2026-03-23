@@ -1,0 +1,9 @@
+language: typescript
+
+toolchains:
+  default: bun
+
+tasks:
+  bun:
+    command: bun
+    toolchain: bun

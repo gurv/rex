@@ -1,0 +1,6 @@
+inheritedBy:
+  toolchains: 'deno'
+
+tasks:
+  deno:
+    command: deno

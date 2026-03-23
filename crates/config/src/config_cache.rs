@@ -1,0 +1,102 @@
+use moon_common::path::hash_component;
+use rustc_hash::FxHashMap;
+use schematic::{Cacher, HandlerError};
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::time::{Duration, SystemTime};
+
+pub struct ConfigCache {
+    config_dir: PathBuf,
+    memory: FxHashMap<String, String>,
+}
+
+impl ConfigCache {
+    pub fn new(config_dir: &Path) -> Self {
+        Self {
+            config_dir: config_dir.to_path_buf(),
+            memory: FxHashMap::default(),
+        }
+    }
+
+    pub fn get_temp_path(&self, url: &str) -> PathBuf {
+        let ext = if url.contains(".pkl") {
+            ".pkl"
+        } else if url.contains(".yaml") || url.contains(".yml") {
+            ".yml"
+        } else if url.contains(".jsonc") {
+            ".jsonc"
+        } else if url.contains(".json") {
+            ".json"
+        } else if url.contains(".toml") {
+            ".toml"
+        } else if url.contains(".hcl") {
+            ".hcl"
+        } else {
+            ""
+        };
+
+        self.config_dir
+            .join("cache")
+            .join("temp")
+            .join(format!("{}{ext}", hash_component(url)))
+    }
+}
+
+// If reading/writing the cache fails, don't crash the entire process,
+// just store in memory and move on!
+impl Cacher for ConfigCache {
+    fn get_file_path(&self, url: &str) -> Result<Option<PathBuf>, HandlerError> {
+        let file = self.get_temp_path(url);
+
+        Ok(if file.exists() { Some(file) } else { None })
+    }
+
+    fn read(&mut self, url: &str) -> Result<Option<String>, HandlerError> {
+        if let Some(contents) = self.memory.get(url) {
+            return Ok(Some(contents.to_owned()));
+        }
+
+        let file = self.get_temp_path(url);
+
+        if file.exists() {
+            let Ok(last_used) =
+                fs::metadata(&file).and_then(|meta| meta.modified().or_else(|_| meta.created()))
+            else {
+                return Ok(None);
+            };
+
+            let now = SystemTime::now();
+            let ttl = Duration::from_secs(86400); // 24 hours
+
+            if last_used > (now - ttl)
+                && let Ok(contents) = fs::read_to_string(&file)
+            {
+                self.memory.insert(url.to_owned(), contents.to_owned());
+
+                return Ok(Some(contents));
+            }
+
+            let _ = fs::remove_file(&file);
+        }
+
+        Ok(None)
+    }
+
+    fn write(&mut self, url: &str, contents: &str) -> Result<(), HandlerError> {
+        if !self.memory.contains_key(url) {
+            let file = self.get_temp_path(url);
+
+            if let Some(parent) = file.parent()
+                && !parent.exists()
+            {
+                let _ = fs::create_dir_all(parent);
+            }
+
+            let _ = fs::write(file, contents);
+
+            self.memory.insert(url.to_owned(), contents.to_owned());
+        }
+
+        Ok(())
+    }
+}

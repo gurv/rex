@@ -1,0 +1,7 @@
+inheritedBy:
+  toolchains: 'javascript'
+  layers: 'tool'
+
+tasks:
+  javascript-tool:
+    command: javascript-tool

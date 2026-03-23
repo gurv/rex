@@ -1,0 +1,71 @@
+language: javascript
+
+tasks:
+  none:
+    command: noop
+    inputs: []
+
+  changed:
+    command: noop
+    inputs:
+      - 'created.txt'
+
+  files:
+    command: noop
+    inputs:
+      - '2.txt'
+      - 'dir/abc.txt'
+
+  filesOptional:
+    command: noop
+    inputs:
+      - file: '4.txt'
+        optional: true
+
+  filesRequired:
+    command: noop
+    inputs:
+      - file: '4.txt'
+        optional: false
+
+  dirs:
+    command: noop
+    inputs:
+      - 'dir'
+
+  globStar:
+    command: noop
+    inputs:
+      - '*.txt'
+
+  globNestedStar:
+    command: noop
+    inputs:
+      - '**/*.txt'
+
+  globGroup:
+    command: noop
+    inputs:
+      - 'dir/{a,xy}z.txt'
+
+  globNegated:
+    command: noop
+    inputs:
+      - '**/*.txt'
+      - '!dir/az.txt'
+      - '!{1,3}.txt'
+
+  envFile:
+    command: noop
+    options:
+      envFile: true
+
+  envFileList:
+    command: noop
+    options:
+      envFile: ['.env.prod', '.env.local']
+
+  moonConfig:
+    command: noop
+    inputs:
+      - 'moon.yml'

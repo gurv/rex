@@ -1,0 +1,31 @@
+language: rust
+
+tasks:
+  # Built-ins
+  system:
+    toolchain: system
+  bun:
+    toolchain: bun
+  bun-via-cmd:
+    command: bun
+  deno-via-cmd:
+    command: deno
+  python:
+    toolchain: python
+  python-via-cmd:
+    command: python
+  node:
+    toolchain: node
+  node-via-cmd:
+    command: npm
+  rust-via-cmd:
+    command: cargo
+  typescript:
+    toolchain: typescript
+  typescript-via-cmd:
+    command: tsc
+
+  # Other
+  unknown:
+    toolchain: unknown
+  unknown-implicit: {}

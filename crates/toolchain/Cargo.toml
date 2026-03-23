@@ -1,0 +1,16 @@
+[package]
+name = "moon_toolchain"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+moon_common = { path = "../common" }
+moon_config = { path = "../config" }
+moon_env_var = { path = "../env-var" }
+indexmap = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+
+[lints]
+workspace = true

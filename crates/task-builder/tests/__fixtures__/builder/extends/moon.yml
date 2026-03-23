@@ -1,0 +1,56 @@
+tags: [extends]
+
+tasks:
+  base:
+    command: lint ./src
+    options:
+      cache: false
+      persistent: true
+      runInCI: false
+    inputs:
+      - '**/*'
+
+  extend-args:
+    extends: base
+    args: --fix
+    options:
+      mergeArgs: prepend
+
+  extend-args-again:
+    extends: extend-args
+    args: --bail
+    options:
+      mergeArgs: append
+
+  extend-inputs:
+    extends: base
+    inputs:
+      - 'src/**/*'
+    options:
+      mergeInputs: replace
+
+  extend-options:
+    extends: base
+    options:
+      retryCount: 3
+      runInCI: true
+
+  local-base:
+    inputs:
+      - 'local-base'
+    options:
+      cache: true
+      retryCount: 3
+
+  extender:
+    extends: 'local-base'
+    args: '-qux'
+    inputs:
+      - 'local-extender'
+    options:
+      mergeArgs: 'prepend'
+
+  local-extends-global:
+    extends: 'global-base'
+    inputs:
+      - 'local-extender'

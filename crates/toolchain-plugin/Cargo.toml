@@ -1,0 +1,30 @@
+[package]
+name = "moon_toolchain_plugin"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "A toolchain plugin, enabling new language + ecosystem support."
+homepage = "https://moonrepo.dev/moon"
+repository = "https://github.com/moonrepo/moon"
+publish = false
+
+[dependencies]
+moon_common = { path = "../common" }
+moon_config = { path = "../config" }
+moon_env_var = { path = "../env-var" }
+moon_feature_flags = { path = "../feature-flags" }
+moon_pdk_api = { path = "../pdk-api" }
+moon_plugin = { path = "../plugin" }
+moon_process = { path = "../process" }
+moon_toolchain = { path = "../toolchain" }
+async-trait = { workspace = true }
+futures = { workspace = true }
+miette = { workspace = true }
+proto_core = { workspace = true }
+rustc-hash = { workspace = true }
+starbase_utils = { workspace = true, features = ["glob", "json"] }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+[lints]
+workspace = true

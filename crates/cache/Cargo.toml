@@ -1,0 +1,27 @@
+[package]
+name = "moon_cache"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "Caching engine."
+homepage = "https://moonrepo.dev/moon"
+repository = "https://github.com/moonrepo/moon"
+publish = false
+
+[dependencies]
+moon_cache_item = { path = "../cache-item" }
+moon_common = { path = "../common" }
+moon_env_var = { path = "../env-var" }
+moon_hash = { path = "../hash" }
+moon_target = { path = "../target" }
+moon_time = { path = "../time" }
+miette = { workspace = true }
+serde = { workspace = true }
+starbase_utils = { workspace = true, features = ["fs-lock", "json"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+starbase_sandbox = { workspace = true }
+
+[lints]
+workspace = true

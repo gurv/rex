@@ -1,0 +1,15 @@
+inheritedBy:
+  tags: ['extends']
+
+tasks:
+  global-base:
+    command: 'global-base'
+    preset: server
+    inputs:
+      - 'global-base'
+
+  extender:
+    extends: 'global-base'
+    args: '--foo --bar -z'
+    inputs:
+      - 'global-extender'

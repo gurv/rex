@@ -1,0 +1,7 @@
+toolchains:
+  default: deno
+
+tasks:
+  deno:
+    command: deno
+    toolchain: deno

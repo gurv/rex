@@ -1,0 +1,212 @@
+use crate::app_error::AppError;
+use miette::IntoDiagnostic;
+use moon_config::{
+    ConfigLoader, ExtensionsConfig, InheritedTasksManager, ToolchainsConfig, WorkspaceConfig,
+};
+use moon_env::MoonEnvironment;
+use moon_env_var::GlobalEnvBag;
+use moon_feature_flags::FeatureFlags;
+use proto_core::ProtoEnvironment;
+use starbase_styles::color;
+use starbase_utils::dirs;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use tokio::spawn;
+use tokio::task::{JoinError, block_in_place};
+use tracing::{debug, instrument};
+
+// We need to load configuration in a blocking task, because config
+// loading is synchronous but uses `reqwest::blocking` under the hood,
+// which triggers a panic when used in an async context...
+async fn load_config_blocking<F, R>(func: F) -> Result<R, JoinError>
+where
+    F: FnOnce() -> R + Send + 'static,
+    R: Send + 'static,
+{
+    spawn(async { block_in_place(func) }).await
+}
+
+/// Recursively attempt to find the workspace root by locating the ".moon"
+/// configuration folder, starting from the current working directory.
+#[instrument]
+pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
+    debug!(
+        working_dir = ?working_dir,
+        "Attempting to find workspace root from current working directory",
+    );
+
+    let workspace_root = if let Some(root) = GlobalEnvBag::instance().get("MOON_WORKSPACE_ROOT") {
+        debug!(
+            env_var = root,
+            "Inheriting from {} environment variable",
+            color::symbol("MOON_WORKSPACE_ROOT")
+        );
+
+        let root: PathBuf = root
+            .parse()
+            .map_err(|_| AppError::InvalidWorkspaceRootEnvVar)?;
+
+        if !root.join(".moon").exists() && !root.join(".config").join("moon").exists() {
+            return Err(AppError::MissingConfigDir.into());
+        }
+
+        root
+    } else {
+        let mut current_dir = Some(working_dir);
+
+        loop {
+            if let Some(dir) = current_dir {
+                if dir.join(".moon").exists() || dir.join(".config").join("moon").exists() {
+                    break dir.to_path_buf();
+                } else {
+                    current_dir = dir.parent();
+                }
+            } else {
+                return Err(AppError::MissingConfigDir.into());
+            }
+        }
+    };
+
+    // Avoid finding the ~/.moon directory
+    let home_dir = dirs::home_dir().ok_or(AppError::MissingHomeDir)?;
+
+    if home_dir == workspace_root {
+        return Err(AppError::MissingConfigDir.into());
+    }
+
+    debug!(
+        workspace_root = ?workspace_root,
+        working_dir = ?working_dir,
+        "Found workspace root",
+    );
+
+    Ok(workspace_root)
+}
+
+/// Detect information for moon from the environment.
+#[instrument]
+pub fn detect_moon_environment(
+    working_dir: &Path,
+    workspace_root: &Path,
+) -> miette::Result<Arc<MoonEnvironment>> {
+    let mut env = MoonEnvironment::new()?;
+    env.working_dir = working_dir.to_path_buf();
+    env.workspace_root = workspace_root.to_path_buf();
+
+    Ok(Arc::new(env))
+}
+
+/// Detect information for proto from the environment.
+#[instrument]
+pub fn detect_proto_environment(
+    working_dir: &Path,
+    _workspace_root: &Path,
+) -> miette::Result<Arc<ProtoEnvironment>> {
+    let mut env = ProtoEnvironment::new()?;
+    env.working_dir = working_dir.to_path_buf();
+
+    Ok(Arc::new(env))
+}
+
+/// Load the workspace configuration file from the `.moon` directory in the workspace root.
+/// This file is required to exist, so error if not found.
+#[instrument(skip(config_loader))]
+pub async fn load_workspace_config(
+    config_loader: ConfigLoader,
+    workspace_root: &Path,
+) -> miette::Result<Arc<WorkspaceConfig>> {
+    let config_name = config_loader.get_debug_label_root("workspace");
+
+    debug!("Loading {} (required)", color::file(&config_name));
+
+    let config_files = config_loader.get_workspace_files();
+
+    if config_files.iter().all(|file| !file.exists()) {
+        return Err(AppError::MissingConfigFile(config_name).into());
+    }
+
+    let root = workspace_root.to_owned();
+    let config = load_config_blocking(move || config_loader.load_workspace_config(root))
+        .await
+        .into_diagnostic()??;
+
+    Ok(Arc::new(config))
+}
+
+/// Load the toolchain configuration file from the `.moon` directory if it exists.
+#[instrument(skip(config_loader, proto_env))]
+pub async fn load_toolchains_config(
+    config_loader: ConfigLoader,
+    proto_env: Arc<ProtoEnvironment>,
+    workspace_root: &Path,
+    working_dir: &Path,
+) -> miette::Result<Arc<ToolchainsConfig>> {
+    debug!(
+        "Attempting to load {} (optional)",
+        color::file(config_loader.get_debug_label_root("toolchains")),
+    );
+
+    let root = workspace_root.to_owned();
+    let cwd = working_dir.to_owned();
+    let config = load_config_blocking(move || {
+        config_loader
+            .load_toolchains_config(root, proto_env.load_file_manager()?.get_local_config(&cwd)?)
+    })
+    .await
+    .into_diagnostic()??;
+
+    GlobalEnvBag::instance().set("PROTO_CLI_VERSION", config.proto.version.to_string());
+
+    Ok(Arc::new(config))
+}
+
+/// Load the extensions configuration file from the `.moon` directory if it exists.
+#[instrument(skip(config_loader))]
+pub async fn load_extensions_config(
+    config_loader: ConfigLoader,
+    workspace_root: &Path,
+) -> miette::Result<Arc<ExtensionsConfig>> {
+    debug!(
+        "Attempting to load {} (optional)",
+        color::file(config_loader.get_debug_label_root("extensions")),
+    );
+
+    let root = workspace_root.to_owned();
+    let config = load_config_blocking(move || config_loader.load_extensions_config(root))
+        .await
+        .into_diagnostic()??;
+
+    Ok(Arc::new(config))
+}
+
+/// Load the tasks configuration file from the `.moon` directory if it exists.
+/// Also load all scoped tasks from the `.moon/tasks` directory and load into the manager.
+#[instrument(skip(config_loader))]
+pub async fn load_tasks_configs(
+    config_loader: ConfigLoader,
+    workspace_root: &Path,
+) -> miette::Result<Arc<InheritedTasksManager>> {
+    debug!(
+        "Attempting to load {} (optional)",
+        color::file(config_loader.get_debug_label_root("tasks/**/*")),
+    );
+
+    let root = workspace_root.to_owned();
+    let manager = load_config_blocking(move || config_loader.load_tasks_manager(root))
+        .await
+        .into_diagnostic()??;
+
+    debug!(
+        "Loaded {} task configs for inheritance",
+        manager.configs.len()
+    );
+
+    Ok(Arc::new(manager))
+}
+
+#[instrument(skip_all)]
+pub fn register_feature_flags(_config: &WorkspaceConfig) -> miette::Result<()> {
+    FeatureFlags::default().register();
+
+    Ok(())
+}

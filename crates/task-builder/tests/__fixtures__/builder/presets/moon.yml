@@ -1,0 +1,21 @@
+tasks:
+  server:
+    preset: 'server'
+  server-custom:
+    preset: 'server'
+    options:
+      cache: true
+
+  server-extends-middle:
+    extends: 'server'
+    options:
+      cache: true
+  server-extends:
+    extends: 'server-extends-middle'
+
+  utility:
+    preset: 'utility'
+  utility-custom:
+    preset: 'utility'
+    options:
+      interactive: false

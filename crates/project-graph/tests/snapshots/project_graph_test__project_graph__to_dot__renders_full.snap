@@ -1,0 +1,15 @@
+---
+source: crates/project-graph/tests/project_graph_test.rs
+expression: graph.projects.to_dot()
+---
+digraph {
+    0 [ label="d"]
+    1 [ label="a"]
+    2 [ label="b"]
+    3 [ label="c"]
+    2 -> 3 [ label="production"]
+    1 -> 2 [ label="development"]
+    0 -> 1 [ label="peer"]
+    0 -> 3 [ label="production"]
+    0 -> 2 [ label="build"]
+}

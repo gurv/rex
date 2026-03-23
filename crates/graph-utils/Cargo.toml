@@ -1,0 +1,16 @@
+[package]
+name = "moon_graph_utils"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+moon_common = { path = "../common" }
+miette = { workspace = true }
+petgraph = { workspace = true }
+rustc-hash = { workspace = true }
+serde = { workspace = true }
+starbase_utils = { workspace = true, features = ["json"] }
+
+[lints]
+workspace = true

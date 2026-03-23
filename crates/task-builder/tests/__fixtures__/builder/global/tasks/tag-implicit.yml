@@ -1,0 +1,9 @@
+inheritedBy:
+  tags: ['implicit']
+
+implicitInputs:
+  - 'project/**/*'
+  - '/workspace.json'
+
+implicitDeps:
+  - 'app:build'

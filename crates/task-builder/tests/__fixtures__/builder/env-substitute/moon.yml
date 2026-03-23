@@ -1,0 +1,9 @@
+tasks:
+  command-no-env:
+    command: './file.sh'
+  command-with-env:
+    command: './${DIR}/file.sh'
+  args-no-env:
+    args: ['arg']
+  args-with-env:
+    args: ['arg', '$ARG']

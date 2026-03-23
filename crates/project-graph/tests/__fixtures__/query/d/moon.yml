@@ -1,0 +1,11 @@
+language: go
+layer: library
+
+tags: [four]
+
+tasks:
+  build:
+    command: build
+    outputs: [dist]
+    # Fallsback to system since deno is not enabled
+    toolchain: deno

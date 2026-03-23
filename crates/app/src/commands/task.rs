@@ -1,0 +1,387 @@
+use crate::app_error::AppError;
+use crate::prompts::select_target;
+use crate::session::MoonSession;
+use clap::Args;
+use iocraft::prelude::{View, element};
+use moon_action::{ActionNode, RunTaskNode};
+use moon_action_context::ActionContext;
+use moon_common::is_test_env;
+use moon_console::ui::{
+    Container, Entry, List, ListItem, Map, MapItem, Section, SelectOption, SelectProps, Style,
+    StyledText,
+};
+use moon_process::Command;
+use moon_project::Project;
+use moon_task::{Target, TargetScope, Task};
+use moon_task_runner::command_builder::CommandBuilder;
+use starbase::AppResult;
+use starbase_utils::json;
+use tracing::instrument;
+
+#[derive(Args, Clone, Debug)]
+pub struct TaskArgs {
+    #[arg(help = "Task target to inspect")]
+    target: Option<Target>,
+
+    #[arg(long, help = "Print in JSON format")]
+    json: bool,
+}
+
+#[instrument(skip(session))]
+pub async fn task(session: MoonSession, args: TaskArgs) -> AppResult {
+    let workspace_graph = session.get_workspace_graph().await?;
+
+    let target = select_target(&session.console, &args.target, || {
+        let tasks = workspace_graph.get_tasks()?;
+
+        Ok(SelectProps {
+            label: "Which task to view?".into(),
+            options: tasks
+                .iter()
+                .map(|task| {
+                    SelectOption::new(&task.target).description_opt(task.description.clone())
+                })
+                .collect(),
+            ..Default::default()
+        })
+    })
+    .await?;
+
+    let TargetScope::Project(project_locator) = &target.scope else {
+        return Err(AppError::ProjectIdRequired.into());
+    };
+
+    let project = workspace_graph.get_project(project_locator)?;
+    let task = workspace_graph.get_task(&target)?;
+    let console = &session.console;
+
+    if args.json {
+        console.out.write_line(json::format(&task, true)?)?;
+
+        return Ok(None);
+    }
+
+    let mut modes = vec![];
+
+    if task.is_internal() {
+        modes.push("internal");
+    }
+    if task.is_interactive() {
+        modes.push("interactive");
+    }
+    if task.is_persistent() {
+        modes.push("persistent");
+    }
+
+    let toolchains = project.get_enabled_toolchains_for_task(&task);
+
+    let mut inputs = vec![];
+    inputs.extend(task.input_globs.keys().map(|i| i.to_string()));
+    inputs.extend(task.input_files.keys().map(|i| i.to_string()));
+    inputs.extend(task.input_env.iter().map(|i| format!("${i}")));
+    inputs.sort();
+
+    let mut outputs = vec![];
+    outputs.extend(task.output_globs.keys().map(|i| i.to_string()));
+    outputs.extend(task.output_files.keys().map(|i| i.to_string()));
+    outputs.sort();
+
+    let command = build_command(&session, &project, &task).await?;
+    let show_in_prod = !is_test_env();
+
+    session.console.render(element! {
+        Container {
+            Section(title: "About") {
+                #(task.description.as_ref().map(|desc| {
+                    element! {
+                        View(margin_bottom: 1) {
+                            StyledText(
+                                content: desc,
+                            )
+                        }
+                    }
+                }))
+
+                Entry(
+                    name: "Target",
+                    value: element! {
+                        StyledText(
+                            content: task.target.to_string(),
+                            style: Style::Id
+                        )
+                    }.into_any()
+                )
+                Entry(
+                    name: "Project",
+                    value: element! {
+                        StyledText(
+                            content: project.id.to_string(),
+                            style: Style::Id
+                        )
+                    }.into_any()
+                )
+                Entry(
+                    name: "Task",
+                    value: element! {
+                        StyledText(
+                            content: task.id.to_string(),
+                            style: Style::Id
+                        )
+                    }.into_any()
+                )
+                Entry(
+                    name: if toolchains.len() == 1 {
+                        "Toolchain"
+                    } else {
+                        "Toolchains"
+                    },
+                    content: toolchains
+                        .into_iter()
+                        .map(|tc| tc.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                )
+                Entry(
+                    name: "Type",
+                    content: task.type_of.to_string(),
+                )
+                #(task.preset.as_ref().map(|preset| {
+                    element! {
+                        Entry(
+                            name: "Preset",
+                            content: preset.to_string(),
+                        )
+                    }
+                }))
+                #(if modes.is_empty() {
+                    None
+                } else {
+                    Some(element! {
+                        Entry(
+                            name: if modes.len() == 1 {
+                                "Mode"
+                            } else {
+                                "Modes"
+                            },
+                            content: modes.join(", "),
+                        )
+                    })
+                })
+                Entry(
+                    name: "Depends on",
+                    no_children: task.deps.is_empty()
+                ) {
+                    List {
+                        #(task.deps.iter().map(|dep| {
+                            element! {
+                                ListItem {
+                                    StyledText(
+                                        content: dep.target.to_string(),
+                                        style: Style::Id
+                                    )
+                                }
+                            }
+                        }))
+                    }
+                }
+            }
+
+            Section(title: "Process") {
+                Entry(
+                    name: if task.script.is_some() {
+                        "Script"
+                    } else {
+                        "Command"
+                    },
+                    value: element! {
+                        StyledText(
+                            content: task.get_command_line(),
+                            style: Style::Shell
+                        )
+                    }.into_any()
+                )
+
+                #(show_in_prod.then(|| {
+                    if task.options.shell.unwrap_or_default() {
+                        element! {
+                            Entry(
+                                name: "Shell",
+                                content: if cfg!(unix) {
+                                    task.options.unix_shell.to_string()
+                                } else if cfg!(windows) {
+                                    task.options.windows_shell.to_string()
+                                } else {
+                                    "unknown".to_string()
+                                }
+                            )
+                        }.into_any()
+                    } else {
+                        element!(View).into_any()
+                    }
+                }))
+                Entry(
+                    name: "Environment variables",
+                    no_children: task.env.is_empty()
+                ) {
+                    Map {
+                        #(task.env.iter().map(|(key, value)| {
+                            element! {
+                                MapItem(
+                                    name: element! {
+                                        StyledText(
+                                            content: key,
+                                            style: Style::Property
+                                        )
+                                    }.into_any(),
+                                    value: element! {
+                                        StyledText(
+                                            content: value.as_deref().unwrap_or("(removed)"),
+                                            style: Style::MutedLight
+                                        )
+                                    }.into_any(),
+                                )
+                            }
+                        }))
+                    }
+                }
+                #(show_in_prod.then(|| {
+                    element! {
+                        Entry(
+                            name: "Working directory",
+                            value: element! {
+                                StyledText(
+                                    content: if task.options.run_from_workspace_root {
+                                        &session.workspace_root
+                                    } else {
+                                        &project.root
+                                    }.to_string_lossy(),
+                                    style: Style::Path
+                                )
+                            }.into_any()
+                        )
+                    }
+                }))
+                #(show_in_prod.then(|| {
+                    element! {
+                        Entry(
+                            name: "Lookup paths",
+                            no_children: command.paths.is_empty()
+                        ) {
+                            List {
+                                #(command.paths.iter().map(|path| {
+                                    element! {
+                                        ListItem {
+                                            StyledText(
+                                                content: path.to_string_lossy(),
+                                                style: Style::Path
+                                            )
+                                        }
+                                    }
+                                }))
+                            }
+                        }
+                    }
+                }))
+                Entry(
+                    name: "Runs dependencies",
+                    content: if task.options.run_deps_in_parallel {
+                        "Parallel"
+                    } else {
+                        "Serial"
+                    }.to_string(),
+                )
+                Entry(
+                    name: "Runs in CI",
+                    content: if task.should_run(true) {
+                        "Yes"
+                    } else {
+                        "No"
+                    }.to_string(),
+                )
+            }
+
+            Section(title: "Configuration") {
+                #(project.inherited
+                    .as_ref()
+                    .and_then(|inherited| inherited.layers.get(task.id.as_str()))
+                    .map(|layers| {
+                    element! {
+                        Entry(
+                            name: "Inherits from",
+                            no_children: layers.is_empty()
+                        ) {
+                            List {
+                                #(layers.iter().map(|layer| {
+                                    element! {
+                                        ListItem {
+                                            StyledText(
+                                                content: layer,
+                                                style: Style::File
+                                            )
+                                        }
+                                    }
+                                }))
+                            }
+                        }
+                    }
+                }))
+                Entry(
+                    name: "Inputs",
+                    no_children: inputs.is_empty()
+                ) {
+                    List {
+                        #(inputs.iter().map(|input| {
+                            element! {
+                                ListItem {
+                                    StyledText(
+                                        content: input,
+                                        style: if input.starts_with('$') {
+                                            Style::Symbol
+                                        } else {
+                                            Style::File
+                                        }
+                                    )
+                                }
+                            }
+                        }))
+                    }
+                }
+                Entry(
+                    name: "Outputs",
+                    no_children: outputs.is_empty()
+                ) {
+                    List {
+                        #(outputs.iter().map(|output| {
+                            element! {
+                                ListItem {
+                                    StyledText(
+                                        content: output.as_str(),
+                                        style: Style::File
+                                    )
+                                }
+                            }
+                        }))
+                    }
+                }
+            }
+        }
+    })?;
+
+    Ok(None)
+}
+
+async fn build_command(
+    session: &MoonSession,
+    project: &Project,
+    task: &Task,
+) -> miette::Result<Command> {
+    let app_context = session.get_app_context().await?;
+    let action_context = ActionContext::default();
+    let node = ActionNode::run_task(RunTaskNode::new(task.target.clone()));
+
+    // Use command builder so that we inherit all paths and env vars
+    let builder = CommandBuilder::new(&app_context, project, task, &node);
+    let command = builder.build(&action_context, "").await?;
+
+    Ok(command)
+}

@@ -1,0 +1,9 @@
+inheritedBy:
+  toolchains: 'node'
+
+tasks:
+  node:
+    command: 'node'
+
+taskOptions:
+  retryCount: 5

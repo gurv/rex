@@ -1,0 +1,891 @@
+use crate::token_expander_error::TokenExpanderError;
+use moon_common::path::{self, RelativeFrom, WorkspaceRelativePathBuf};
+use moon_config::{EnvMap, Input, Output, ProjectMetadataConfig, patterns};
+use moon_env_var::{EnvScanner, EnvSubstitutor, GlobalEnvBag};
+use moon_graph_utils::GraphExpanderContext;
+use moon_project::{FileGroup, Project};
+use moon_project_graph::ProjectGraph;
+use moon_task::{Task, TaskFileInput, TaskFileOutput, TaskGlobInput, TaskGlobOutput};
+use moon_time::{now_millis, now_timestamp};
+use pathdiff::diff_paths;
+use regex::Regex;
+use rustc_hash::{FxHashMap, FxHashSet};
+use std::borrow::Cow;
+use std::env;
+use std::mem;
+use std::path::Path;
+use tracing::{instrument, warn};
+
+#[derive(Debug, Default, PartialEq)]
+pub struct ExpandedResult {
+    pub env: Vec<String>,
+    pub files: Vec<WorkspaceRelativePathBuf>,
+    pub files_for_input: FxHashMap<WorkspaceRelativePathBuf, TaskFileInput>,
+    pub files_for_output: FxHashMap<WorkspaceRelativePathBuf, TaskFileOutput>,
+    pub globs: Vec<WorkspaceRelativePathBuf>,
+    pub globs_for_input: FxHashMap<WorkspaceRelativePathBuf, TaskGlobInput>,
+    pub globs_for_output: FxHashMap<WorkspaceRelativePathBuf, TaskGlobOutput>,
+    pub token: Option<String>,
+    pub value: Option<String>,
+}
+
+#[derive(PartialEq)]
+pub enum TokenScope {
+    Command,
+    Script,
+    Args,
+    Env,
+    Inputs,
+    Outputs,
+}
+
+impl TokenScope {
+    pub fn label(&self) -> String {
+        match self {
+            TokenScope::Command => "commands",
+            TokenScope::Script => "scripts",
+            TokenScope::Args => "args",
+            TokenScope::Env => "env",
+            TokenScope::Inputs => "inputs",
+            TokenScope::Outputs => "outputs",
+        }
+        .into()
+    }
+}
+
+pub struct TokenExpander<'graph> {
+    pub scope: TokenScope,
+    pub context: &'graph GraphExpanderContext,
+    pub project: &'graph Project,
+    pub project_graph: &'graph ProjectGraph,
+}
+
+impl<'graph> TokenExpander<'graph> {
+    pub fn new(
+        project_graph: &'graph ProjectGraph,
+        project: &'graph Project,
+        context: &'graph GraphExpanderContext,
+    ) -> Self {
+        Self {
+            scope: TokenScope::Args,
+            context,
+            project,
+            project_graph,
+        }
+    }
+
+    pub fn has_token_function(&self, value: &str) -> bool {
+        if value.contains('@') {
+            if patterns::TOKEN_FUNC_DISTINCT.is_match(value) {
+                return true;
+            } else if patterns::TOKEN_FUNC.is_match(value) {
+                if self.scope == TokenScope::Script {
+                    return true;
+                }
+
+                warn!(
+                    "Found a token function in `{}` with other content. Token functions *must* be used literally as the only value.",
+                    value
+                );
+            }
+        }
+
+        false
+    }
+
+    pub fn has_token_variable(&self, value: &str) -> bool {
+        value.contains('$') && patterns::TOKEN_VAR.is_match(value)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_command(&mut self, task: &mut Task) -> miette::Result<String> {
+        self.scope = TokenScope::Command;
+
+        // Expand on quoted value if available
+        let mut command = Cow::Owned(task.command.get_value().to_owned());
+
+        if self.has_token_function(&command) {
+            let result = self.replace_function(task, &command)?;
+
+            if let (Some(token), Some(value)) = (result.token, result.value) {
+                command = Cow::Owned(command.replace(&token, &value));
+            }
+        }
+
+        self.replace_variables_and_scan(task, command)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_script(&mut self, task: &mut Task) -> miette::Result<String> {
+        self.scope = TokenScope::Script;
+
+        let mut script = Cow::Owned(task.script.clone().expect("Script not defined!"));
+
+        while self.has_token_function(&script) {
+            let result = self.replace_function(task, &script)?;
+
+            self.infer_inputs_from_result(task, &result);
+
+            if let Some(token) = result.token {
+                let mut items = vec![];
+
+                for file in result.files {
+                    items.push(self.resolve_path_for_task(task, file)?);
+                }
+
+                for glob in result.globs {
+                    items.push(self.resolve_path_for_task(task, glob)?);
+                }
+
+                if let Some(value) = result.value {
+                    items.push(value);
+                }
+
+                script = Cow::Owned(script.replace(&token, &items.join(" ")));
+            }
+        }
+
+        self.replace_variables_and_scan(task, script)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_args(&mut self, task: &mut Task) -> miette::Result<Vec<String>> {
+        self.expand_args_with_task(task, None)
+    }
+
+    pub fn expand_args_with_task(
+        &mut self,
+        task: &mut Task,
+        base_args: Option<Vec<String>>,
+    ) -> miette::Result<Vec<String>> {
+        self.scope = TokenScope::Args;
+
+        let mut args = vec![];
+        let base_args = base_args.unwrap_or_else(|| {
+            // Expand on quoted value if available
+            task.args
+                .iter()
+                .map(|arg| arg.get_value().to_owned())
+                .collect()
+        });
+
+        for arg in base_args {
+            // Token functions
+            if self.has_token_function(&arg) {
+                let result = self.replace_function(task, &arg)?;
+
+                self.infer_inputs_from_result(task, &result);
+
+                for file in result.files {
+                    args.push(self.resolve_path_for_task(task, file)?);
+                }
+
+                for glob in result.globs {
+                    args.push(self.resolve_path_for_task(task, glob)?);
+                }
+
+                if let Some(value) = result.value {
+                    args.push(value);
+                }
+
+                // Everything else
+            } else {
+                args.push(self.replace_variables_and_scan(task, arg)?);
+            }
+        }
+
+        Ok(args)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_env(&mut self, task: &mut Task) -> miette::Result<EnvMap> {
+        self.expand_env_with_task(task, None)
+    }
+
+    pub fn expand_env_with_task(
+        &mut self,
+        task: &mut Task,
+        base_env: Option<EnvMap>,
+    ) -> miette::Result<EnvMap> {
+        self.scope = TokenScope::Env;
+
+        let mut env = EnvMap::default();
+        let base_env = base_env.unwrap_or_else(|| mem::take(&mut task.env));
+
+        for (key, value) in base_env {
+            let Some(value) = value else {
+                env.insert(key, None);
+                continue;
+            };
+
+            if self.has_token_function(&value) {
+                let result = self.replace_function(task, &value)?;
+                let mut items = vec![];
+
+                self.infer_inputs_from_result(task, &result);
+
+                for file in result.files {
+                    items.push(self.resolve_path_for_task(task, file)?);
+                }
+
+                for glob in result.globs {
+                    items.push(self.resolve_path_for_task(task, glob)?);
+                }
+
+                if let Some(value) = result.value {
+                    items.push(value);
+                }
+
+                env.insert(
+                    key.to_owned(),
+                    Some(items.into_iter().collect::<Vec<_>>().join(",")),
+                );
+            } else {
+                env.insert(
+                    key.to_owned(),
+                    Some(self.replace_variables_and_substitute(task, &env, value)?),
+                );
+            }
+        }
+
+        Ok(env)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_inputs(&mut self, task: &Task) -> miette::Result<ExpandedResult> {
+        self.scope = TokenScope::Inputs;
+
+        let mut result = ExpandedResult::default();
+        let bag = GlobalEnvBag::instance();
+
+        for input in &task.inputs {
+            match &input {
+                Input::EnvVar(var) => {
+                    result.env.push(var.to_owned());
+                }
+                Input::EnvVarGlob(var_glob) => {
+                    let pattern =
+                        Regex::new(format!("^{}$", var_glob.replace('*', "[A-Z0-9_]+")).as_str())
+                            .unwrap();
+
+                    bag.list(|var_name, _| {
+                        if let Some(var_name) = var_name.to_str()
+                            && pattern.is_match(var_name)
+                        {
+                            result.env.push(var_name.to_owned());
+                        }
+                    });
+                }
+                Input::TokenFunc(func) => {
+                    let inner_result = self.replace_function(task, func)?;
+
+                    result.env.extend(inner_result.env);
+                    result.files.extend(inner_result.files);
+                    result.globs.extend(inner_result.globs);
+                    result.value = inner_result.value;
+                }
+                Input::TokenVar(var) => {
+                    result.files.push(
+                        self.project.source.join::<&str>(
+                            self.replace_variable(task, Cow::Borrowed(var))?.as_ref(),
+                        ),
+                    );
+                }
+                Input::File(inner) => {
+                    result.files_for_input.insert(
+                        self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?,
+                        TaskFileInput {
+                            content: inner.content.clone(),
+                            optional: inner.optional,
+                        },
+                    );
+                }
+                Input::FileGroup(inner) => {
+                    self.update_result_for_file_group(
+                        self.project.get_file_group(&inner.group)?,
+                        inner.format.to_string().as_str(),
+                        &mut result,
+                    )?;
+                }
+                Input::Glob(inner) => {
+                    result.globs_for_input.insert(
+                        self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?,
+                        TaskGlobInput { cache: inner.cache },
+                    );
+                }
+                Input::Project(inner) => {
+                    let project = self.project_graph.get_unexpanded(&inner.project)?;
+
+                    if let Some(group_id) = &inner.group {
+                        self.update_result_for_file_group(
+                            project.get_file_group(group_id)?,
+                            "static",
+                            &mut result,
+                        )?;
+                    } else if !inner.filter.is_empty() {
+                        for glob in &inner.filter {
+                            result.globs_for_input.insert(
+                                self.create_path_for_task(
+                                    task,
+                                    path::expand_to_workspace_relative(
+                                        RelativeFrom::Project(project.source.as_str()),
+                                        glob,
+                                    ),
+                                )?,
+                                TaskGlobInput::default(),
+                            );
+                        }
+                    } else {
+                        result.globs_for_input.insert(
+                            self.create_path_for_task(task, project.source.join("**/*"))?,
+                            TaskGlobInput::default(),
+                        );
+                    }
+                }
+            };
+        }
+
+        Ok(result)
+    }
+
+    #[instrument(skip_all)]
+    pub fn expand_outputs(&mut self, task: &Task) -> miette::Result<ExpandedResult> {
+        self.scope = TokenScope::Outputs;
+
+        let mut result = ExpandedResult::default();
+
+        for output in &task.outputs {
+            match output {
+                Output::TokenFunc(func) => {
+                    let inner_result = self.replace_function(task, func)?;
+
+                    result.files.extend(inner_result.files);
+                    result.globs.extend(inner_result.globs);
+                    result.value = inner_result.value;
+                }
+                Output::TokenVar(var) => {
+                    result.files.push(
+                        self.project.source.join::<&str>(
+                            self.replace_variable(task, Cow::Borrowed(var))?.as_ref(),
+                        ),
+                    );
+                }
+                Output::File(inner) => {
+                    result.files_for_output.insert(
+                        self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?,
+                        TaskFileOutput {
+                            optional: inner.optional.unwrap_or_default(),
+                        },
+                    );
+                }
+                Output::Glob(inner) => {
+                    result.globs_for_output.insert(
+                        self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?,
+                        TaskGlobOutput {},
+                    );
+                }
+            };
+        }
+
+        Ok(result)
+    }
+
+    #[instrument(skip(self, task))]
+    pub fn replace_function(&self, task: &Task, value: &str) -> miette::Result<ExpandedResult> {
+        let matches = patterns::TOKEN_FUNC.captures(value).unwrap();
+        let token = matches.get(0).unwrap().as_str(); // @name(arg)
+        let func = matches.get(1).unwrap().as_str(); // name
+        let arg = matches.get(2).unwrap().as_str(); // arg
+
+        let mut result = ExpandedResult {
+            token: Some(token.to_owned()),
+            ..ExpandedResult::default()
+        };
+
+        match func {
+            // File groups
+            "root" | "dirs" | "files" | "globs" | "group" => {
+                self.check_scope(
+                    task,
+                    token,
+                    &[
+                        TokenScope::Script,
+                        TokenScope::Args,
+                        TokenScope::Env,
+                        TokenScope::Inputs,
+                        TokenScope::Outputs,
+                    ],
+                )?;
+
+                self.update_result_for_file_group(
+                    self.project.get_file_group(arg)?,
+                    func,
+                    &mut result,
+                )?;
+            }
+            // Inputs, outputs
+            "in" => {
+                self.check_scope(task, token, &[TokenScope::Script, TokenScope::Args])?;
+
+                let index = self.parse_index(task, token, arg)?;
+                let input =
+                    task.inputs
+                        .get(index)
+                        .ok_or_else(|| TokenExpanderError::MissingInIndex {
+                            index,
+                            target: task.target.to_string(),
+                            token: token.to_owned(),
+                        })?;
+
+                match input {
+                    Input::File(inner) => {
+                        result.files.push(self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?);
+                    }
+                    Input::FileGroup(inner) => {
+                        self.update_result_for_file_group(
+                            self.project.get_file_group(&inner.group)?,
+                            inner.format.to_string().as_str(),
+                            &mut result,
+                        )?;
+                    }
+                    Input::Glob(inner) => {
+                        result.globs.push(self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?);
+                    }
+                    Input::TokenFunc(func) => {
+                        let inner_result = self.replace_function(task, func)?;
+                        result.files.extend(inner_result.files);
+                        result.globs.extend(inner_result.globs);
+                    }
+                    _ => {
+                        return Err(TokenExpanderError::InvalidTokenIndexReference {
+                            target: task.target.to_string(),
+                            token: token.to_owned(),
+                        }
+                        .into());
+                    }
+                };
+            }
+            "out" => {
+                self.check_scope(task, token, &[TokenScope::Script, TokenScope::Args])?;
+
+                let index = self.parse_index(task, token, arg)?;
+                let output =
+                    task.outputs
+                        .get(index)
+                        .ok_or_else(|| TokenExpanderError::MissingOutIndex {
+                            index,
+                            target: task.target.to_string(),
+                            token: token.to_owned(),
+                        })?;
+
+                match output {
+                    Output::File(inner) => {
+                        result.files.push(self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?);
+                    }
+                    Output::Glob(inner) => {
+                        result.globs.push(self.create_path_for_task(
+                            task,
+                            inner.to_workspace_relative(&self.project.source),
+                        )?);
+                    }
+                    Output::TokenFunc(func) => {
+                        let inner_result = self.replace_function(task, func)?;
+                        result.files.extend(inner_result.files);
+                        result.globs.extend(inner_result.globs);
+                    }
+                    _ => {
+                        return Err(TokenExpanderError::InvalidTokenIndexReference {
+                            target: task.target.to_string(),
+                            token: token.to_owned(),
+                        }
+                        .into());
+                    }
+                };
+            }
+            // Misc
+            "envs" => {
+                self.check_scope(task, token, &[TokenScope::Inputs])?;
+
+                self.update_result_for_file_group(
+                    self.project.get_file_group(arg)?,
+                    func,
+                    &mut result,
+                )?;
+            }
+            "meta" => {
+                self.check_scope(
+                    task,
+                    token,
+                    &[
+                        TokenScope::Command,
+                        TokenScope::Script,
+                        TokenScope::Args,
+                        TokenScope::Env,
+                    ],
+                )?;
+
+                let project = self.project;
+                let metadata = project.config.project.as_ref();
+
+                result.value = match arg {
+                    "channel" => metadata.and_then(|md| md.channel.clone()),
+                    "description" => metadata.and_then(|md| md.description.clone()),
+                    "maintainers" => metadata.and_then(|md| {
+                        if md.maintainers.is_empty() {
+                            None
+                        } else {
+                            Some(md.maintainers.join(","))
+                        }
+                    }),
+                    "name" | "title" => metadata.and_then(|md| md.title.clone()),
+                    "owner" => metadata.and_then(|md| md.owner.clone()),
+                    custom_field => metadata.and_then(|md| {
+                        md.metadata.get(custom_field).map(|value| value.to_string())
+                    }),
+                };
+            }
+            _ => {
+                return Err(TokenExpanderError::UnknownToken {
+                    token: token.to_owned(),
+                }
+                .into());
+            }
+        };
+
+        Ok(result)
+    }
+
+    pub fn replace_variables(&self, task: &Task, value: &str) -> miette::Result<String> {
+        let mut value = Cow::Borrowed(value);
+
+        while self.has_token_variable(&value) {
+            value = self.replace_variable(task, value)?;
+        }
+
+        Ok(value.to_string())
+    }
+
+    #[instrument(skip(self, task))]
+    pub fn replace_variable<'l>(
+        &self,
+        task: &Task,
+        value: Cow<'l, str>,
+    ) -> miette::Result<Cow<'l, str>> {
+        let Some(matches) = patterns::TOKEN_VAR.captures(&value) else {
+            return Ok(value);
+        };
+
+        let token_match = matches.get(0).unwrap(); // $var
+        let variable = matches.get(1).unwrap().as_str(); // var
+        let project = self.project;
+
+        let get_metadata =
+            |op: fn(md: &ProjectMetadataConfig) -> Option<&'_ str>| match &project.config.project {
+                Some(metadata) => Cow::Borrowed(op(metadata).unwrap_or_default()),
+                None => Cow::Owned(String::new()),
+            };
+
+        let replaced_value = match variable {
+            // Env
+            "arch" => Cow::Borrowed(env::consts::ARCH),
+            "os" => Cow::Borrowed(env::consts::OS),
+            "osFamily" => Cow::Borrowed(env::consts::FAMILY),
+            "workingDir" => Cow::Owned(self.stringify_path(&self.context.working_dir)?),
+            "workspaceRoot" => Cow::Owned(self.stringify_path(&self.context.workspace_root)?),
+            // Project
+            "language" => Cow::Owned(project.language.to_string()),
+            "project" | "projectId" => Cow::Borrowed(project.id.as_str()),
+            "projectAlias" => match project.aliases.first() {
+                Some(alias) => Cow::Borrowed(alias.alias.as_str()),
+                None => Cow::Owned(String::new()),
+            },
+            "projectAliases" => Cow::Owned(
+                project
+                    .aliases
+                    .iter()
+                    .map(|alias| alias.alias.clone())
+                    .collect::<Vec<_>>()
+                    .join(","),
+            ),
+            "projectChannel" => get_metadata(|md| md.channel.as_deref()),
+            "projectLayer" => Cow::Owned(project.layer.to_string()),
+            "projectName" | "projectTitle" => get_metadata(|md| md.title.as_deref()),
+            "projectOwner" => get_metadata(|md| md.owner.as_deref()),
+            "projectRoot" => Cow::Owned(self.stringify_path(&project.root)?),
+            "projectSource" => Cow::Borrowed(project.source.as_str()),
+            "projectStack" => Cow::Owned(project.stack.to_string()),
+            // Task
+            "target" => Cow::Borrowed(task.target.as_str()),
+            "task" | "taskId" => Cow::Borrowed(task.id.as_str()),
+            "taskToolchain" => match task.toolchains.first() {
+                Some(tc) => Cow::Borrowed(tc.as_str()),
+                None => Cow::Owned("unknown".into()),
+            },
+            "taskToolchains" => Cow::Owned(task.toolchains.join(",")),
+            "taskType" => Cow::Owned(task.type_of.to_string()),
+            // Datetime
+            "date" => Cow::Owned(now_timestamp().format("%F").to_string()),
+            "datetime" => Cow::Owned(now_timestamp().format("%F_%T").to_string()),
+            "time" => Cow::Owned(now_timestamp().format("%T").to_string()),
+            "timestamp" => Cow::Owned((now_millis() / 1000).to_string()),
+            // VCS
+            "vcsBranch" => Cow::Borrowed(self.context.vcs_branch.as_ref().as_str()),
+            "vcsRepository" => Cow::Borrowed(self.context.vcs_repository.as_ref().as_str()),
+            "vcsRevision" => Cow::Borrowed(self.context.vcs_revision.as_ref().as_str()),
+            _ => {
+                return Ok(value);
+            }
+        };
+
+        let mut inner = value.to_string();
+        inner.replace_range(token_match.range(), &replaced_value);
+
+        Ok(inner.into())
+    }
+
+    fn check_scope(&self, task: &Task, token: &str, allowed: &[TokenScope]) -> miette::Result<()> {
+        if !allowed.contains(&self.scope) {
+            return Err(TokenExpanderError::InvalidTokenScope {
+                target: task.target.to_string(),
+                token: token.to_owned(),
+                scope: self.scope.label(),
+            }
+            .into());
+        }
+
+        Ok(())
+    }
+
+    fn parse_index(&self, task: &Task, token: &str, value: &str) -> miette::Result<usize> {
+        Ok(value
+            .parse::<usize>()
+            .map_err(|_| TokenExpanderError::InvalidTokenIndex {
+                target: task.target.to_string(),
+                token: token.to_owned(),
+                index: value.to_owned(),
+            })?)
+    }
+
+    fn update_result_for_file_group(
+        &self,
+        group: &FileGroup,
+        format: &str,
+        result: &mut ExpandedResult,
+    ) -> miette::Result<()> {
+        let loose_check = matches!(self.scope, TokenScope::Outputs);
+
+        match format {
+            "root" => {
+                result
+                    .files
+                    .push(group.root(&self.context.workspace_root, &self.project.source)?);
+            }
+            "dirs" => {
+                result
+                    .files
+                    .extend(group.dirs(&self.context.workspace_root, loose_check)?);
+            }
+            "envs" => {
+                if self.scope == TokenScope::Inputs {
+                    result.env.extend(group.env.clone());
+                }
+            }
+            "files" => {
+                result
+                    .files
+                    .extend(group.files(&self.context.workspace_root, loose_check)?);
+            }
+            "globs" => {
+                result.globs.extend(group.globs()?.to_owned());
+            }
+            "group" | "static" => {
+                result.files.extend(group.files.clone());
+                result.globs.extend(group.globs.clone());
+
+                if self.scope == TokenScope::Inputs {
+                    result.env.extend(group.env.clone());
+                }
+            }
+            _ => {}
+        };
+
+        Ok(())
+    }
+
+    fn create_path_for_task(
+        &self,
+        task: &Task,
+        path: WorkspaceRelativePathBuf,
+    ) -> miette::Result<WorkspaceRelativePathBuf> {
+        Ok(WorkspaceRelativePathBuf::from(
+            self.replace_variables_and_substitute(task, &task.env, path.as_str())?,
+        ))
+    }
+
+    pub(crate) fn replace_variables_and_substitute<T: AsRef<str>>(
+        &self,
+        task: &Task,
+        env: &EnvMap,
+        value: T,
+    ) -> miette::Result<String> {
+        Ok(EnvSubstitutor::default()
+            .with_global_vars(GlobalEnvBag::instance())
+            .with_local_vars(&task.env)
+            .with_local_vars(env)
+            .substitute(self.replace_variables(task, value.as_ref())?))
+    }
+
+    fn replace_variables_and_scan<T: AsRef<str>>(
+        &self,
+        task: &mut Task,
+        value: T,
+    ) -> miette::Result<String> {
+        let mut scanner = EnvScanner::default();
+        let result = scanner.scan(self.replace_variables(task, value.as_ref())?);
+
+        if task.options.infer_inputs && !scanner.found.is_empty() {
+            self.infer_inputs_from_set(task, scanner.found);
+        }
+
+        Ok(result)
+    }
+
+    fn resolve_path_for_task(
+        &self,
+        task: &Task,
+        path: WorkspaceRelativePathBuf,
+    ) -> miette::Result<String> {
+        // Handle negated globs
+        let (path, negated) = match path.as_str().strip_prefix("!") {
+            Some(inner) => (WorkspaceRelativePathBuf::from(inner), "!"),
+            None => (path, ""),
+        };
+
+        // From workspace root to any file
+        if task.options.run_from_workspace_root {
+            Ok(format!("{negated}{path}"))
+
+            // From project root to project file
+        } else if let Ok(proj_path) = path.strip_prefix(&self.project.source) {
+            Ok(format!("{negated}{proj_path}"))
+
+            // From project root to non-project file
+        } else {
+            let abs_path = path.to_logical_path(&self.context.workspace_root);
+
+            Ok(format!(
+                "{negated}{}",
+                self.stringify_path(
+                    &diff_paths(&abs_path, &self.project.root).unwrap_or(abs_path)
+                )?
+            ))
+        }
+    }
+
+    fn stringify_path(&self, orig_value: &Path) -> miette::Result<String> {
+        let value = path::to_string(orig_value)?;
+
+        // https://cygwin.com/cygwin-ug-net/cygpath.html
+        #[cfg(windows)]
+        {
+            if GlobalEnvBag::instance()
+                .get("MSYSTEM")
+                .is_some_and(|value| value == "MINGW32" || value == "MINGW64")
+            {
+                let mut value = moon_common::path::standardize_separators(value);
+
+                if orig_value.is_absolute() {
+                    for drive in 'A'..='Z' {
+                        if let Some(suffix) = value.strip_prefix(&format!("{drive}:/")) {
+                            value = format!("/{}/{suffix}", drive.to_ascii_lowercase());
+                            break;
+                        }
+                    }
+                }
+
+                return Ok(value);
+            }
+        }
+
+        Ok(value)
+    }
+
+    fn infer_inputs_from_result(&self, task: &mut Task, result: &ExpandedResult) {
+        if task.options.infer_inputs {
+            task.input_files.extend(result.files_for_input.clone());
+            task.input_files.extend(
+                result
+                    .files
+                    .iter()
+                    .map(|file| (file.to_owned(), TaskFileInput::default())),
+            );
+
+            task.input_globs.extend(result.globs_for_input.clone());
+            task.input_globs.extend(
+                result
+                    .globs
+                    .iter()
+                    .map(|glob| (glob.to_owned(), TaskGlobInput::default())),
+            );
+        }
+    }
+
+    fn infer_inputs_from_set(&self, task: &mut Task, mut set: FxHashSet<String>) {
+        let mut blacklist = vec![
+            "HOME",
+            "USER",
+            "PWD",
+            "CI_",
+            "GIT_",
+            "BUILD_",
+            "PR_",
+            "PULL_",
+            "COMMIT_HASH",
+            "COMMIT_REF",
+            "COMMIT_SHA",
+            "HEAD",
+            "BASE",
+            "BRANCH",
+            "_SHA",
+        ];
+        let ci = ci_env::get_environment();
+        let cd = cd_env::get_environment();
+
+        if let Some(ci_prefix) = ci.as_ref().and_then(|ci| ci.env_prefix.as_ref()) {
+            blacklist.push(ci_prefix);
+        }
+
+        if let Some(cd_prefix) = cd.as_ref().and_then(|cd| cd.env_prefix.as_ref()) {
+            blacklist.push(cd_prefix);
+        }
+
+        set.retain(|key| {
+            blacklist
+                .iter()
+                .all(|item| key != item && !key.starts_with(item) && !key.ends_with(item))
+        });
+
+        task.input_env.extend(set);
+    }
+}

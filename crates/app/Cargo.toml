@@ -1,0 +1,99 @@
+[package]
+name = "moon_app"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+moon_action = { path = "../action" }
+moon_action_context = { path = "../action-context" }
+moon_action_graph = { path = "../action-graph" }
+moon_action_pipeline = { path = "../action-pipeline" }
+moon_actions = { path = "../actions" }
+moon_affected = { path = "../affected" }
+moon_api = { path = "../api" }
+moon_app_context = { path = "../app-context" }
+moon_app_macros = { path = "../app-macros" }
+moon_cache = { path = "../cache" }
+moon_codegen = { path = "../codegen" }
+moon_common = { path = "../common" }
+moon_config = { path = "../config", features = ["loader", "proto", "tracing"] }
+moon_console = { path = "../console" }
+moon_docker = { path = "../docker" }
+moon_env = { path = "../env" }
+moon_env_var = { path = "../env-var" }
+moon_extension_plugin = { path = "../extension-plugin" }
+moon_feature_flags = { path = "../feature-flags" }
+moon_mcp = { path = "../mcp" }
+moon_pdk_api = { path = "../pdk-api" }
+moon_plugin = { path = "../plugin" }
+moon_process = { path = "../process" }
+moon_process_augment = { path = "../process-augment" }
+moon_project = { path = "../project" }
+moon_project_graph = { path = "../project-graph" }
+moon_query = { path = "../query" }
+moon_remote = { path = "../remote" }
+moon_task = { path = "../task" }
+moon_task_graph = { path = "../task-graph" }
+moon_task_runner = { path = "../task-runner" }
+moon_toolchain = { path = "../toolchain" }
+moon_toolchain_plugin = { path = "../toolchain-plugin" }
+moon_vcs = { path = "../vcs" }
+moon_workspace = { path = "../workspace" }
+moon_workspace_graph = { path = "../workspace-graph" }
+async-recursion = { workspace = true }
+async-trait = { workspace = true }
+bytes = "1.11.1"
+ci_env = { workspace = true }
+clap = { workspace = true, features = [
+    "color",
+    "env",
+    "help",
+    "string",
+    "suggestions",
+    "usage",
+    "wrap_help",
+] }
+clap_complete = { workspace = true }
+clap_complete_nushell = "4.5.10"
+convert_case = { workspace = true }
+diff = "0.1.13"
+iocraft = { workspace = true }
+miette = { workspace = true }
+proto_core = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true }
+rustc-hash = { workspace = true }
+schematic = { workspace = true, features = [
+    "config",
+    "schema",
+    "renderer_template",
+] }
+semver = { workspace = true }
+serde = { workspace = true }
+starbase = { workspace = true }
+starbase_archive = { workspace = true }
+starbase_shell = { workspace = true }
+starbase_styles = { workspace = true }
+starbase_utils = { workspace = true, features = [
+    "editor-config",
+    "json",
+    "toml",
+    "yaml",
+] }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+# Visualizer
+open = "5.3.3"
+petgraph = { workspace = true }
+tera = { workspace = true }
+tiny_http = "0.12.0"
+
+[dev-dependencies]
+serial_test = { workspace = true }
+starbase_sandbox = { workspace = true }
+
+[lints]
+workspace = true

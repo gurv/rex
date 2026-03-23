@@ -1,0 +1,30 @@
+[package]
+name = "moon_project_builder"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "Builder for creating projects and their tasks."
+homepage = "https://moonrepo.dev/moon"
+repository = "https://github.com/moonrepo/moon"
+publish = false
+
+[dependencies]
+moon_common = { path = "../common" }
+moon_config = { path = "../config" }
+moon_file_group = { path = "../file-group" }
+moon_project = { path = "../project" }
+moon_task = { path = "../task" }
+moon_task_builder = { path = "../task-builder" }
+moon_toolchain = { path = "../toolchain" }
+moon_toolchain_plugin = { path = "../toolchain-plugin" }
+miette = { workspace = true }
+rustc-hash = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+moon_test_utils2 = { path = "../test-utils" }
+starbase_sandbox = { workspace = true }
+tokio = { workspace = true }
+
+[lints]
+workspace = true

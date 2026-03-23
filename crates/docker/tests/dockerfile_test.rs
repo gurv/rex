@@ -1,0 +1,69 @@
+use moon_common::Id;
+use moon_docker::{GenerateDockerfileOptions, generate_dockerfile};
+use moon_target::Target;
+use starbase_sandbox::assert_snapshot;
+
+fn create_options() -> GenerateDockerfileOptions {
+    GenerateDockerfileOptions {
+        project: Id::raw("app"),
+        ..Default::default()
+    }
+}
+
+mod dockerfile {
+    use super::*;
+
+    #[test]
+    fn renders_defaults() {
+        assert_snapshot!(generate_dockerfile(create_options()).unwrap());
+    }
+
+    #[test]
+    fn disables_toolchain() {
+        let mut options = create_options();
+        options.disable_toolchain = true;
+
+        assert_snapshot!(generate_dockerfile(options).unwrap());
+    }
+
+    #[test]
+    fn with_tasks() {
+        let mut options = create_options();
+        options.build_task = Some(Target::parse("app:compile").unwrap());
+        options.start_task = Some(Target::parse("app:serve").unwrap());
+
+        assert_snapshot!(generate_dockerfile(options).unwrap());
+    }
+
+    #[test]
+    fn with_prune() {
+        let mut options = create_options();
+        options.run_prune = true;
+        options.build_task = Some(Target::parse("app:compile").unwrap());
+        options.start_task = Some(Target::parse("app:serve").unwrap());
+
+        assert_snapshot!(generate_dockerfile(options).unwrap());
+    }
+
+    #[test]
+    fn with_setup() {
+        let mut options = create_options();
+        options.run_setup = true;
+
+        assert_snapshot!(generate_dockerfile(options).unwrap());
+    }
+
+    #[test]
+    fn renders_a_custom_template() {
+        let mut options = create_options();
+        options.build_task = Some(Target::parse("app:compile").unwrap());
+        options.start_task = Some(Target::parse("app:serve").unwrap());
+        options.template_path = Some(
+            std::env::current_dir()
+                .unwrap()
+                .join("templates/CustomTemplate.tera"),
+        );
+
+        assert_snapshot!(generate_dockerfile(options).unwrap());
+    }
+}

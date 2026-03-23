@@ -1,0 +1,7 @@
+toolchains:
+  default: bun
+
+tasks:
+  bun:
+    command: bun
+    toolchain: bun

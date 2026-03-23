@@ -1,0 +1,6 @@
+inheritedBy:
+  tags: ['scope']
+
+tasks:
+  tag:
+    command: 'tag'

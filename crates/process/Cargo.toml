@@ -1,0 +1,34 @@
+[package]
+name = "moon_process"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "Process utilities."
+homepage = "https://moonrepo.dev/moon"
+repository = "https://github.com/moonrepo/moon"
+publish = false
+
+[dependencies]
+moon_common = { path = "../common" }
+moon_console = { path = "../console" }
+moon_env_var = { path = "../env-var" }
+cached = { workspace = true }
+miette = { workspace = true }
+rustc-hash = { workspace = true }
+starbase_shell = { workspace = true }
+system_env = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["io-util", "signal", "sync"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.180"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61.2", default-features = false, features = [
+	# "Win32_System_Console",
+	"Win32_System_Threading",
+] }
+
+[lints]
+workspace = true

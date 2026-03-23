@@ -1,0 +1,41 @@
+[package]
+name = "moon_action_graph"
+version = "0.0.1"
+edition = "2024"
+license = "MIT"
+description = "Dependency graph for actions (tasks)."
+homepage = "https://moonrepo.dev/moon"
+repository = "https://github.com/moonrepo/moon"
+publish = false
+
+[dependencies]
+moon_action = { path = "../action" }
+moon_action_context = { path = "../action-context" }
+moon_affected = { path = "../affected" }
+moon_app_context = { path = "../app-context" }
+moon_common = { path = "../common" }
+moon_config = { path = "../config" }
+moon_graph_utils = { path = "../graph-utils" }
+moon_pdk_api = { path = "../pdk-api" }
+moon_project = { path = "../project" }
+moon_task = { path = "../task" }
+moon_toolchain = { path = "../toolchain" }
+moon_query = { path = "../query" }
+moon_workspace_graph = { path = "../workspace-graph" }
+daggy = { workspace = true }
+graph-cycles = "0.3.0"
+miette = { workspace = true }
+petgraph = { workspace = true }
+rustc-hash = { workspace = true }
+starbase_utils = { workspace = true, features = ["glob"] }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+moon_config = { path = "../config" }
+moon_test_utils2 = { path = "../test-utils" }
+starbase_sandbox = { workspace = true }
+
+[lints]
+workspace = true

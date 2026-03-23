@@ -1,0 +1,18 @@
+[package]
+name = "moon_app_context"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[dependencies]
+moon_cache = { path = "../cache" }
+moon_config = { path = "../config" }
+moon_console = { path = "../console" }
+moon_env = { path = "../env" }
+moon_extension_plugin = { path = "../extension-plugin" }
+moon_toolchain_plugin = { path = "../toolchain-plugin" }
+moon_vcs = { path = "../vcs" }
+proto_core = { workspace = true }
+
+[lints]
+workspace = true

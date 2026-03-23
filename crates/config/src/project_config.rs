@@ -1,0 +1,174 @@
+use crate::project::*;
+use crate::shapes::Input;
+use crate::task_config::{EnvMap, TaskConfig};
+use crate::{config_enum, config_struct, config_unit_enum};
+use moon_common::Id;
+use rustc_hash::FxHashMap;
+use schematic::{Config, ConfigEnum, ValidateError};
+use std::collections::BTreeMap;
+
+fn validate_channel<D, C>(
+    value: &str,
+    _data: &D,
+    _ctx: &C,
+    _finalize: bool,
+) -> Result<(), ValidateError> {
+    if !value.is_empty() && !value.starts_with('#') {
+        return Err(ValidateError::new("must start with a `#`"));
+    }
+
+    Ok(())
+}
+
+config_unit_enum!(
+    /// The technology stack of the project, for categorizing.
+    #[derive(ConfigEnum)]
+    pub enum StackType {
+        Backend,
+        Data,
+        Frontend,
+        Infrastructure,
+        Systems,
+        #[default]
+        Unknown,
+    }
+);
+
+config_unit_enum!(
+    /// The layer within the technology stack, for categorizing.
+    #[derive(ConfigEnum)]
+    pub enum LayerType {
+        Application,
+        Automation,
+        Configuration,
+        Library,
+        Scaffolding,
+        Tool,
+        #[default]
+        Unknown,
+    }
+);
+
+config_struct!(
+    /// Expanded information about the project.
+    #[derive(Config)]
+    #[config(allow_unknown_fields)]
+    pub struct ProjectMetadataConfig {
+        /// A human-readable title of the project.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub title: Option<String>,
+
+        /// A description on what the project does and why it exists.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub description: Option<String>,
+
+        /// The owner of the project. Can be an individual, team, or
+        /// organization. The format is unspecified.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub owner: Option<String>,
+
+        /// The individual maintainers of the project. The format is unspecified.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pub maintainers: Vec<String>,
+
+        /// The Slack, Discord, IRC, etc, channel to discuss the project.
+        /// Must start with a `#`.
+        #[setting(validate = validate_channel)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub channel: Option<String>,
+
+        /// Custom metadata fields.
+        #[setting(flatten)]
+        pub metadata: FxHashMap<String, serde_json::Value>,
+    }
+);
+
+config_enum!(
+    /// Expanded information about a project dependency.
+    #[derive(Config)]
+    #[serde(untagged)]
+    pub enum ProjectDependsOn {
+        /// A project referenced by identifier.
+        String(Id),
+
+        /// A project referenced by identifier, with additional parameters.
+        #[setting(nested)]
+        Object(ProjectDependencyConfig),
+    }
+);
+
+config_struct!(
+    /// Configures information and tasks for a project.
+    /// Docs: https://moonrepo.dev/docs/config/project
+    #[derive(Config)]
+    pub struct ProjectConfig {
+        #[setting(rename = "$schema")]
+        pub schema: String,
+
+        /// Other projects that this project depends on.
+        #[setting(nested, alias = "deps")]
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pub depends_on: Vec<ProjectDependsOn>,
+
+        /// Configures Docker integration for this project.
+        /// @since 1.27.0
+        #[setting(nested)]
+        pub docker: ProjectDockerConfig,
+
+        /// A map of environment variables that will be inherited by
+        /// all tasks within the project.
+        #[serde(default, skip_serializing_if = "EnvMap::is_empty")]
+        pub env: EnvMap,
+
+        /// A map of group identifiers to a list of file paths, globs, and
+        /// environment variables, that can be referenced from tasks.
+        #[serde(default, skip_serializing_if = "FxHashMap::is_empty")]
+        pub file_groups: FxHashMap<Id, Vec<Input>>,
+
+        /// Overrides the identifier within the project graph, as defined in
+        /// the workspace `projects` setting.
+        /// @since 1.18.0
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub id: Option<Id>,
+
+        /// The primary programming language of the project.
+        pub language: LanguageType,
+
+        /// The layer within the technology stack, for categorizing.
+        pub layer: LayerType,
+
+        /// Defines ownership of source code within the current project, by mapping
+        /// file paths and globs to owners. An owner is either a user, team, or group.
+        /// @since 1.8.0
+        #[setting(nested)]
+        pub owners: OwnersConfig,
+
+        /// Expanded information about the project.
+        #[setting(nested)]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub project: Option<ProjectMetadataConfig>,
+
+        /// The technology stack of the project, for categorizing.
+        /// @since 1.22.0
+        pub stack: StackType,
+
+        /// A list of tags that this project belongs to, for categorizing,
+        /// boundary enforcement, and task inheritance.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        pub tags: Vec<Id>,
+
+        /// A map of identifiers to task objects. Tasks represent the work-unit
+        /// of a project, and can be ran in the action pipeline.
+        #[setting(nested)]
+        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+        pub tasks: BTreeMap<Id, TaskConfig>,
+
+        /// Overrides top-level toolchain settings, scoped to this project.
+        #[setting(nested)]
+        pub toolchains: ProjectToolchainsConfig,
+
+        /// Overrides top-level workspace settings, scoped to this project.
+        #[setting(nested)]
+        pub workspace: ProjectWorkspaceConfig,
+    }
+);
