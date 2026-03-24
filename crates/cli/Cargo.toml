@@ -31,7 +31,7 @@ moon_common = { path = "../common" }
 moon_env_var = { path = "../env-var" }
 clap = { workspace = true }
 mimalloc = { version = "0.1.48", default-features = false }
-proto_shim = { path = "../../proto/shim" }
+proto_shim = { path = "../shim" }
 sigpipe = "0.1.3"
 starbase = { workspace = true }
 starbase_styles = { workspace = true }
@@ -67,6 +67,10 @@ rustc-hash = { workspace = true }
 serial_test = { workspace = true }
 starbase_archive = { workspace = true }
 starbase_sandbox = { workspace = true }
+version_spec = { path = "../version-spec" }
+warpgate_api = { path = "../warpgate-api" }
+warpgate = { path = "../warpgate" }
+semver = { workspace = true }
 
 [lints]
 workspace = true

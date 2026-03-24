@@ -8,7 +8,7 @@ use moon_pdk_api::{
 };
 use moon_process::ProcessRegistry;
 use moon_task::Target;
-use proto_core::UnresolvedVersionSpec;
+use version_spec::UnresolvedVersionSpec;
 use starbase_utils::json::{JsonMap, JsonValue};
 use std::collections::VecDeque;
 

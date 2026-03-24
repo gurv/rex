@@ -13,11 +13,12 @@ moon_pdk_api = { version = "2.0.1", path = "../pdk-api" }
 moon_target = { version = "2.0.1", path = "../target" }
 extism = { workspace = true }
 proto_core = { path = "../../proto/core" }
-proto_pdk_test_utils = { path = "../../proto/pdk-test-utils" }
+# proto_pdk_test_utils = { path = "../../proto/pdk-test-utils" }
+proto_pdk_api = { path = "../../proto/pdk-api" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 starbase_sandbox = { workspace = true }
-warpgate = { path = "../../proto/warpgate" }
+warpgate = { path = "../warpgate" }
 
 [lints]
 workspace = true

@@ -132,8 +132,8 @@ impl ToolchainsConfig {
         false
     }
 
-    pub fn get_plugin_locator(id: &Id) -> Option<proto_core::PluginLocator> {
-        use proto_core::warpgate::find_debug_locator_with_url_fallback as locate;
+    pub fn get_plugin_locator(id: &Id) -> Option<warpgate_api::PluginLocator> {
+        use warpgate::find_debug_locator_with_url_fallback as locate;
 
         match id.as_str() {
             "bun" => Some(locate("bun_toolchain", "1.0.2")),
@@ -261,7 +261,7 @@ impl ToolchainsConfig {
                 #[cfg(debug_assertions)]
                 "tc-tier1" | "tc-tier2" | "tc-tier2-reqs" | "tc-tier2-setup-env" | "tc-tier3"
                 | "tc-tier3-reqs" => {
-                    use proto_core::warpgate::find_debug_locator;
+                    use warpgate::find_debug_locator;
 
                     config.plugin = Some(
                         find_debug_locator(&id.replace("-", "_"))

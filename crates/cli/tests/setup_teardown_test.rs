@@ -1,7 +1,7 @@
 use moon_common::Id;
 use moon_config::PartialToolchainPluginConfig;
 use moon_test_utils2::{create_empty_moon_sandbox, predicates::prelude::*};
-use proto_core::UnresolvedVersionSpec;
+use version_spec::UnresolvedVersionSpec;
 use starbase_utils::dirs;
 
 mod setup {

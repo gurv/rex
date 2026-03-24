@@ -19,7 +19,7 @@ rustc-hash = { workspace = true }
 schematic = { workspace = true, features = ["schema_serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
-warpgate_api = { path = "../../proto/warpgate-api" }
+warpgate_api = { path = "../warpgate-api" }
 
 [features]
 default = []

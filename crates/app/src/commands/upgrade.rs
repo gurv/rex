@@ -25,7 +25,7 @@ pub fn is_musl() -> bool {
 
 #[instrument(skip(session))]
 pub async fn upgrade(session: MoonSession) -> AppResult {
-    if proto_core::is_offline() {
+    if moon_common::is_offline() {
         return Err(AppError::UpgradeRequiresInternet.into());
     }
 

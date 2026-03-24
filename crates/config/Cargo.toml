@@ -14,6 +14,8 @@ features = ["loader"]
 [dependencies]
 moon_common = { version = "2.0.2", path = "../common" }
 moon_target = { version = "2.0.1", path = "../target" }
+warpgate = { path = "../warpgate" }
+warpgate_api = { path = "../warpgate-api" }
 deserialize_untagged_verbose_error = "0.1.5"
 hcl-rs = "0.19.6"
 indexmap = { workspace = true }
@@ -40,8 +42,7 @@ semver = { workspace = true, features = ["serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_path_to_error = "0.1.20"
-version_spec = { path = "../../proto/version-spec", features = ["schematic"] }
-warpgate_api = { path = "../../proto/warpgate-api", features = ["schematic"] }
+version_spec = { path = "../version-spec", features = ["schematic"] }
 
 # Optional
 # proto_core = { path = "../../proto/core", optional = true }
@@ -53,6 +54,7 @@ moon_config = { path = ".", features = ["proto", "tracing"] }
 httpmock = "0.8.3"
 serial_test = { workspace = true }
 starbase_sandbox = { workspace = true }
+warpgate_api = { path = "../warpgate-api" }
 
 [features]
 default = []

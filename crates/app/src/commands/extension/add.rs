@@ -9,7 +9,7 @@ use moon_config::{ExtensionsConfig, PartialExtensionPluginConfig};
 use moon_console::ui::{Container, Notice, StyledText, Variant};
 use moon_extension_plugin::{ExtensionPlugin, ExtensionRegistry};
 use moon_pdk_api::InitializeExtensionInput;
-use proto_core::PluginLocator;
+use warpgate_api::PluginLocator;
 use starbase::AppResult;
 use tracing::instrument;
 

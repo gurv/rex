@@ -6,7 +6,7 @@ use moon_config::{
     PortablePath, ProjectConfig, ProjectDependencyConfig, ProjectDependsOn, ProjectToolchainEntry,
     TaskArgs, ToolchainPluginConfig,
 };
-use proto_core::UnresolvedVersionSpec;
+use version_spec::UnresolvedVersionSpec;
 use rustc_hash::FxHashMap;
 use schematic::schema::IndexMap;
 use serde_json::Value;

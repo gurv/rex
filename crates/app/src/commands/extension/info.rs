@@ -7,7 +7,7 @@ use moon_common::{Id, is_test_env};
 use moon_config::ExtensionsConfig;
 use moon_console::ui::*;
 use moon_extension_plugin::ExtensionPlugin;
-use proto_core::PluginLocator;
+use warpgate_api::PluginLocator;
 use starbase::AppResult;
 use tracing::instrument;
 

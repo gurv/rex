@@ -1,9 +1,8 @@
 use crate::host::*;
 use crate::plugin::*;
 use crate::plugin_error::PluginError;
-use moon_common::{Id, IdExt};
+use moon_common::{Id, IdExt, is_offline};
 use moon_pdk_api::{MoonContext, Operation};
-use proto_core::is_offline;
 use scc::hash_map::Entry;
 use starbase_utils::fs;
 use std::collections::BTreeMap;

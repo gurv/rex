@@ -4429,6 +4429,8 @@ dependencies = [
  "tiny_http",
  "tokio",
  "tracing",
+ "version_spec",
+ "warpgate_api",
 ]
 
 [[package]]
@@ -4509,6 +4511,7 @@ dependencies = [
  "proto_core",
  "proto_shim",
  "rustc-hash",
+ "semver",
  "serial_test",
  "sigpipe",
  "starbase",
@@ -4518,6 +4521,9 @@ dependencies = [
  "starbase_utils",
  "tokio",
  "tracing",
+ "version_spec",
+ "warpgate",
+ "warpgate_api",
  "wasi-common",
  "wasmtime",
  "wiggle",
@@ -4571,10 +4577,14 @@ dependencies = [
  "relative-path",
  "rustc-hash",
  "schematic",
+ "semver",
  "serde",
+ "starbase_archive",
  "starbase_id",
  "starbase_styles",
+ "starbase_utils",
  "thiserror 2.0.18",
+ "url",
 ]
 
 [[package]]
@@ -4602,6 +4612,7 @@ dependencies = [
  "starbase_sandbox",
  "tracing",
  "version_spec",
+ "warpgate",
  "warpgate_api",
 ]
 
@@ -4808,7 +4819,7 @@ dependencies = [
  "moon_pdk_api",
  "moon_target",
  "proto_core",
- "proto_pdk_test_utils",
+ "proto_pdk_api",
  "serde",
  "serde_json",
  "starbase_sandbox",
@@ -5255,6 +5266,8 @@ dependencies = [
  "starbase_utils",
  "tokio",
  "tracing",
+ "version_spec",
+ "warpgate_api",
 ]
 
 [[package]]
@@ -6275,19 +6288,6 @@ dependencies = [
  "thiserror 2.0.18",
  "version_spec",
  "warpgate_api",
-]
-
-[[package]]
-name = "proto_pdk_test_utils"
-version = "0.43.7"
-dependencies = [
- "extism",
- "proto_core",
- "proto_pdk_api",
- "serde",
- "serde_json",
- "starbase_sandbox",
- "warpgate",
 ]
 
 [[package]]

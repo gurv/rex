@@ -12,12 +12,12 @@ rust-version = "1.89.0"
 proto_pdk_api = { version = "0.31.8", path = "../pdk-api", features = [
     "schematic",
 ] }
-proto_shim = { version = "0.8.0", path = "../shim" }
-system_env = { version = "0.9.1", path = "../system-env" }
-version_spec = { version = "0.10.2", path = "../version-spec", features = [
+proto_shim = { path = "../../crates/shim" }
+system_env = { path = "../../crates/system-env" }
+version_spec = { path = "../../crates/version-spec", features = [
     "schematic",
 ] }
-warpgate = { version = "0.29.3", path = "../warpgate", features = [
+warpgate = { path = "../../crates/warpgate", features = [
     "miette",
     "schematic",
 ] }

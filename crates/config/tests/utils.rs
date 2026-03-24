@@ -5,7 +5,7 @@ use moon_common::Id;
 pub use moon_config::test_utils::*;
 use moon_config::*;
 use moon_target::Target;
-use proto_core::{FileLocator, PluginLocator};
+use warpgate_api::{FileLocator, PluginLocator};
 use rustc_hash::FxHashMap;
 use schematic::{Config, ConfigError, ConfigLoader as BaseLoader};
 use serde_json::Value;

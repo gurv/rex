@@ -2,7 +2,9 @@ mod utils;
 
 use httpmock::prelude::*;
 use moon_config::{ConfigLoader, ToolchainsConfig};
-use proto_core::{Id, ProtoConfig, ToolContext, UnresolvedVersionSpec};
+use proto_core::{ProtoConfig, ToolContext};
+use starbase_id::Id;
+use version_spec::UnresolvedVersionSpec;
 use schematic::ConfigLoader as BaseLoader;
 use serde_json::Value;
 use serial_test::serial;

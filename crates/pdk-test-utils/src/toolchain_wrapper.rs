@@ -1,6 +1,7 @@
+use crate::wrapper::WasmTestWrapper as ToolTestWrapper;
 use moon_pdk_api::*;
 use moon_target::Target;
-use proto_pdk_test_utils::WasmTestWrapper as ToolTestWrapper;
+// use proto_pdk_test_utils::WasmTestWrapper as ToolTestWrapper;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;

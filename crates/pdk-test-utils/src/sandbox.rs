@@ -1,13 +1,14 @@
 use crate::extension_wrapper::*;
 use crate::host_func_mocker::*;
 use crate::toolchain_wrapper::*;
+use crate::wrapper::WasmTestWrapper as ToolTestWrapper;
 use extism::{Function, UserData, ValType};
 use moon_pdk_api::{
     Id, RegisterExtensionInput, RegisterExtensionOutput, RegisterToolchainInput,
     RegisterToolchainOutput,
 };
 use proto_core::{ProtoEnvironment, Tool, ToolContext, inject_proto_manifest_config};
-use proto_pdk_test_utils::WasmTestWrapper as ToolTestWrapper;
+// use proto_pdk_test_utils::WasmTestWrapper as ToolTestWrapper;
 use starbase_sandbox::{Sandbox, create_empty_sandbox, create_sandbox};
 use std::collections::BTreeMap;
 use std::fmt;

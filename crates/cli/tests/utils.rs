@@ -3,7 +3,7 @@
 use moon_common::{Id, is_ci};
 use moon_config::PartialToolchainPluginConfig;
 use moon_test_utils2::{MoonSandbox, create_moon_sandbox};
-use proto_core::UnresolvedVersionSpec;
+use version_spec::UnresolvedVersionSpec;
 
 pub fn create_projects_sandbox() -> MoonSandbox {
     let sandbox = create_moon_sandbox("projects");

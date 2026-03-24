@@ -107,7 +107,7 @@ impl Launchpad {
         bypass_cache: bool,
         manifest_url: &str,
     ) -> miette::Result<Option<VersionCheck>> {
-        if is_test_env() || proto_core::is_offline() {
+        if is_test_env() || moon_common::is_offline() {
             return Ok(None);
         }
 
@@ -139,7 +139,7 @@ impl Launchpad {
         &self,
         manifest_url: &str,
     ) -> miette::Result<Option<VersionCheck>> {
-        if is_test_env() || proto_core::is_offline() {
+        if is_test_env() || moon_common::is_offline() {
             return Ok(None);
         }
 
@@ -194,7 +194,7 @@ impl Launchpad {
         &self,
         toolchains: BTreeMap<String, String>,
     ) -> miette::Result<()> {
-        if !is_ci() || is_test_env() || proto_core::is_offline() {
+        if !is_ci() || is_test_env() || moon_common::is_offline() {
             return Ok(());
         }
 

@@ -19,6 +19,10 @@ serde = { workspace = true }
 starbase_id = { workspace = true }
 starbase_styles = { workspace = true }
 thiserror = { workspace = true }
+semver = { workspace = true }
+starbase_archive = { workspace = true }
+starbase_utils = { workspace = true, features = ["fs-lock", "yaml"] }
+url = { version = "2.5.8", features = ["serde"] }
 
 [lints]
 workspace = true

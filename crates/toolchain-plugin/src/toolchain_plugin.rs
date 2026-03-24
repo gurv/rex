@@ -9,10 +9,12 @@ use proto_core::flow::install::InstallOptions;
 use proto_core::flow::locate::Locator;
 use proto_core::flow::manage::Manager;
 use proto_core::flow::resolve::Resolver;
+use warpgate_api::PluginLocator;
 use proto_core::{
-    PluginLocator, PluginType as ProtoPluginType, Tool, ToolContext, ToolSpec,
-    UnresolvedVersionSpec, locate_plugin,
+    PluginType as ProtoPluginType, Tool, ToolContext, ToolSpec,
+    locate_plugin,
 };
+use version_spec::UnresolvedVersionSpec;
 use starbase_utils::glob::{self, GlobSet};
 use std::fmt;
 use std::ops::Deref;

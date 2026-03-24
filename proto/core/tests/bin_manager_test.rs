@@ -1,4 +1,4 @@
-use proto_core::VersionSpec;
+use version_spec::VersionSpec;
 use proto_core::layout::BinManager;
 use rustc_hash::FxHashMap;
 

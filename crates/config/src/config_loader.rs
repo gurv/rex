@@ -150,7 +150,7 @@ impl ConfigLoader {
 
         #[cfg(feature = "proto")]
         {
-            use proto_core::PluginLocator;
+            use warpgate_api::PluginLocator;
 
             result.config.inherit_defaults()?;
 
@@ -268,7 +268,7 @@ impl ConfigLoader {
 
         #[cfg(feature = "proto")]
         {
-            use proto_core::PluginLocator;
+            use warpgate_api::PluginLocator;
 
             result.config.inherit_defaults(proto_config)?;
 

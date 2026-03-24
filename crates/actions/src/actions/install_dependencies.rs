@@ -59,7 +59,7 @@ pub async fn install_dependencies(
     }
 
     // Installing dependencies requires an internet connection
-    if proto_core::is_offline() {
+    if moon_common::is_offline() {
         warn!(
             root = node.root.as_str(),
             toolchain_id = node.toolchain_id.as_str(),

@@ -9,7 +9,7 @@ use moon_config::{PartialToolchainPluginConfig, ToolchainsConfig};
 use moon_console::ui::{Container, Notice, StyledText, Variant};
 use moon_pdk_api::InitializeToolchainInput;
 use moon_toolchain_plugin::{ToolchainPlugin, ToolchainRegistry};
-use proto_core::PluginLocator;
+use warpgate_api::PluginLocator;
 use starbase::AppResult;
 use tracing::instrument;
 

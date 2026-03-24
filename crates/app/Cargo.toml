@@ -39,6 +39,7 @@ moon_task_runner = { path = "../task-runner" }
 moon_toolchain = { path = "../toolchain" }
 moon_toolchain_plugin = { path = "../toolchain-plugin" }
 moon_vcs = { path = "../vcs" }
+warpgate_api = { path = "../warpgate-api" }
 moon_workspace = { path = "../workspace" }
 moon_workspace_graph = { path = "../workspace-graph" }
 async-recursion = { workspace = true }
@@ -84,6 +85,7 @@ starbase_utils = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+version_spec = { path = "../version-spec" }
 
 # Visualizer
 open = "5.3.3"

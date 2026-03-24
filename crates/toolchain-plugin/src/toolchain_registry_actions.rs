@@ -11,7 +11,7 @@ use moon_pdk_api::{
     SetupToolchainOutput, SyncOutput, SyncProjectInput, SyncWorkspaceInput, TeardownToolchainInput,
 };
 use moon_plugin::CallResult;
-use proto_core::UnresolvedVersionSpec;
+use version_spec::UnresolvedVersionSpec;
 use rustc_hash::{FxHashMap, FxHashSet};
 use starbase_utils::json::JsonValue;
 use std::path::{Path, PathBuf};

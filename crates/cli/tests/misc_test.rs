@@ -1,5 +1,5 @@
 use moon_test_utils2::{create_empty_moon_sandbox, create_moon_sandbox, predicates::prelude::*};
-use proto_core::VersionReq;
+use semver::VersionReq;
 use std::fs;
 
 mod cli {
