@@ -1,15 +1,9 @@
-use crate::app::Commands;
-use crate::commands::exec::OnFailure;
 use crate::session::MoonSession;
 use iocraft::prelude::element;
 use miette::IntoDiagnostic;
-use moon_action::Action;
-use moon_action_context::ActionContext;
-use moon_action_graph::ActionGraph;
-use moon_action_pipeline::ActionPipeline;
 use moon_common::Id;
 use moon_console::ui::{OwnedOrShared, Progress, ProgressDisplay, ProgressReporter};
-use moon_console::{Console, ConsoleError, Level};
+use moon_console::{Console, ConsoleError};
 use moon_workspace::WorkspaceBuilderContext;
 use serde::Serialize;
 use starbase_utils::{fs, json, toml, yaml};
@@ -69,59 +63,6 @@ pub fn append_plugin_to_config_file(
     )?;
 
     Ok(path.to_path_buf())
-}
-
-pub async fn run_action_pipeline(
-    session: &MoonSession,
-    action_context: ActionContext,
-    action_graph: ActionGraph,
-) -> miette::Result<Vec<Action>> {
-    let mut pipeline = ActionPipeline::new(
-        session.get_app_context().await?,
-        session.get_workspace_graph().await?,
-    );
-
-    if let Some(concurrency) = &session.cli.concurrency {
-        pipeline.concurrency = *concurrency;
-    }
-
-    match &session.cli.command {
-        Commands::Check(cmd) => {
-            pipeline.bail = true;
-            pipeline.summary = cmd
-                .summary
-                .clone()
-                .map(|sum| sum.unwrap_or_default().to_level());
-        }
-        Commands::Ci(_) => {
-            pipeline.report_name = "ciReport.json".into();
-            pipeline.summary = Some(Level::Three);
-        }
-        Commands::Exec(cmd) => {
-            pipeline.bail = cmd.on_failure == OnFailure::Bail;
-            pipeline.summary = cmd
-                .summary
-                .clone()
-                .map(|sum| sum.unwrap_or_default().to_level());
-        }
-        Commands::Run(cmd) => {
-            pipeline.bail = true;
-            pipeline.summary = cmd
-                .summary
-                .clone()
-                .map(|sum| sum.unwrap_or_default().to_level());
-        }
-        Commands::Setup | Commands::Sync { .. } => {
-            pipeline.summary = Some(Level::Two);
-        }
-        _ => {}
-    };
-
-    let results = pipeline
-        .run_with_context(action_graph, action_context)
-        .await?;
-
-    Ok(results)
 }
 
 pub async fn create_workspace_graph_context(

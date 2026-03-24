@@ -5,7 +5,6 @@ pub mod commands;
 mod components;
 mod helpers;
 mod prompts;
-pub mod queries;
 mod session;
 pub mod systems;
 

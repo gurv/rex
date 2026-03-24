@@ -1,32 +1,10 @@
 use crate::app_options::*;
-use crate::commands::action_graph::ActionGraphArgs;
-use crate::commands::bin::BinArgs;
-use crate::commands::check::CheckArgs;
-use crate::commands::ci::CiArgs;
-use crate::commands::clean::CleanArgs;
-use crate::commands::completions::CompletionsArgs;
-use crate::commands::debug::DebugCommands;
-use crate::commands::docker::DockerCommands;
-use crate::commands::exec::ExecArgs;
 use crate::commands::ext::ExtArgs;
 use crate::commands::extension::ExtensionCommands;
 use crate::commands::generate::GenerateArgs;
-use crate::commands::hash::HashArgs;
-use crate::commands::init::InitArgs;
 use crate::commands::mcp::McpArgs;
-use crate::commands::migrate::MigrateCommands;
-use crate::commands::project::ProjectArgs;
-use crate::commands::project_graph::ProjectGraphArgs;
-use crate::commands::projects::ProjectsArgs;
-use crate::commands::query::QueryCommands;
-use crate::commands::run::RunArgs;
-use crate::commands::sync::SyncCommands;
-use crate::commands::task::TaskArgs;
-use crate::commands::task_graph::TaskGraphArgs;
-use crate::commands::tasks::TasksArgs;
 use crate::commands::template::TemplateArgs;
 use crate::commands::templates::TemplatesArgs;
-use crate::commands::toolchain::ToolchainCommands;
 use crate::systems::bootstrap;
 use clap::builder::styling::{Color, Style, Styles};
 use clap::{Parser, Subcommand};
@@ -44,63 +22,6 @@ pub const EXE_NAME: &str = "moon";
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum Commands {
-    #[command(
-        alias = "ag",
-        name = "action-graph",
-        about = "Display an interactive dependency graph of actions."
-    )]
-    ActionGraph(ActionGraphArgs),
-
-    #[command(
-        name = "bin",
-        about = "Return an absolute path to a binary within the toolchain."
-    )]
-    Bin(BinArgs),
-
-    #[command(
-        alias = "c",
-        name = "check",
-        about = "Run build and test related tasks for one or many projects."
-    )]
-    Check(CheckArgs),
-
-    #[command(name = "ci", about = "Run all affected tasks in a CI environment.")]
-    Ci(CiArgs),
-
-    #[command(
-        name = "clean",
-        about = "Clean the workspace and delete any stale or invalid artifacts."
-    )]
-    Clean(CleanArgs),
-
-    #[command(
-        name = "completions",
-        about = "Generate command completions for your current shell."
-    )]
-    Completions(CompletionsArgs),
-
-    #[command(name = "debug", about = "Debug internals.", hide = true)]
-    Debug {
-        #[command(subcommand)]
-        command: DebugCommands,
-    },
-
-    #[command(
-        name = "docker",
-        about = "Operations for integrating with Docker and Dockerfiles."
-    )]
-    Docker {
-        #[command(subcommand)]
-        command: DockerCommands,
-    },
-
-    #[command(
-        alias = "x",
-        name = "exec",
-        about = "Low-level command for executing tasks in the action pipeline."
-    )]
-    Exec(ExecArgs),
-
     #[command(name = "ext", about = "Execute an extension plugin.")]
     Ext(ExtArgs),
 
@@ -118,101 +39,10 @@ pub enum Commands {
     Generate(GenerateArgs),
 
     #[command(
-        alias = "h",
-        name = "hash",
-        about = "Inspect or diff the contents of a generated hashes."
-    )]
-    Hash(HashArgs),
-
-    #[command(name = "init", about = "Initialize a new moon repository.")]
-    Init(InitArgs),
-
-    #[command(
         name = "mcp",
         about = "Start an MCP (model context protocol) server that can respond to AI agent requests."
     )]
     Mcp(McpArgs),
-
-    #[command(
-        name = "migrate",
-        about = "Operations for migrating existing projects to moon."
-    )]
-    Migrate {
-        #[command(subcommand)]
-        command: MigrateCommands,
-    },
-
-    #[command(
-        alias = "p",
-        name = "project",
-        about = "Display information about a single project."
-    )]
-    Project(ProjectArgs),
-
-    #[command(
-        alias = "pg",
-        name = "project-graph",
-        about = "Display an interactive graph of projects."
-    )]
-    ProjectGraph(ProjectGraphArgs),
-
-    #[command(name = "projects", about = "Display a table of all projects.")]
-    Projects(ProjectsArgs),
-
-    #[command(
-        alias = "q",
-        name = "query",
-        about = "Query information about moon, the environment, and more as JSON."
-    )]
-    Query {
-        #[command(subcommand)]
-        command: QueryCommands,
-    },
-
-    #[command(
-        alias = "r",
-        name = "run",
-        about = "Run one or many tasks in the action pipeline."
-    )]
-    Run(RunArgs),
-
-    #[command(
-        name = "setup",
-        about = "Setup the environment by installing all toolchains."
-    )]
-    Setup,
-
-    #[command(
-        name = "sync",
-        about = "Sync the workspace and all projects to a healthy state."
-    )]
-    Sync {
-        #[command(subcommand)]
-        command: Option<SyncCommands>,
-    },
-
-    #[command(
-        alias = "t",
-        name = "task",
-        about = "Display information about a single task."
-    )]
-    Task(TaskArgs),
-
-    #[command(
-        alias = "tg",
-        name = "task-graph",
-        about = "Display an interactive graph of tasks."
-    )]
-    TaskGraph(TaskGraphArgs),
-
-    #[command(name = "tasks", about = "Display a table of all tasks.")]
-    Tasks(TasksArgs),
-
-    #[command(
-        name = "teardown",
-        about = "Teardown the environment by uninstalling all toolchains and deleting cache files."
-    )]
-    Teardown,
 
     #[command(
         name = "template",
@@ -225,12 +55,6 @@ pub enum Commands {
         about = "List all templates that are available for code generation."
     )]
     Templates(TemplatesArgs),
-
-    #[command(name = "toolchain", about = "Manage toolchain plugins.")]
-    Toolchain {
-        #[command(subcommand)]
-        command: ToolchainCommands,
-    },
 
     #[command(
         alias = "up",

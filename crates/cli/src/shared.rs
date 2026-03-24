@@ -1,13 +1,7 @@
 use crate::lookup::*;
 use clap::Parser;
 use mimalloc::MiMalloc;
-use moon_app::commands::debug::DebugCommands;
-use moon_app::commands::docker::DockerCommands;
 use moon_app::commands::extension::ExtensionCommands;
-use moon_app::commands::migrate::MigrateCommands;
-use moon_app::commands::query::QueryCommands;
-use moon_app::commands::sync::SyncCommands;
-use moon_app::commands::toolchain::ToolchainCommands;
 use moon_app::{Cli, Commands, MoonSession, commands};
 use moon_env_var::GlobalEnvBag;
 use starbase::diagnostics::IntoDiagnostic;
@@ -135,29 +129,6 @@ pub async fn run_cli(args: Vec<OsString>) -> MainResult {
     let exit_code = app
         .run(MoonSession::new(cli, version), |session| async {
             match session.cli.command.clone() {
-                Commands::ActionGraph(args) => {
-                    commands::action_graph::action_graph(session, args).await
-                }
-                Commands::Bin(args) => commands::bin::bin(session, args).await,
-                Commands::Ci(args) => commands::ci::ci(session, args).await,
-                Commands::Check(args) => commands::check::check(session, args).await,
-                Commands::Clean(args) => commands::clean::clean(session, args).await,
-                Commands::Completions(args) => {
-                    commands::completions::completions(session, args).await
-                }
-                Commands::Debug { command } => match command {
-                    DebugCommands::Config => commands::debug::config::debug_config(session).await,
-                    DebugCommands::Vcs => commands::debug::vcs::debug_vcs(session).await,
-                },
-                Commands::Docker { command } => match command {
-                    DockerCommands::File(args) => commands::docker::file(session, args).await,
-                    DockerCommands::Prune => commands::docker::prune(session).await,
-                    DockerCommands::Scaffold(args) => {
-                        commands::docker::scaffold(session, args).await
-                    }
-                    DockerCommands::Setup => commands::docker::setup(session).await,
-                },
-                Commands::Exec(args) => commands::exec::exec(session, args).await,
                 Commands::Ext(args) => commands::ext::ext(session, args).await,
                 Commands::Extension { command } => match command {
                     ExtensionCommands::Add(args) => {
@@ -168,60 +139,9 @@ pub async fn run_cli(args: Vec<OsString>) -> MainResult {
                     }
                 },
                 Commands::Generate(args) => commands::generate::generate(session, args).await,
-                Commands::Hash(args) => commands::hash::hash(session, args).await,
-                Commands::Init(args) => commands::init::init(session, args).await,
                 Commands::Mcp(args) => commands::mcp::mcp(session, args).await,
-                Commands::Migrate { command, .. } => match command {
-                    MigrateCommands::V2(args) => commands::migrate::v2(session, args).await,
-                },
-                Commands::Project(args) => commands::project::project(session, args).await,
-                Commands::ProjectGraph(args) => {
-                    commands::project_graph::project_graph(session, args).await
-                }
-                Commands::Projects(args) => commands::projects::projects(session, args).await,
-                Commands::Query { command } => match command {
-                    QueryCommands::Affected(args) => {
-                        commands::query::affected::affected(session, args).await
-                    }
-                    QueryCommands::ChangedFiles(args) => {
-                        commands::query::changed_files::changed_files(session, args).await
-                    }
-                    QueryCommands::Projects(args) => {
-                        commands::query::projects::projects(session, args).await
-                    }
-                    QueryCommands::Tasks(args) => {
-                        commands::query::tasks::tasks(session, args).await
-                    }
-                },
-                Commands::Run(args) => commands::run::run(session, args).await,
-                Commands::Setup => commands::setup::setup(session).await,
-                Commands::Sync { command } => match command {
-                    Some(SyncCommands::Codeowners(args)) => {
-                        commands::syncs::codeowners::sync(session, args).await
-                    }
-                    Some(SyncCommands::ConfigSchemas(args)) => {
-                        commands::syncs::config_schemas::sync(session, args).await
-                    }
-                    Some(SyncCommands::VcsHooks(args)) => {
-                        commands::syncs::vcs_hooks::sync(session, args).await
-                    }
-                    Some(SyncCommands::Projects) => commands::syncs::projects::sync(session).await,
-                    None => commands::sync::sync(session).await,
-                },
-                Commands::Task(args) => commands::task::task(session, args).await,
-                Commands::TaskGraph(args) => commands::task_graph::task_graph(session, args).await,
-                Commands::Tasks(args) => commands::tasks::tasks(session, args).await,
-                Commands::Teardown => commands::teardown::teardown(session).await,
                 Commands::Template(args) => commands::template::template(session, args).await,
                 Commands::Templates(args) => commands::templates::templates(session, args).await,
-                Commands::Toolchain { command } => match command {
-                    ToolchainCommands::Add(args) => {
-                        commands::toolchain::add::add(session, args).await
-                    }
-                    ToolchainCommands::Info(args) => {
-                        commands::toolchain::info::info(session, args).await
-                    }
-                },
                 Commands::Upgrade => commands::upgrade::upgrade(session).await,
             }
         })

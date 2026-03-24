@@ -1,10 +1,9 @@
-use crate::app::{Cli, Commands};
+use crate::app::Cli;
 use crate::app_error::AppError;
 use crate::helpers::*;
 use crate::systems::*;
 use async_trait::async_trait;
 use moon_action_graph::{ActionGraphBuilder, ActionGraphBuilderOptions};
-use moon_api::Launchpad;
 use moon_app_context::AppContext;
 use moon_cache::CacheEngine;
 use moon_codegen::CodeGenerator;
@@ -31,7 +30,6 @@ use std::fmt;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::OnceCell;
-use tokio::try_join;
 use tracing::debug;
 
 #[derive(Clone)]
@@ -240,13 +238,6 @@ impl MoonSession {
         self.workspace_config.telemetry
     }
 
-    pub fn requires_workspace_configured(&self) -> bool {
-        !matches!(
-            self.cli.command,
-            Commands::Completions(_) | Commands::Init(_) | Commands::Migrate { .. }
-        )
-    }
-
     async fn load_workspace_graph(&self) -> miette::Result<Arc<WorkspaceGraph>> {
         let cache_engine = self.get_cache_engine()?;
         let context = create_workspace_graph_context(self).await?;
@@ -286,11 +277,7 @@ impl AppSession for MoonSession {
 
         self.working_dir = env::current_dir().map_err(|_| AppError::MissingWorkingDir)?;
 
-        self.workspace_root = if self.requires_workspace_configured() {
-            startup::find_workspace_root(&self.working_dir)?
-        } else {
-            self.working_dir.clone()
-        };
+        self.workspace_root = self.working_dir.clone();
 
         self.config_dir = self.config_loader.locate_dir(&self.workspace_root);
 
@@ -303,33 +290,10 @@ impl AppSession for MoonSession {
 
         // Load configs
 
-        if self.requires_workspace_configured() {
-            let (workspace_config, tasks_config, extensions_config, toolchains_config) = try_join!(
-                startup::load_workspace_config(self.config_loader.clone(), &self.workspace_root),
-                startup::load_tasks_configs(self.config_loader.clone(), &self.workspace_root),
-                startup::load_extensions_config(self.config_loader.clone(), &self.workspace_root),
-                startup::load_toolchains_config(
-                    self.config_loader.clone(),
-                    self.proto_env.clone(),
-                    &self.workspace_root,
-                    &self.working_dir,
-                ),
-            )?;
-
-            self.workspace_config = workspace_config;
-            self.extensions_config = extensions_config;
-            self.toolchains_config = toolchains_config;
-            self.tasks_config = tasks_config;
-        }
-
         startup::register_feature_flags(&self.workspace_config)?;
 
         // Load singleton components
         ProcessRegistry::register(self.workspace_config.pipeline.kill_process_threshold);
-
-        if self.requires_workspace_configured() {
-            Launchpad::register(self.moon_env.clone())?;
-        }
 
         Ok(None)
     }
@@ -344,34 +308,10 @@ impl AppSession for MoonSession {
 
         analyze::extract_repo_info(&vcs).await?;
 
-        // Preload
-        if self.requires_workspace_configured() {
-            let _ = self.get_cache_engine()?;
-        }
-
         Ok(None)
     }
 
     async fn execute(&mut self) -> AppResult {
-        if self.is_telemetry_enabled()
-            && matches!(
-                self.cli.command,
-                Commands::Ci(_)
-                    | Commands::Check(_)
-                    | Commands::Exec(_)
-                    | Commands::Run(_)
-                    | Commands::Sync { .. }
-            )
-        {
-            let cache_engine = self.get_cache_engine()?;
-
-            execute::check_for_new_version(
-                &self.console,
-                &cache_engine,
-                &self.toolchains_config.moon.manifest_url,
-            )
-            .await?;
-        }
 
         Ok(None)
     }

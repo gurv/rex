@@ -7,8 +7,6 @@ use moon_pdk_api::{
     ConditionType, InitializePluginOutput, PromptType, SettingCondition, SettingPrompt,
 };
 use moon_process::ProcessRegistry;
-use moon_task::Target;
-use version_spec::UnresolvedVersionSpec;
 use starbase_utils::json::{JsonMap, JsonValue};
 use std::collections::VecDeque;
 
@@ -80,43 +78,6 @@ pub async fn select_identifier<'a>(
     )
     .await
     .map(|mut ids| ids.remove(0))
-}
-
-pub async fn select_identifiers<'a>(
-    console: &Console,
-    ids: &'a [Id],
-    input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
-) -> miette::Result<Vec<Id>> {
-    select_identifiers_internal(console, Vec::from_iter(ids), input, |value| {
-        Id::new(value).into_diagnostic()
-    })
-    .await
-}
-
-pub async fn select_target<'a>(
-    console: &Console,
-    target: &'a Option<Target>,
-    input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
-) -> miette::Result<Target> {
-    select_identifiers_internal(
-        console,
-        target.as_ref().map_or(vec![], |target| vec![target]),
-        input,
-        |value| Target::parse(&value),
-    )
-    .await
-    .map(|mut targets| targets.remove(0))
-}
-
-pub async fn select_targets<'a>(
-    console: &Console,
-    targets: &'a [Target],
-    input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
-) -> miette::Result<Vec<Target>> {
-    select_identifiers_internal(console, Vec::from_iter(targets), input, |value| {
-        Target::parse(&value)
-    })
-    .await
 }
 
 pub async fn render_prompt(
@@ -207,67 +168,6 @@ pub async fn render_prompt(
             Ok(Some(items[index].clone()))
         }
     }
-}
-
-pub async fn render_version_prompt(
-    console: &Console,
-    skip_prompts: bool,
-    toolchain: &str,
-    op: impl FnOnce() -> miette::Result<Option<UnresolvedVersionSpec>>,
-) -> miette::Result<Option<UnresolvedVersionSpec>> {
-    let default_version = op()?;
-
-    if skip_prompts {
-        return Ok(default_version);
-    }
-
-    let mut confirmed = false;
-    let mut value = String::new();
-
-    console
-        .render_prompt(element! {
-            Confirm(
-                label: if let Some(version) = &default_version {
-                    format!(
-                        "Manage {toolchain} {version} through <shell>moon</shell>? <muted>(recommended)</muted>"
-                    )
-                } else {
-                    format!(
-                        "Manage {toolchain} through <shell>moon</shell>? <muted>(recommended)</muted>"
-                    )
-                },
-                description: "Will download and install on-demand.".to_string(),
-                on_confirm: &mut confirmed,
-            )
-        })
-        .await?;
-
-    if confirmed {
-        console
-            .render_prompt(element! {
-                Input(
-                    label: format!("{toolchain} version?"),
-                    default_value: default_version.map(|v| v.to_string()).unwrap_or_default(),
-                    on_value: &mut value,
-                    validate: move |input: String| {
-                        if input.trim().is_empty() {
-                            Some("Please provide a version".into())
-                        } else if let Err(error) = UnresolvedVersionSpec::parse(&input) {
-                            Some(error.to_string())
-                        } else {
-                            None
-                        }
-                    }
-                )
-            })
-            .await?;
-    }
-
-    Ok(if value.is_empty() {
-        None
-    } else {
-        UnresolvedVersionSpec::parse(value).ok()
-    })
 }
 
 pub async fn evaluate_plugin_initialize_prompts(

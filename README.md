@@ -21,13 +21,31 @@ ls -la ~/.rex*
 
 
 20260324: 114 МБт
+20260324: 94 МБт
+
 
 Убираем команды
 
 moon:
-ction-graph
-migrate
-project*
-task*
+  action-graph
+  migrate
+  project*
+  task*
+  docker
+  toolchain
+  sync
+  hash
+  check
+  ci
+  bin
+  clean
+  completions
+  exec
+  init
+  query
+  run
+  setup
+  teardown
+
 
 proto:
