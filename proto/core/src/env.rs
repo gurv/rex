@@ -15,9 +15,9 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, RwLockReadGuard, RwLockWriteGuard};
 use std::time::Duration;
-use system_env::{SystemArch, SystemOS};
+use rex_system_env::{SystemArch, SystemOS};
 use tracing::debug;
-use warpgate::PluginLoader;
+use rex_warpgate::PluginLoader;
 
 pub type ProtoConsole = Console<EmptyReporter>;
 

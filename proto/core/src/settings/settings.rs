@@ -3,8 +3,8 @@ use indexmap::IndexMap;
 use rustc_hash::FxHashMap;
 use schematic::{Config, DefaultValueResult, RegexSetting, env, merge};
 use serde::{Deserialize, Serialize};
-use system_env::{SystemOS, SystemPackageManager};
-use warpgate::{HttpOptions, RegistryConfig};
+use rex_system_env::{SystemOS, SystemPackageManager};
+use rex_warpgate::{HttpOptions, RegistryConfig};
 
 // `[settings.build]`
 #[derive(Clone, Config, Debug, Serialize)]

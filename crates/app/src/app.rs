@@ -1,67 +1,57 @@
 use crate::app_options::*;
-use crate::commands::ext::ExtArgs;
-use crate::commands::extension::ExtensionCommands;
-use crate::commands::generate::GenerateArgs;
-use crate::commands::mcp::McpArgs;
-use crate::commands::template::TemplateArgs;
-use crate::commands::templates::TemplatesArgs;
+use crate::commands::run::RunArgs;
+use crate::commands::plugin::PluginCommands;
 use crate::systems::bootstrap;
 use clap::builder::styling::{Color, Style, Styles};
 use clap::{Parser, Subcommand};
-use moon_cache::CacheMode;
-use moon_env_var::GlobalEnvBag;
+use rex_cache::CacheMode;
+use rex_env_var::GlobalEnvBag;
 use starbase_styles::color::Color as ColorType;
 use std::env;
 use std::path::PathBuf;
 
 #[cfg(windows)]
-pub const EXE_NAME: &str = "moon.exe";
+pub const EXE_NAME: &str = "rex.exe";
 
 #[cfg(not(windows))]
-pub const EXE_NAME: &str = "moon";
+pub const EXE_NAME: &str = "rex";
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum Commands {
-    #[command(name = "ext", about = "Execute an extension plugin.")]
-    Ext(ExtArgs),
+    #[command(name = "run", about = "Execute plugin.")]
+    Run(RunArgs),
 
-    #[command(name = "extension", about = "Manage extension plugins.")]
-    Extension {
+    #[command(name = "plugin", about = "Manage plugins.")]
+    Plugin {
         #[command(subcommand)]
-        command: ExtensionCommands,
+        command: PluginCommands,
     },
 
-    #[command(
-        alias = "g",
-        name = "generate",
-        about = "Generate and scaffold files from a pre-defined template."
-    )]
-    Generate(GenerateArgs),
+    // #[command(
+    //     alias = "g",
+    //     name = "generate",
+    //     about = "Generate and scaffold files from a pre-defined template."
+    // )]
+    // Generate(GenerateArgs),
 
-    #[command(
-        name = "mcp",
-        about = "Start an MCP (model context protocol) server that can respond to AI agent requests."
-    )]
-    Mcp(McpArgs),
+    // #[command(
+    //     name = "mcp",
+    //     about = "Start an MCP (model context protocol) server that can respond to AI agent requests."
+    // )]
+    // Mcp(McpArgs),
 
-    #[command(
-        name = "template",
-        about = "Display information about a single template."
-    )]
-    Template(TemplateArgs),
+    // #[command(name = "template", about = "Manage templates.")]
+    // Template {
+    //     #[command(subcommand)]
+    //     command: TemplateCommands,
+    // },
 
-    #[command(
-        name = "templates",
-        about = "List all templates that are available for code generation."
-    )]
-    Templates(TemplatesArgs),
-
-    #[command(
-        alias = "up",
-        name = "upgrade",
-        about = "Upgrade to the latest version of moon."
-    )]
-    Upgrade,
+    // #[command(
+    //     alias = "up",
+    //     name = "upgrade",
+    //     about = "Upgrade to the latest version of rex."
+    // )]
+    // Upgrade,
 }
 
 fn fg(ty: ColorType) -> Style {
@@ -82,9 +72,9 @@ fn create_styles() -> Styles {
 #[derive(Clone, Debug, Parser)]
 #[command(
     bin_name = EXE_NAME,
-    name = "moon",
-    about = "Take your repo to the moon!",
-    version = env::var("MOON_VERSION").unwrap_or_default(),
+    name = "rex",
+    about = "Take your repo to the rex!",
+    version = env::var("REX_VERSION").unwrap_or_default(),
     disable_help_subcommand = true,
     next_line_help = false,
     propagate_version = true,
@@ -94,7 +84,7 @@ pub struct Cli {
     #[arg(
         long,
         global = true,
-        env = "MOON_CACHE",
+        env = "REX_CACHE",
         help = "Mode for cache operations",
         help_heading = "Global options",
         default_value_t
@@ -104,7 +94,7 @@ pub struct Cli {
     #[arg(
         long,
         global = true,
-        env = "MOON_COLOR",
+        env = "REX_COLOR",
         help = "Force colored output",
         help_heading = "Global options"
     )]
@@ -114,7 +104,7 @@ pub struct Cli {
         long,
         short = 'c',
         global = true,
-        env = "MOON_CONCURRENCY",
+        env = "REX_CONCURRENCY",
         help = "Maximum number of threads to utilize",
         help_heading = "Global options"
     )]
@@ -123,7 +113,7 @@ pub struct Cli {
     #[arg(
         long,
         global = true,
-        env = "MOON_DUMP",
+        env = "REX_DUMP",
         help = "Dump a trace profile to the working directory",
         help_heading = "Global options"
     )]
@@ -133,7 +123,7 @@ pub struct Cli {
         value_enum,
         long,
         global = true,
-        env = "MOON_LOG",
+        env = "REX_LOG",
         help = "Lowest log level to output",
         help_heading = "Global options",
         default_value_t
@@ -143,7 +133,7 @@ pub struct Cli {
     #[arg(
         long,
         global = true,
-        env = "MOON_LOG_FILE",
+        env = "REX_LOG_FILE",
         help = "Path to a file to write logs to",
         help_heading = "Global options"
     )]
@@ -153,8 +143,8 @@ pub struct Cli {
         long,
         short = 'q',
         global = true,
-        env = "MOON_QUIET",
-        help = "Hide all moon console output",
+        env = "REX_QUIET",
+        help = "Hide all rex console output",
         help_heading = "Global options"
     )]
     pub quiet: bool,
@@ -163,7 +153,7 @@ pub struct Cli {
         value_enum,
         long,
         global = true,
-        env = "MOON_THEME",
+        env = "REX_THEME",
         help = "Terminal theme to print with",
         help_heading = "Global options",
         default_value_t
@@ -182,16 +172,16 @@ impl Cli {
         bag.set("STARBASE_LOG", self.log.to_string());
         bag.set("STARBASE_THEME", self.theme.to_string());
 
-        if !bag.has("MOON_CACHE") {
-            bag.set("MOON_CACHE", self.cache.to_string());
+        if !bag.has("REX_CACHE") {
+            bag.set("REX_CACHE", self.cache.to_string());
         }
 
-        if !bag.has("MOON_LOG") {
-            bag.set("MOON_LOG", self.log.to_string());
+        if !bag.has("REX_LOG") {
+            bag.set("REX_LOG", self.log.to_string());
         }
 
-        if !bag.has("MOON_THEME") {
-            bag.set("MOON_THEME", self.theme.to_string());
+        if !bag.has("REX_THEME") {
+            bag.set("REX_THEME", self.theme.to_string());
         }
 
         if matches!(self.cache, CacheMode::Off | CacheMode::Write) {

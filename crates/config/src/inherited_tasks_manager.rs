@@ -1,7 +1,7 @@
 use crate::inherited_tasks_config::*;
 use crate::shapes::{Input, OneOrMany};
 use miette::IntoDiagnostic;
-use moon_common::path::{PathExt, WorkspaceRelativePathBuf, standardize_separators};
+use rex_common::path::{PathExt, WorkspaceRelativePathBuf, standardize_separators};
 use rustc_hash::FxHashMap;
 use schematic::schema::indexmap::IndexMap;
 use std::path::Path;

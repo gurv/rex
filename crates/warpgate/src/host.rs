@@ -12,10 +12,10 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
-use system_env::find_command_on_path;
+use rex_system_env::find_command_on_path;
 use tokio::runtime::Handle;
 use tracing::{debug, error, instrument, trace, warn};
-use warpgate_api::{
+use rex_warpgate_api::{
     ExecCommandInput, ExecCommandOutput, HostLogInput, HostLogTarget, SendRequestInput,
     SendRequestOutput,
 };

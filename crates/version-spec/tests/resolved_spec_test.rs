@@ -1,6 +1,6 @@
 use compact_str::CompactString;
 use semver::Version;
-use version_spec::{CalVer, SemVer, VersionSpec};
+use rex_version_spec::{CalVer, SemVer, VersionSpec};
 
 mod resolved_spec {
     use super::*;

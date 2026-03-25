@@ -1,5 +1,5 @@
 use crate::{TargetScope, target::Target};
-use moon_common::Id;
+use rex_common::Id;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use std::str::FromStr;
 

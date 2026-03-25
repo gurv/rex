@@ -1,47 +1,31 @@
 [package]
-name = "moon_app"
-version = "0.0.1"
-edition = "2024"
+name = "rex_app"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_action = { path = "../action" }
-moon_action_context = { path = "../action-context" }
-moon_action_graph = { path = "../action-graph" }
-moon_action_pipeline = { path = "../action-pipeline" }
-moon_actions = { path = "../actions" }
-moon_affected = { path = "../affected" }
-moon_api = { path = "../api" }
-moon_app_context = { path = "../app-context" }
-moon_app_macros = { path = "../app-macros" }
-moon_cache = { path = "../cache" }
-moon_codegen = { path = "../codegen" }
-moon_common = { path = "../common" }
-moon_config = { path = "../config", features = ["loader", "proto", "tracing"] }
-moon_console = { path = "../console" }
-moon_docker = { path = "../docker" }
-moon_env = { path = "../env" }
-moon_env_var = { path = "../env-var" }
-moon_extension_plugin = { path = "../extension-plugin" }
-moon_feature_flags = { path = "../feature-flags" }
-moon_mcp = { path = "../mcp" }
-moon_pdk_api = { path = "../pdk-api" }
-moon_plugin = { path = "../plugin" }
-moon_process = { path = "../process" }
-moon_process_augment = { path = "../process-augment" }
-moon_project = { path = "../project" }
-moon_project_graph = { path = "../project-graph" }
-moon_query = { path = "../query" }
-moon_remote = { path = "../remote" }
-moon_task = { path = "../task" }
-moon_task_graph = { path = "../task-graph" }
-moon_task_runner = { path = "../task-runner" }
-moon_toolchain = { path = "../toolchain" }
-moon_toolchain_plugin = { path = "../toolchain-plugin" }
-moon_vcs = { path = "../vcs" }
-warpgate_api = { path = "../warpgate-api" }
-moon_workspace = { path = "../workspace" }
-moon_workspace_graph = { path = "../workspace-graph" }
+rex_action = { path = "../action" }
+rex_api = { path = "../api" }
+rex_app_context = { path = "../app-context" }
+rex_app_macros = { path = "../app-macros" }
+rex_cache = { path = "../cache" }
+rex_common = { path = "../common" }
+rex_config = { path = "../config", features = ["loader", "proto", "tracing"] }
+rex_console = { path = "../console" }
+rex_env = { path = "../env" }
+rex_env_var = { path = "../env-var" }
+rex_extension_plugin = { path = "../extension-plugin" }
+rex_feature_flags = { path = "../feature-flags" }
+rex_pdk_api = { path = "../pdk-api" }
+rex_plugin = { path = "../plugin" }
+rex_process = { path = "../process" }
+rex_process_augment = { path = "../process-augment" }
+rex_warpgate_api = { path = "../warpgate-api" }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
 bytes = "1.11.1"
@@ -85,17 +69,11 @@ starbase_utils = { workspace = true, features = [
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-version_spec = { path = "../version-spec" }
-
-# Visualizer
+rex_version_spec = { path = "../version-spec" }
 open = "5.3.3"
 petgraph = { workspace = true }
 tera = { workspace = true }
 tiny_http = "0.12.0"
-
-[dev-dependencies]
-serial_test = { workspace = true }
-starbase_sandbox = { workspace = true }
 
 [lints]
 workspace = true

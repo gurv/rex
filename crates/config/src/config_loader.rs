@@ -8,14 +8,14 @@ use crate::project_config::{PartialProjectConfig, ProjectConfig};
 use crate::template_config::TemplateConfig;
 use crate::toolchains_config::ToolchainsConfig;
 use crate::workspace_config::WorkspaceConfig;
-use moon_common::color;
+use rex_common::color;
 use schematic::{Config, ConfigLoader as Loader};
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug, Default)]
 pub struct ConfigLoader {
-    pub dir: PathBuf, // .moon
+    pub dir: PathBuf, // .rex
     finder: ConfigFinder,
 }
 
@@ -28,13 +28,13 @@ impl ConfigLoader {
     }
 
     pub fn locate_dir(&mut self, workspace_root: &Path) -> PathBuf {
-        let moon_dir = workspace_root.join(".moon");
-        let config_moon_dir = workspace_root.join(".config").join("moon");
+        let rex_dir = workspace_root.join(".rex");
+        let config_rex_dir = workspace_root.join(".config").join("rex");
 
-        if config_moon_dir.exists() {
-            self.dir = config_moon_dir;
+        if config_rex_dir.exists() {
+            self.dir = config_rex_dir;
         } else {
-            self.dir = moon_dir;
+            self.dir = rex_dir;
         }
 
         self.dir.clone()
@@ -150,7 +150,7 @@ impl ConfigLoader {
 
         #[cfg(feature = "proto")]
         {
-            use warpgate_api::PluginLocator;
+            use rex_warpgate_api::PluginLocator;
 
             result.config.inherit_defaults()?;
 
@@ -268,7 +268,7 @@ impl ConfigLoader {
 
         #[cfg(feature = "proto")]
         {
-            use warpgate_api::PluginLocator;
+            use rex_warpgate_api::PluginLocator;
 
             result.config.inherit_defaults(proto_config)?;
 

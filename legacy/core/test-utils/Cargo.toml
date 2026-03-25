@@ -1,12 +1,16 @@
 [package]
-name = "moon_test_utils"
-version = "0.0.1"
-edition = "2024"
+name = "rex_test_utils"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_common = { path = "../../../crates/common" }
-moon_config = { path = "../../../crates/config" }
+rex_common = { path = "../../../crates/common" }
+rex_config = { path = "../../../crates/config" }
 assert_cmd = "2.1.1"
 assert_fs = "1.1.3"
 insta = "1.43.2"

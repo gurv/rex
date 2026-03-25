@@ -1,12 +1,12 @@
 [package]
-name = "moon_time"
-version = "0.0.1"
-edition = "2024"
-license = "MIT"
-description = "Date and time utilities."
-homepage = "https://moonrepo.dev/moon"
-repository = "https://github.com/moonrepo/moon"
+name = "rex_time"
+version = "0.1.0"
 publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 chrono = { workspace = true }

@@ -80,7 +80,7 @@ impl GlobalEnvBag {
                 || k.starts_with("WARPGATE")
                 || k.contains("COLOR")
                 || k == "PATH"
-                || k == "MOON_VERSION"
+                || k == "REX_VERSION"
         }) {
             unsafe {
                 env::set_var(key, value);
@@ -126,26 +126,26 @@ impl GlobalEnvBag {
     }
 
     pub fn should_debug_mcp(&self) -> bool {
-        self.get_as("MOON_DEBUG_MCP", as_bool).unwrap_or_default()
+        self.get_as("REX_DEBUG_MCP", as_bool).unwrap_or_default()
     }
 
     pub fn should_debug_process_env(&self) -> bool {
-        self.get_as("MOON_DEBUG_PROCESS_ENV", as_bool)
+        self.get_as("REX_DEBUG_PROCESS_ENV", as_bool)
             .unwrap_or_default()
     }
 
     pub fn should_debug_process_input(&self) -> bool {
-        self.get_as("MOON_DEBUG_PROCESS_INPUT", as_bool)
+        self.get_as("REX_DEBUG_PROCESS_INPUT", as_bool)
             .unwrap_or_default()
     }
 
     pub fn should_debug_remote(&self) -> bool {
-        self.get_as("MOON_DEBUG_REMOTE", as_bool)
+        self.get_as("REX_DEBUG_REMOTE", as_bool)
             .unwrap_or_default()
     }
 
     pub fn should_debug_wasm(&self) -> bool {
-        self.get_as("MOON_DEBUG_WASM", as_bool).unwrap_or_default()
+        self.get_as("REX_DEBUG_WASM", as_bool).unwrap_or_default()
     }
 }
 

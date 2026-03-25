@@ -1,5 +1,0 @@
-tags: [extends]
-
-tasks:
-  base:
-    extends: unknown

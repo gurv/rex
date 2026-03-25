@@ -8,7 +8,7 @@ use starbase_utils::json::JsonError;
 use starbase_utils::toml::TomlError;
 use starbase_utils::yaml::YamlError;
 use thiserror::Error;
-use warpgate::{WarpgateLoaderError, WarpgatePluginError};
+use rex_warpgate::{WarpgateLoaderError, WarpgatePluginError};
 
 #[derive(Error, Debug, miette::Diagnostic)]
 pub enum ProtoLoaderError {

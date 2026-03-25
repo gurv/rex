@@ -1,11 +1,11 @@
 use crate::common::{InitializePluginInput, InitializePluginOutput};
 use crate::context::*;
-use moon_common::Id;
-use moon_config::{DockerPruneConfig, DockerScaffoldConfig, LanguageType};
-use moon_project::ProjectFragment;
+use rex_common::Id;
+use rex_config::{DockerPruneConfig, DockerScaffoldConfig, LanguageType};
+use rex_project::ProjectFragment;
+use rex_warpgate_api::{VirtualPath, api_struct, api_unit_enum};
 use schematic::Schema;
 use std::path::PathBuf;
-use warpgate_api::{VirtualPath, api_struct, api_unit_enum};
 
 pub use proto_pdk_api::{
     DetectVersionInput, DetectVersionOutput, ParseVersionFileInput, ParseVersionFileOutput,
@@ -88,8 +88,8 @@ api_struct!(
 api_struct!(
     /// Input passed to the `define_docker_metadata` function.
     pub struct DefineDockerMetadataInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Workspace and project merged toolchain configuration,
         /// with the latter taking precedence.
@@ -127,8 +127,8 @@ api_unit_enum!(
 api_struct!(
     /// Input passed to the `scaffold_docker` function.
     pub struct ScaffoldDockerInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Docker scaffold configuration.
         pub docker_config: DockerScaffoldConfig,
@@ -165,8 +165,8 @@ api_struct!(
     /// Input passed to the `prune_docker` function.
     /// Requires `locate_dependencies_root`.
     pub struct PruneDockerInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Docker prune configuration.
         pub docker_config: DockerPruneConfig,

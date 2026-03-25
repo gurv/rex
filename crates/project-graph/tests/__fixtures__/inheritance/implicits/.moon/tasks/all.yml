@@ -1,5 +1,0 @@
-implicitDeps:
-  - base:local
-
-implicitInputs:
-  - global.*

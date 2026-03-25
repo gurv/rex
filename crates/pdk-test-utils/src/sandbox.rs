@@ -1,14 +1,12 @@
 use crate::extension_wrapper::*;
 use crate::host_func_mocker::*;
-use crate::toolchain_wrapper::*;
-use crate::wrapper::WasmTestWrapper as ToolTestWrapper;
 use extism::{Function, UserData, ValType};
-use moon_pdk_api::{
-    Id, RegisterExtensionInput, RegisterExtensionOutput, RegisterToolchainInput,
-    RegisterToolchainOutput,
+
+// };
+use rex_pdk_api::{
+    Id, RegisterExtensionInput, RegisterExtensionOutput
 };
-use proto_core::{ProtoEnvironment, Tool, ToolContext, inject_proto_manifest_config};
-// use proto_pdk_test_utils::WasmTestWrapper as ToolTestWrapper;
+use proto_core::{ProtoEnvironment, ToolContext, inject_proto_manifest_config};
 use starbase_sandbox::{Sandbox, create_empty_sandbox, create_sandbox};
 use std::collections::BTreeMap;
 use std::fmt;
@@ -16,33 +14,33 @@ use std::fs;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::sync::Arc;
-use warpgate::{
+use rex_warpgate::{
     PluginContainer, PluginLoader, PluginManifest, Wasm, host::*, inject_default_manifest_config,
     test_utils::*,
 };
 
-pub struct MoonWasmSandbox {
+pub struct RexWasmSandbox {
     pub sandbox: Sandbox,
     pub home_dir: PathBuf,
     pub host_funcs: MockedHostFuncs,
-    pub moon_dir: PathBuf,
+    pub rex_dir: PathBuf,
     pub proto: Arc<ProtoEnvironment>,
     pub proto_dir: PathBuf,
     pub root: PathBuf,
     pub wasm_file: PathBuf,
 }
 
-impl MoonWasmSandbox {
+impl RexWasmSandbox {
     pub fn new(sandbox: Sandbox) -> Self {
         let root = sandbox.path().to_path_buf();
         let home_dir = root.join(".home");
-        let moon_dir = root.join(".moon");
+        let rex_dir = root.join(".rex");
         let proto_dir = root.join(".proto");
         let wasm_file = find_wasm_file();
 
         // Folders must exist for WASM to compile correctly!
         fs::create_dir_all(&home_dir).unwrap();
-        fs::create_dir_all(&moon_dir).unwrap();
+        fs::create_dir_all(&rex_dir).unwrap();
         fs::create_dir_all(&proto_dir).unwrap();
 
         // Required for toolchains
@@ -51,7 +49,7 @@ impl MoonWasmSandbox {
 
         Self {
             home_dir,
-            moon_dir,
+            rex_dir,
             proto: Arc::new(proto),
             proto_dir,
             root,
@@ -106,59 +104,59 @@ impl MoonWasmSandbox {
         }
     }
 
-    pub async fn create_toolchain(&self, id: &str) -> ToolchainTestWrapper {
-        self.create_toolchain_with_config(id, |_| {}).await
-    }
+    // pub async fn create_toolchain(&self, id: &str) -> ToolchainTestWrapper {
+    //     self.create_toolchain_with_config(id, |_| {}).await
+    // }
 
-    pub async fn create_toolchain_with_config(
-        &self,
-        id: &str,
-        mut op: impl FnMut(&mut ConfigBuilder),
-    ) -> ToolchainTestWrapper {
-        let id = Id::raw(id);
+    // pub async fn create_toolchain_with_config(
+    //     &self,
+    //     id: &str,
+    //     mut op: impl FnMut(&mut ConfigBuilder),
+    // ) -> ToolchainTestWrapper {
+    //     let id = Id::raw(id);
 
-        // Create manifest
-        let mut manifest = PluginManifest::new([Wasm::file(self.wasm_file.clone())]);
+    //     // Create manifest
+    //     let mut manifest = PluginManifest::new([Wasm::file(self.wasm_file.clone())]);
 
-        // Create config
-        let mut config = self.create_config();
-        config.plugin_id(&id);
+    //     // Create config
+    //     let mut config = self.create_config();
+    //     config.plugin_id(&id);
 
-        op(&mut config);
+    //     op(&mut config);
 
-        manifest.config.extend(config.build());
+    //     manifest.config.extend(config.build());
 
-        // Create plugin
-        let plugin = Arc::new(self.create_plugin_container(id, manifest, true));
-        let metadata: RegisterToolchainOutput = plugin
-            .cache_func_with(
-                "register_toolchain",
-                RegisterToolchainInput {
-                    id: plugin.id.clone(),
-                },
-            )
-            .await
-            .unwrap();
+    //     // Create plugin
+    //     let plugin = Arc::new(self.create_plugin_container(id, manifest, true));
+    //     let metadata: RegisterToolchainOutput = plugin
+    //         .cache_func_with(
+    //             "register_toolchain",
+    //             RegisterToolchainInput {
+    //                 id: plugin.id.clone(),
+    //             },
+    //         )
+    //         .await
+    //         .unwrap();
 
-        ToolchainTestWrapper {
-            metadata,
-            plugin: plugin.clone(),
-            root: self.root.clone(),
-            tool: if plugin.has_func("register_tool").await {
-                Some(ToolTestWrapper {
-                    tool: Tool::new(
-                        ToolContext::new(plugin.id.clone()),
-                        self.proto.clone(),
-                        plugin,
-                    )
-                    .await
-                    .unwrap(),
-                })
-            } else {
-                None
-            },
-        }
-    }
+    //     ToolchainTestWrapper {
+    //         metadata,
+    //         plugin: plugin.clone(),
+    //         root: self.root.clone(),
+    //         tool: if plugin.has_func("register_tool").await {
+    //             Some(ToolTestWrapper {
+    //                 tool: Tool::new(
+    //                     ToolContext::new(plugin.id.clone()),
+    //                     self.proto.clone(),
+    //                     plugin,
+    //                 )
+    //                 .await
+    //                 .unwrap(),
+    //             })
+    //         } else {
+    //             None
+    //         },
+    //     }
+    // }
 
     pub fn enable_logging(&self) {
         enable_wasm_logging(&self.wasm_file);
@@ -173,7 +171,7 @@ impl MoonWasmSandbox {
         let virtual_paths = BTreeMap::<PathBuf, PathBuf>::from_iter([
             (self.root.clone(), "/workspace".into()),
             (self.home_dir.clone(), "/userhome".into()),
-            (self.moon_dir.clone(), "/moon".into()),
+            (self.rex_dir.clone(), "/rex".into()),
             (self.proto_dir.clone(), "/proto".into()),
         ]);
 
@@ -197,10 +195,10 @@ impl MoonWasmSandbox {
     }
 
     fn create_host_funcs(&self, virtual_paths: BTreeMap<PathBuf, PathBuf>) -> Vec<Function> {
-        let loader = PluginLoader::new(self.moon_dir.join("plugins"), self.moon_dir.join("temp"));
+        let loader = PluginLoader::new(self.rex_dir.join("plugins"), self.rex_dir.join("temp"));
 
         let host_data = HostData {
-            cache_dir: self.moon_dir.join("cache"),
+            cache_dir: self.rex_dir.join("cache"),
             http_client: loader.get_http_client().unwrap().clone(),
             virtual_paths,
             working_dir: self.root.clone(),
@@ -209,20 +207,21 @@ impl MoonWasmSandbox {
         let mut funcs = create_host_functions(host_data.clone());
 
         for func_type in [
-            MoonHostFunction::LoadExtensionConfig,
-            MoonHostFunction::LoadProject,
-            MoonHostFunction::LoadProjects,
-            MoonHostFunction::LoadTask,
-            MoonHostFunction::LoadTasks,
-            MoonHostFunction::LoadToolchainConfig,
+            RexHostFunction::LoadExtensionConfig,
+            // RexHostFunction::LoadProject,
+            // RexHostFunction::LoadProjects,
+            // RexHostFunction::LoadTask,
+            // RexHostFunction::LoadTasks,
+            // RexHostFunction::LoadToolchainConfig,
         ] {
             funcs.push(Function::new(
                 func_type.as_str().to_string(),
-                if func_type == MoonHostFunction::LoadToolchainConfig {
-                    vec![ValType::I64, ValType::I64]
-                } else {
-                    vec![ValType::I64]
-                },
+                // if func_type == RexHostFunction::LoadToolchainConfig {
+                //     vec![ValType::I64, ValType::I64]
+                // } else {
+                //     vec![ValType::I64]
+                // },
+                vec![ValType::I64],
                 [ValType::I64],
                 UserData::new((func_type, self.host_funcs.clone())),
                 mocked_host_func_impl,
@@ -233,7 +232,7 @@ impl MoonWasmSandbox {
     }
 }
 
-impl Deref for MoonWasmSandbox {
+impl Deref for RexWasmSandbox {
     type Target = Sandbox;
 
     fn deref(&self) -> &Self::Target {
@@ -241,11 +240,11 @@ impl Deref for MoonWasmSandbox {
     }
 }
 
-impl fmt::Debug for MoonWasmSandbox {
+impl fmt::Debug for RexWasmSandbox {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("MoonWasmSandbox")
+        f.debug_struct("RexWasmSandbox")
             .field("home_dir", &self.home_dir)
-            .field("moon_dir", &self.moon_dir)
+            .field("rex_dir", &self.rex_dir)
             .field("proto_dir", &self.proto_dir)
             .field("root", &self.root)
             .field("wasm_file", &self.wasm_file)
@@ -253,10 +252,10 @@ impl fmt::Debug for MoonWasmSandbox {
     }
 }
 
-pub fn create_moon_sandbox(fixture: &str) -> MoonWasmSandbox {
-    MoonWasmSandbox::new(create_sandbox(fixture))
+pub fn create_rex_sandbox(fixture: &str) -> RexWasmSandbox {
+    RexWasmSandbox::new(create_sandbox(fixture))
 }
 
-pub fn create_empty_moon_sandbox() -> MoonWasmSandbox {
-    MoonWasmSandbox::new(create_empty_sandbox())
+pub fn create_empty_rex_sandbox() -> RexWasmSandbox {
+    RexWasmSandbox::new(create_empty_sandbox())
 }

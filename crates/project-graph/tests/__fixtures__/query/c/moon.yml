@@ -1,8 +1,0 @@
-language: python
-layer: tool
-
-tags: [three, one]
-
-tasks:
-  test:
-    command: test

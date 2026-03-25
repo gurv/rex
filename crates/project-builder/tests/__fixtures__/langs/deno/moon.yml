@@ -1,4 +1,0 @@
-language: javascript
-layer: application
-toolchains:
-  default: deno

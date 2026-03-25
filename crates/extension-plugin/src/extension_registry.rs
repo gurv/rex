@@ -2,11 +2,11 @@ use crate::extension_plugin::ExtensionPlugin;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
 use miette::IntoDiagnostic;
-use moon_common::Id;
-use moon_config::ExtensionsConfig;
-use moon_pdk_api::Operation;
-use moon_plugin::{
-    CallResult, MoonHostData, PluginError, PluginRegistry, PluginType, serialize_config,
+use rex_common::Id;
+use rex_config::ExtensionsConfig;
+use rex_pdk_api::Operation;
+use rex_plugin::{
+    CallResult, PluginError, PluginRegistry, PluginType, RexHostData, serialize_config,
 };
 use starbase_utils::json::JsonValue;
 use std::fmt::Debug;
@@ -27,14 +27,14 @@ impl Default for ExtensionRegistry {
             config: Arc::new(ExtensionsConfig::default()),
             registry: Arc::new(PluginRegistry::new(
                 PluginType::Extension,
-                MoonHostData::default(),
+                RexHostData::default(),
             )),
         }
     }
 }
 
 impl ExtensionRegistry {
-    pub fn new(host_data: MoonHostData, config: Arc<ExtensionsConfig>) -> Self {
+    pub fn new(host_data: RexHostData, config: Arc<ExtensionsConfig>) -> Self {
         Self {
             config,
             registry: Arc::new(PluginRegistry::new(PluginType::Extension, host_data)),
@@ -119,12 +119,12 @@ impl ExtensionRegistry {
                         trace!(
                             extension_id = id.as_str(),
                             config = %value,
-                            "Storing moon extension configuration",
+                            "Storing rex extension configuration",
                         );
 
                         manifest
                             .config
-                            .insert("moon_extension_config".to_owned(), value);
+                            .insert("rex_extension_config".to_owned(), value);
 
                         Ok(())
                     })

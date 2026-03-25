@@ -1,9 +1,0 @@
-layer: library
-
-toolchains:
-  default: node
-
-tasks:
-  node-library:
-    command: node-library
-    toolchain: node

@@ -6,9 +6,9 @@ use starbase_utils::toml::{self, TomlError};
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
-use system_env::{SystemArch, SystemOS};
+use rex_system_env::{SystemArch, SystemOS};
 use tracing::{debug, instrument};
-use version_spec::{UnresolvedVersionSpec, VersionSpec};
+use rex_version_spec::{UnresolvedVersionSpec, VersionSpec};
 
 pub const PROTO_LOCK_NAME: &str = ".protolock";
 

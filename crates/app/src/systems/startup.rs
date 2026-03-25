@@ -1,12 +1,12 @@
 use crate::app_error::AppError;
 use miette::IntoDiagnostic;
-use moon_config::{
+use proto_core::ProtoEnvironment;
+use rex_config::{
     ConfigLoader, ExtensionsConfig, InheritedTasksManager, ToolchainsConfig, WorkspaceConfig,
 };
-use moon_env::MoonEnvironment;
-use moon_env_var::GlobalEnvBag;
-use moon_feature_flags::FeatureFlags;
-use proto_core::ProtoEnvironment;
+use rex_env::RexEnvironment;
+use rex_env_var::GlobalEnvBag;
+use rex_feature_flags::FeatureFlags;
 use starbase_styles::color;
 use starbase_utils::dirs;
 use std::path::{Path, PathBuf};
@@ -26,7 +26,7 @@ where
     spawn(async { block_in_place(func) }).await
 }
 
-/// Recursively attempt to find the workspace root by locating the ".moon"
+/// Recursively attempt to find the workspace root by locating the ".rex"
 /// configuration folder, starting from the current working directory.
 #[instrument]
 pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
@@ -35,18 +35,18 @@ pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
         "Attempting to find workspace root from current working directory",
     );
 
-    let workspace_root = if let Some(root) = GlobalEnvBag::instance().get("MOON_WORKSPACE_ROOT") {
+    let workspace_root = if let Some(root) = GlobalEnvBag::instance().get("REX_WORKSPACE_ROOT") {
         debug!(
             env_var = root,
             "Inheriting from {} environment variable",
-            color::symbol("MOON_WORKSPACE_ROOT")
+            color::symbol("REX_WORKSPACE_ROOT")
         );
 
         let root: PathBuf = root
             .parse()
             .map_err(|_| AppError::InvalidWorkspaceRootEnvVar)?;
 
-        if !root.join(".moon").exists() && !root.join(".config").join("moon").exists() {
+        if !root.join(".rex").exists() && !root.join(".config").join("rex").exists() {
             return Err(AppError::MissingConfigDir.into());
         }
 
@@ -56,7 +56,7 @@ pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
 
         loop {
             if let Some(dir) = current_dir {
-                if dir.join(".moon").exists() || dir.join(".config").join("moon").exists() {
+                if dir.join(".rex").exists() || dir.join(".config").join("rex").exists() {
                     break dir.to_path_buf();
                 } else {
                     current_dir = dir.parent();
@@ -67,7 +67,7 @@ pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
         }
     };
 
-    // Avoid finding the ~/.moon directory
+    // Avoid finding the ~/.rex directory
     let home_dir = dirs::home_dir().ok_or(AppError::MissingHomeDir)?;
 
     if home_dir == workspace_root {
@@ -83,13 +83,13 @@ pub fn find_workspace_root(working_dir: &Path) -> miette::Result<PathBuf> {
     Ok(workspace_root)
 }
 
-/// Detect information for moon from the environment.
+/// Detect information for rex from the environment.
 #[instrument]
-pub fn detect_moon_environment(
+pub fn detect_rex_environment(
     working_dir: &Path,
     workspace_root: &Path,
-) -> miette::Result<Arc<MoonEnvironment>> {
-    let mut env = MoonEnvironment::new()?;
+) -> miette::Result<Arc<RexEnvironment>> {
+    let mut env = RexEnvironment::new()?;
     env.working_dir = working_dir.to_path_buf();
     env.workspace_root = workspace_root.to_path_buf();
 
@@ -108,7 +108,7 @@ pub fn detect_proto_environment(
     Ok(Arc::new(env))
 }
 
-/// Load the workspace configuration file from the `.moon` directory in the workspace root.
+/// Load the workspace configuration file from the `.rex` directory in the workspace root.
 /// This file is required to exist, so error if not found.
 #[instrument(skip(config_loader))]
 pub async fn load_workspace_config(
@@ -133,7 +133,7 @@ pub async fn load_workspace_config(
     Ok(Arc::new(config))
 }
 
-/// Load the toolchain configuration file from the `.moon` directory if it exists.
+/// Load the toolchain configuration file from the `.rex` directory if it exists.
 #[instrument(skip(config_loader, proto_env))]
 pub async fn load_toolchains_config(
     config_loader: ConfigLoader,
@@ -160,7 +160,7 @@ pub async fn load_toolchains_config(
     Ok(Arc::new(config))
 }
 
-/// Load the extensions configuration file from the `.moon` directory if it exists.
+/// Load the extensions configuration file from the `.rex` directory if it exists.
 #[instrument(skip(config_loader))]
 pub async fn load_extensions_config(
     config_loader: ConfigLoader,
@@ -179,8 +179,8 @@ pub async fn load_extensions_config(
     Ok(Arc::new(config))
 }
 
-/// Load the tasks configuration file from the `.moon` directory if it exists.
-/// Also load all scoped tasks from the `.moon/tasks` directory and load into the manager.
+/// Load the tasks configuration file from the `.rex` directory if it exists.
+/// Also load all scoped tasks from the `.rex/tasks` directory and load into the manager.
 #[instrument(skip(config_loader))]
 pub async fn load_tasks_configs(
     config_loader: ConfigLoader,

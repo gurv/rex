@@ -7,7 +7,7 @@ use crate::flow::resolve::ProtoResolveError;
 use crate::layout::ProtoLayoutError;
 use starbase_utils::json::JsonError;
 use thiserror::Error;
-use warpgate::WarpgatePluginError;
+use rex_warpgate::WarpgatePluginError;
 
 #[derive(Error, Debug, miette::Diagnostic)]
 pub enum ProtoManageError {

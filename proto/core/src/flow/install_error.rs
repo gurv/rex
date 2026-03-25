@@ -9,7 +9,7 @@ use starbase_utils::fs::FsError;
 use starbase_utils::net::NetError;
 use std::path::PathBuf;
 use thiserror::Error;
-use warpgate::{WarpgateHttpClientError, WarpgatePluginError};
+use rex_warpgate::{WarpgateHttpClientError, WarpgatePluginError};
 
 #[derive(Error, Debug, miette::Diagnostic)]
 pub enum ProtoInstallError {

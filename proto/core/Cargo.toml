@@ -1,23 +1,23 @@
 [package]
 name = "proto_core"
-version = "0.55.5"
-edition = "2024"
-license = "MIT"
-description = "Core proto APIs."
-homepage = "https://moonrepo.dev/proto"
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.89.0"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-proto_pdk_api = { version = "0.31.8", path = "../pdk-api", features = [
+proto_pdk_api = { path = "../pdk-api", features = [
     "schematic",
 ] }
-proto_shim = { path = "../../crates/shim" }
-system_env = { path = "../../crates/system-env" }
-version_spec = { path = "../../crates/version-spec", features = [
+rex_proto_shim = { path = "../../crates/shim" }
+rex_system_env = { path = "../../crates/system-env" }
+rex_version_spec = { path = "../../crates/version-spec", features = [
     "schematic",
 ] }
-warpgate = { path = "../../crates/warpgate", features = [
+rex_warpgate = { path = "../../crates/warpgate", features = [
     "miette",
     "schematic",
 ] }
@@ -61,14 +61,8 @@ tracing = { workspace = true }
 url = { version = "2.5.8", features = ["serde"] }
 uuid = { workspace = true }
 
-[dev-dependencies]
-proto_core = { path = ".", features = ["test-plugins"] }
-starbase_sandbox = { workspace = true }
-tokio = { workspace = true }
-
 [features]
 default = []
 clap = ["dep:clap"]
 
-# Internal only!
 test-plugins = []

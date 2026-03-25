@@ -4,7 +4,7 @@ use crate::id::Id;
 use schematic::{Config, ValidateError, ValidateResult};
 use serde::Serialize;
 use std::collections::BTreeMap;
-use warpgate::PluginLocator;
+use rex_warpgate::PluginLocator;
 
 fn validate_reserved_words<T>(
     value: &BTreeMap<Id, PluginLocator>,

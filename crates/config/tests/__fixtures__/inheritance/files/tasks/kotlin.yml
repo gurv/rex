@@ -1,6 +1,0 @@
-inheritedBy:
-  toolchains: 'kotlin'
-
-tasks:
-  kotlin:
-    command: kotlin

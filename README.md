@@ -5,6 +5,10 @@
 
 ```sh
 ls -la ~/.rex*
+target/debug/rex plugin add unpack file:///Users/gurv/Downloads/unpack_extension.wasm --log verbose
+target/debug/rex plugin add download https://github.com/moonrepo/plugins/releases/download/download_extension-v1.0.2/download_extension.wasm --log verbose
+ls -laR /Users/gurv/.rex
+ls -laR /Users/gurv/.proto
 ```
 
 * run
@@ -19,33 +23,6 @@ ls -la ~/.rex*
     * --filter
 * upgrade
 
-
 20260324: 114 МБт
 20260324: 94 МБт
-
-
-Убираем команды
-
-moon:
-  action-graph
-  migrate
-  project*
-  task*
-  docker
-  toolchain
-  sync
-  hash
-  check
-  ci
-  bin
-  clean
-  completions
-  exec
-  init
-  query
-  run
-  setup
-  teardown
-
-
-proto:
+20260324: 40 МБт

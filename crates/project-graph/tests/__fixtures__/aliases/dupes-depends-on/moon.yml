@@ -1,5 +1,0 @@
-dependsOn:
-  - id: 'two'
-    scope: 'development'
-  - id: 'alias-two'
-    scope: 'build'

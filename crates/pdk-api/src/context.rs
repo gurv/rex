@@ -1,11 +1,10 @@
-use moon_common::Id;
-use moon_project::ProjectFragment;
+use rex_common::Id;
 use std::time::{Duration, Instant, SystemTime};
-use warpgate_api::{AnyResult, VirtualPath, api_enum, api_struct};
+use rex_warpgate_api::{AnyResult, VirtualPath, api_enum, api_struct};
 
 api_struct!(
-    /// Information about the current moon workspace.
-    pub struct MoonContext {
+    /// Information about the current rex workspace.
+    pub struct RexContext {
         /// Virtual path to the current working directory.
         pub working_dir: VirtualPath,
 
@@ -14,7 +13,7 @@ api_struct!(
     }
 );
 
-impl MoonContext {
+impl RexContext {
     /// Return the provided file path as an absolute path (using virtual paths).
     /// If the path is already absolute (either real or virtual), return it.
     /// Otherwise prefix the path with the current working directory.
@@ -28,19 +27,19 @@ impl MoonContext {
         self.working_dir.join(path)
     }
 
-    /// Return an absolute path for the provided project.
-    pub fn get_project_root(&self, project: &ProjectFragment) -> VirtualPath {
-        self.get_project_root_from_source(&project.source)
-    }
+    // /// Return an absolute path for the provided project.
+    // pub fn get_project_root(&self, project: &ProjectFragment) -> VirtualPath {
+    //     self.get_project_root_from_source(&project.source)
+    // }
 
-    /// Return an absolute path for the provided project file path source.
-    pub fn get_project_root_from_source(&self, source: &str) -> VirtualPath {
-        if source.is_empty() || source == "." {
-            self.workspace_root.clone()
-        } else {
-            self.workspace_root.join(source)
-        }
-    }
+    // /// Return an absolute path for the provided project file path source.
+    // pub fn get_project_root_from_source(&self, source: &str) -> VirtualPath {
+    //     if source.is_empty() || source == "." {
+    //         self.workspace_root.clone()
+    //     } else {
+    //         self.workspace_root.join(source)
+    //     }
+    // }
 }
 
 api_enum!(

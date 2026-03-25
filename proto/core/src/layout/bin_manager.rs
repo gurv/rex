@@ -1,7 +1,7 @@
 use crate::tool_manifest::ToolManifest;
 use rustc_hash::{FxHashMap, FxHashSet};
 use std::mem;
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 #[derive(Debug, Default)]
 pub struct BinManager {

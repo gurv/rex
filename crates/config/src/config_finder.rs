@@ -30,7 +30,7 @@ impl ConfigFinder {
     }
 
     pub fn get_project_file_names(&self) -> Vec<String> {
-        self.get_file_names("moon")
+        self.get_file_names("rex")
     }
 
     pub fn get_template_file_names(&self) -> Vec<String> {
@@ -53,10 +53,10 @@ impl ConfigFinder {
         let mut label = String::new();
         let ext_glob = self.get_ext_glob();
 
-        if dir.file_name().is_some_and(|inner| inner == ".moon") {
-            label.push_str(".moon/");
+        if dir.file_name().is_some_and(|inner| inner == ".rex") {
+            label.push_str(".rex/");
         } else {
-            label.push_str(".config/moon/");
+            label.push_str(".config/rex/");
         }
 
         label.push_str(name);

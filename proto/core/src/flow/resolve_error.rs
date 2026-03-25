@@ -8,7 +8,7 @@ use starbase_styles::{Style, Stylize};
 use starbase_utils::fs::FsError;
 use std::path::PathBuf;
 use thiserror::Error;
-use warpgate::{WarpgateHttpClientError, WarpgatePluginError};
+use rex_warpgate::{WarpgateHttpClientError, WarpgatePluginError};
 
 #[derive(Error, Debug, miette::Diagnostic)]
 pub enum ProtoResolveError {
@@ -53,7 +53,7 @@ pub enum ProtoResolveError {
     InvalidVersionSpec {
         version: String,
         #[source]
-        error: Box<version_spec::SpecError>,
+        error: Box<rex_version_spec::SpecError>,
     },
 
     #[diagnostic(

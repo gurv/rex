@@ -1,5 +1,5 @@
 use miette::Diagnostic;
-use moon_common::{Style, Stylize};
+use rex_common::{Style, Stylize};
 use std::path::PathBuf;
 use thiserror::Error;
 

@@ -1,7 +1,7 @@
 use crate::resolve_path;
-use moon_cache_item::CacheItem;
-use moon_common::path::encode_component;
-use moon_target::{Target, TargetScope};
+use rex_cache_item::CacheItem;
+use rex_common::path::encode_component;
+use rex_target::{Target, TargetScope};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use starbase_utils::{fs, json};
@@ -11,7 +11,7 @@ use tracing::debug;
 
 #[derive(Debug)]
 pub struct StateEngine {
-    /// The `.moon/cache/states` directory. Stores state information about anything...
+    /// The `.rex/cache/states` directory. Stores state information about anything...
     /// tools, dependencies, projects, tasks, etc.
     pub states_dir: PathBuf,
 }

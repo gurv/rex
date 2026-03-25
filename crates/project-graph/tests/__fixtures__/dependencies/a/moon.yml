@@ -1,3 +1,0 @@
-dependsOn:
-  - id: b
-    scope: development

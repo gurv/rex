@@ -4,7 +4,7 @@ use proto_pdk_api::LoadVersionsOutput;
 use semver::VersionReq;
 use std::collections::BTreeMap;
 use tracing::trace;
-use version_spec::*;
+use rex_version_spec::*;
 
 #[derive(Default)]
 pub struct VersionResolver<'tool> {

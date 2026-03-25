@@ -1,5 +1,5 @@
 use semver::{BuildMetadata, Prerelease, Version};
-use version_spec::{CalVer, is_calver};
+use rex_version_spec::{CalVer, is_calver};
 
 mod calver {
     use super::*;

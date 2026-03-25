@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use tracing::instrument;
-use warpgate_api::{PluginLocator, UrlLocator, VirtualPath};
+use rex_warpgate_api::{PluginLocator, UrlLocator, VirtualPath};
 
 /// Create a SHA256 hash key based on the provided value and seed.
 pub fn create_cache_key(value: &str, seed: Option<&str>) -> String {
@@ -208,7 +208,7 @@ fn prepare_from_path(path: &Path) -> PathBuf {
 #[cfg(any(debug_assertions, test))]
 pub fn find_debug_locator(name: &str) -> Option<PluginLocator> {
     use crate::test_utils::find_wasm_file_with_name;
-    use warpgate_api::FileLocator;
+    use rex_warpgate_api::FileLocator;
 
     find_wasm_file_with_name(name).map(|wasm_path| {
         PluginLocator::File(Box::new(FileLocator {

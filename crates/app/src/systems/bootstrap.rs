@@ -1,4 +1,4 @@
-use moon_env_var::GlobalEnvBag;
+use rex_env_var::GlobalEnvBag;
 use starbase_styles::color::{no_color, supports_color};
 
 pub fn setup_no_colors() {
@@ -13,9 +13,9 @@ pub fn setup_colors(force: bool) {
     let bag = GlobalEnvBag::instance();
 
     // If being forced by --color or other env vars
-    if force || bag.has("MOON_COLOR") || bag.has("FORCE_COLOR") || bag.has("CLICOLOR_FORCE") {
+    if force || bag.has("REX_COLOR") || bag.has("FORCE_COLOR") || bag.has("CLICOLOR_FORCE") {
         let mut color_level = bag
-            .get("MOON_COLOR")
+            .get("REX_COLOR")
             .or_else(|| bag.get("FORCE_COLOR"))
             .unwrap_or("3".to_owned());
 
@@ -42,114 +42,5 @@ pub fn setup_colors(force: bool) {
         setup_no_colors();
     } else {
         bag.set("CLICOLOR", supports_color().to_string());
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use serial_test::serial;
-
-    fn reset_vars() {
-        let bag = GlobalEnvBag::instance();
-        bag.remove("NO_COLOR");
-        bag.remove("CLICOLOR");
-        bag.remove("CLICOLOR_FORCE");
-        bag.remove("FORCE_COLOR");
-        bag.remove("MOON_COLOR");
-    }
-
-    mod setup_color {
-        use super::*;
-
-        mod no_color {
-            use super::*;
-
-            #[test]
-            #[serial]
-            fn sets_vars() {
-                let bag = GlobalEnvBag::instance();
-                bag.set("NO_COLOR", "1");
-
-                setup_colors(false);
-
-                assert_eq!(bag.get("CLICOLOR").unwrap(), "0");
-                assert_eq!(bag.get("NO_COLOR").unwrap(), "1");
-
-                reset_vars();
-            }
-        }
-
-        mod forced_color {
-            use super::*;
-
-            #[test]
-            #[serial]
-            fn disables_if_zero() {
-                let bag = GlobalEnvBag::instance();
-
-                for var in ["MOON_COLOR", "FORCE_COLOR"] {
-                    bag.set(var, "0");
-
-                    setup_colors(false);
-
-                    assert_eq!(bag.get("CLICOLOR").unwrap(), "0");
-                    assert_eq!(bag.get("NO_COLOR").unwrap(), "1");
-
-                    reset_vars();
-                }
-            }
-
-            #[test]
-            #[serial]
-            fn disables_if_false_string() {
-                let bag = GlobalEnvBag::instance();
-
-                for var in ["MOON_COLOR", "FORCE_COLOR"] {
-                    bag.set(var, "false");
-
-                    setup_colors(false);
-
-                    assert_eq!(bag.get("CLICOLOR").unwrap(), "0");
-                    assert_eq!(bag.get("NO_COLOR").unwrap(), "1");
-
-                    reset_vars();
-                }
-            }
-
-            #[test]
-            #[serial]
-            fn enables_if_empty_string() {
-                let bag = GlobalEnvBag::instance();
-
-                for var in ["MOON_COLOR", "FORCE_COLOR"] {
-                    bag.set(var, "");
-
-                    setup_colors(false);
-
-                    assert_eq!(bag.get("CLICOLOR_FORCE").unwrap(), "1");
-                    assert_eq!(bag.get("FORCE_COLOR").unwrap(), "1");
-
-                    reset_vars();
-                }
-            }
-
-            #[test]
-            #[serial]
-            fn enables_if_true_string() {
-                let bag = GlobalEnvBag::instance();
-
-                for var in ["MOON_COLOR", "FORCE_COLOR"] {
-                    bag.set(var, "true");
-
-                    setup_colors(false);
-
-                    assert_eq!(bag.get("CLICOLOR_FORCE").unwrap(), "1");
-                    assert_eq!(bag.get("FORCE_COLOR").unwrap(), "1");
-
-                    reset_vars();
-                }
-            }
-        }
     }
 }

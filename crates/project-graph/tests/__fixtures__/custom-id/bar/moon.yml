@@ -1,5 +1,0 @@
-id: 'bar-renamed'
-
-tasks:
-  noop:
-    command: noop

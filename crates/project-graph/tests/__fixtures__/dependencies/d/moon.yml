@@ -1,6 +1,0 @@
-dependsOn:
-  - c
-  - id: b
-    scope: build
-  - id: a
-    scope: peer

@@ -1,6 +1,0 @@
-inheritedBy:
-  toolchains: 'typescript'
-
-tasks:
-  typescript:
-    command: typescript

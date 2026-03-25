@@ -4,12 +4,12 @@ mod plugin_error;
 mod plugin_registry;
 
 pub use host::*;
-pub use moon_env::MoonEnvironment;
 pub use plugin::*;
 pub use plugin_error::*;
 pub use plugin_registry::*;
 pub use proto_core::ProtoEnvironment;
-pub use warpgate::{PluginContainer, PluginLoader, PluginLocator, PluginManifest, Wasm};
+pub use rex_env::RexEnvironment;
+pub use rex_warpgate::{PluginContainer, PluginLoader, PluginLocator, PluginManifest, Wasm};
 
 use convert_case::{Case, Casing};
 use miette::IntoDiagnostic;

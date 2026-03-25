@@ -4,8 +4,8 @@ use crate::{
     config_struct, config_unit_enum, generate_io_file_methods, generate_io_glob_methods, patterns,
 };
 use deserialize_untagged_verbose_error::DeserializeUntaggedVerboseError;
-use moon_common::Id;
-use moon_common::path::{
+use rex_common::Id;
+use rex_common::path::{
     RelativeFrom, WorkspaceRelativePathBuf, expand_to_workspace_relative, standardize_separators,
 };
 use schematic::{

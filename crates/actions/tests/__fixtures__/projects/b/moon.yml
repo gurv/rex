@@ -1,6 +1,0 @@
-# With toolchain
-toolchains:
-  default: 'tc-tier1'
-
-tasks:
-  build: {}

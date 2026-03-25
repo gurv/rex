@@ -1,5 +1,5 @@
 use iocraft::prelude::*;
-use moon_console::ui::{List, ListItem, Style, StyledText};
+use rex_console::ui::{List, ListItem, Style, StyledText};
 
 #[derive(Default, Props)]
 pub struct ApiListProps {

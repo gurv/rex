@@ -1,5 +1,0 @@
-fileGroups:
-  sources:
-    - 'src/**/*'
-  configs:
-    - 'config.*'

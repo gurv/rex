@@ -44,7 +44,7 @@ pub use template::*;
 pub use template_config::*;
 pub use toolchain::*;
 pub use toolchains_config::*;
-pub use version_spec::{CalVer, SemVer, UnresolvedVersionSpec, VersionSpec};
+pub use rex_version_spec::{CalVer, SemVer, UnresolvedVersionSpec, VersionSpec};
 pub use workspace::*;
 pub use workspace_config::*;
 

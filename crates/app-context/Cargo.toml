@@ -1,17 +1,19 @@
 [package]
-name = "moon_app_context"
-version = "0.0.1"
-edition = "2024"
+name = "rex_app_context"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_cache = { path = "../cache" }
-moon_config = { path = "../config" }
-moon_console = { path = "../console" }
-moon_env = { path = "../env" }
-moon_extension_plugin = { path = "../extension-plugin" }
-moon_toolchain_plugin = { path = "../toolchain-plugin" }
-moon_vcs = { path = "../vcs" }
+rex_cache = { path = "../cache" }
+rex_config = { path = "../config" }
+rex_console = { path = "../console" }
+rex_env = { path = "../env" }
+rex_extension_plugin = { path = "../extension-plugin" }
 proto_core = { path = "../../proto/core" }
 
 [lints]

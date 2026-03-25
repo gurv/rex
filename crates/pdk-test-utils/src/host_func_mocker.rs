@@ -4,24 +4,24 @@ use std::sync::Arc;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(PartialEq)]
-pub enum MoonHostFunction {
+pub enum RexHostFunction {
     LoadExtensionConfig,
-    LoadProject,
-    LoadProjects,
-    LoadTask,
-    LoadTasks,
-    LoadToolchainConfig,
+    // LoadProject,
+    // LoadProjects,
+    // LoadTask,
+    // LoadTasks,
+    // LoadToolchainConfig,
 }
 
-impl MoonHostFunction {
+impl RexHostFunction {
     pub fn as_str(&self) -> &str {
         match self {
             Self::LoadExtensionConfig => "load_extension_config_by_id",
-            Self::LoadProject => "load_project_by_id",
-            Self::LoadProjects => "load_projects_by_id",
-            Self::LoadTask => "load_task_by_target",
-            Self::LoadTasks => "load_tasks_by_target",
-            Self::LoadToolchainConfig => "load_toolchain_config_by_id",
+            // Self::LoadProject => "load_project_by_id",
+            // Self::LoadProjects => "load_projects_by_id",
+            // Self::LoadTask => "load_task_by_target",
+            // Self::LoadTasks => "load_tasks_by_target",
+            // Self::LoadToolchainConfig => "load_toolchain_config_by_id",
         }
     }
 }
@@ -76,14 +76,14 @@ pub fn mocked_host_func_impl(
     plugin: &mut CurrentPlugin,
     inputs: &[Val],
     outputs: &mut [Val],
-    user_data: UserData<(MoonHostFunction, MockedHostFuncs)>,
+    user_data: UserData<(RexHostFunction, MockedHostFuncs)>,
 ) -> Result<(), Error> {
     let data = user_data.get()?;
     let data = data.lock().unwrap();
     let (func_type, mocked_funcs) = &*data;
 
     let value = match func_type {
-        MoonHostFunction::LoadExtensionConfig => {
+        RexHostFunction::LoadExtensionConfig => {
             let extension_id: String = plugin.memory_get_val(&inputs[0])?;
 
             mocked_funcs
@@ -91,52 +91,52 @@ pub fn mocked_host_func_impl(
                 .as_ref()
                 .map_or(json!({}), |func| func(extension_id))
         }
-        MoonHostFunction::LoadProject => {
-            let id: String = plugin.memory_get_val(&inputs[0])?;
+        // RexHostFunction::LoadProject => {
+        //     let id: String = plugin.memory_get_val(&inputs[0])?;
 
-            mocked_funcs
-                .load_project
-                .as_ref()
-                .map_or(json!({}), |func| func(id))
-        }
-        MoonHostFunction::LoadProjects => {
-            let ids_raw: String = plugin.memory_get_val(&inputs[0])?;
-            let ids: Vec<String> = serde_json::from_str(&ids_raw)?;
+        //     mocked_funcs
+        //         .load_project
+        //         .as_ref()
+        //         .map_or(json!({}), |func| func(id))
+        // }
+        // RexHostFunction::LoadProjects => {
+        //     let ids_raw: String = plugin.memory_get_val(&inputs[0])?;
+        //     let ids: Vec<String> = serde_json::from_str(&ids_raw)?;
 
-            mocked_funcs
-                .load_projects
-                .as_ref()
-                .map_or(json!({}), |func| func(ids))
-        }
-        MoonHostFunction::LoadTask => {
-            let id: String = plugin.memory_get_val(&inputs[0])?;
+        //     mocked_funcs
+        //         .load_projects
+        //         .as_ref()
+        //         .map_or(json!({}), |func| func(ids))
+        // }
+        // RexHostFunction::LoadTask => {
+        //     let id: String = plugin.memory_get_val(&inputs[0])?;
 
-            mocked_funcs
-                .load_task
-                .as_ref()
-                .map_or(json!({}), |func| func(id))
-        }
-        MoonHostFunction::LoadTasks => {
-            let ids_raw: String = plugin.memory_get_val(&inputs[0])?;
-            let ids: Vec<String> = serde_json::from_str(&ids_raw)?;
+        //     mocked_funcs
+        //         .load_task
+        //         .as_ref()
+        //         .map_or(json!({}), |func| func(id))
+        // }
+        // RexHostFunction::LoadTasks => {
+        //     let ids_raw: String = plugin.memory_get_val(&inputs[0])?;
+        //     let ids: Vec<String> = serde_json::from_str(&ids_raw)?;
 
-            mocked_funcs
-                .load_tasks
-                .as_ref()
-                .map_or(json!({}), |func| func(ids))
-        }
-        MoonHostFunction::LoadToolchainConfig => {
-            let toolchain_id: String = plugin.memory_get_val(&inputs[0])?;
-            let project_id = match inputs.get(1) {
-                Some(input) => Some(plugin.memory_get_val::<String>(input)?),
-                None => None,
-            };
+        //     mocked_funcs
+        //         .load_tasks
+        //         .as_ref()
+        //         .map_or(json!({}), |func| func(ids))
+        // }
+        // RexHostFunction::LoadToolchainConfig => {
+        //     let toolchain_id: String = plugin.memory_get_val(&inputs[0])?;
+        //     let project_id = match inputs.get(1) {
+        //         Some(input) => Some(plugin.memory_get_val::<String>(input)?),
+        //         None => None,
+        //     };
 
-            mocked_funcs
-                .load_toolchain_config
-                .as_ref()
-                .map_or(json!({}), |func| func(toolchain_id, project_id))
-        }
+        //     mocked_funcs
+        //         .load_toolchain_config
+        //         .as_ref()
+        //         .map_or(json!({}), |func| func(toolchain_id, project_id))
+        // }
     };
 
     plugin.memory_set_val(&mut outputs[0], serde_json::to_string(&value)?)?;

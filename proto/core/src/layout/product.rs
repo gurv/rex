@@ -3,7 +3,7 @@ use crate::helpers::now;
 use starbase_utils::fs;
 use std::path::PathBuf;
 use tracing::instrument;
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 #[derive(Clone, Default, Debug)]
 pub struct Product {

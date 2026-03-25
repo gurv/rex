@@ -1,7 +1,7 @@
 use crate::api::PluginContext;
 use rustc_hash::FxHashMap;
 use std::path::PathBuf;
-use warpgate_api::*;
+use rex_warpgate_api::*;
 
 /// Enumeration of all available hook functions that can be implemented by plugins.
 ///

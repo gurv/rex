@@ -1,8 +1,0 @@
-tags: ['deep1', 'deep2', 'deep3']
-
-tasks:
-  build:
-    args: ['value']
-    options:
-      mutex: 'lock-overwrite'
-      runInCI: true

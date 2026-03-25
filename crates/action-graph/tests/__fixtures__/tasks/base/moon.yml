@@ -1,7 +1,0 @@
-tasks:
-  build:
-    command: 'build'
-  internal:
-    command: 'unknown'
-    options:
-      internal: true

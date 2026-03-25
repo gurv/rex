@@ -1,13 +1,12 @@
 use crate::command::{Command, EnvBehavior};
 use crate::command_line::CommandLine;
-// use crate::output_stream::capture_stream;
 use crate::output::Output;
 use crate::process_error::ProcessError;
 use crate::process_registry::ProcessRegistry;
 use crate::shared_child::SharedChild;
 use miette::IntoDiagnostic;
-use moon_common::color;
-use moon_env_var::GlobalEnvBag;
+use rex_common::color;
+use rex_env_var::GlobalEnvBag;
 use rustc_hash::FxHashMap;
 use std::env;
 use std::ffi::{OsStr, OsString};
@@ -522,7 +521,7 @@ impl Command {
     fn pre_log_command(&self, line: &CommandLine, child: &SharedChild) {
         let bag = GlobalEnvBag::instance();
 
-        let workspace_env_key = OsString::from("MOON_WORKSPACE_ROOT");
+        let workspace_env_key = OsString::from("REX_WORKSPACE_ROOT");
         let workspace_root = if let Some(var) = self.env.get(&workspace_env_key)
             && let Some(value) = var.get_value()
         {
@@ -561,7 +560,7 @@ impl Command {
                 } else if debug_env
                     || key
                         .to_str()
-                        .map(|k| k.starts_with("MOON_"))
+                        .map(|k| k.starts_with("REX_"))
                         .unwrap_or_default()
                 {
                     Some((key, value.get_value().unwrap()))

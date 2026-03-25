@@ -1,5 +1,5 @@
 use crate::config_struct;
-use moon_common::Id;
+use rex_common::Id;
 use rustc_hash::FxHashMap;
 use schematic::Config;
 

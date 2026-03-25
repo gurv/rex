@@ -4,7 +4,7 @@ mod state_engine;
 
 pub use cache_engine::*;
 pub use hash_engine::*;
-pub use moon_cache_item::*;
+pub use rex_cache_item::*;
 pub use state_engine::*;
 
 use starbase_utils::fs::RemoveDirContentsResult;

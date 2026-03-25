@@ -1,18 +1,18 @@
 [package]
-name = "moon_extension_plugin"
-version = "0.0.1"
-edition = "2024"
-license = "MIT"
-description = "An extension plugin, allowing unique functionality."
-homepage = "https://moonrepo.dev/moon"
-repository = "https://github.com/moonrepo/moon"
+name = "rex_extension_plugin"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_common = { path = "../common" }
-moon_config = { path = "../config" }
-moon_pdk_api = { path = "../pdk-api" }
-moon_plugin = { path = "../plugin" }
+rex_common = { path = "../common" }
+rex_config = { path = "../config" }
+rex_pdk_api = { path = "../pdk-api" }
+rex_plugin = { path = "../plugin" }
 async-trait = { workspace = true }
 futures = { workspace = true }
 miette = { workspace = true }

@@ -1,5 +1,0 @@
-language: ruby
-
-tasks:
-  ruby-tool:
-    command: ruby-tool

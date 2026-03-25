@@ -6,13 +6,13 @@ use crate::tool_spec::ToolSpec;
 use proto_pdk_api::{
     ExecutableConfig, LocateExecutablesInput, LocateExecutablesOutput, PluginFunction,
 };
-use proto_shim::{get_exe_file_name, get_shim_file_name};
+use rex_proto_shim::{get_exe_file_name, get_shim_file_name};
 use serde::Serialize;
 use starbase_utils::{fs, path};
 use std::env;
 use std::path::PathBuf;
 use tracing::{debug, instrument};
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 // Executable = File within the tool's install directory
 // Binary/shim = File within proto's store directories

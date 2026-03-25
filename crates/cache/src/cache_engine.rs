@@ -1,8 +1,8 @@
 use crate::{HashEngine, StateEngine, merge_clean_results, resolve_path};
-use moon_cache_item::*;
-use moon_common::path::encode_component;
-use moon_env_var::GlobalEnvBag;
-use moon_time::parse_duration;
+use rex_cache_item::*;
+use rex_common::path::encode_component;
+use rex_env_var::GlobalEnvBag;
+use rex_time::parse_duration;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use starbase_utils::fs::{FileLock, RemoveDirContentsResult};
@@ -15,7 +15,7 @@ use tracing::{debug, instrument};
 
 #[derive(Debug)]
 pub struct CacheEngine {
-    /// The `.moon/cache` directory relative to workspace root.
+    /// The `.rex/cache` directory relative to workspace root.
     /// Contains cached items pertaining to runs and processes.
     pub cache_dir: PathBuf,
 
@@ -49,7 +49,7 @@ impl CacheEngine {
             fs::write_file(
                 cache_tag,
                 r#"Signature: 8a477f597d28d172789f06886806bc55
-# This file is a cache directory tag created by moon.
+# This file is a cache directory tag created by rex.
 # For information see https://bford.info/cachedir"#,
             )?;
         }
@@ -67,7 +67,7 @@ impl CacheEngine {
     pub fn force_mode(&self, mode: CacheMode) {
         let _ = self.forced_mode.write().unwrap().insert(mode);
 
-        GlobalEnvBag::instance().set("MOON_CACHE", mode.to_string());
+        GlobalEnvBag::instance().set("REX_CACHE", mode.to_string());
     }
 
     pub fn cache<T>(&self, path: impl AsRef<OsStr>) -> miette::Result<CacheItem<T>>

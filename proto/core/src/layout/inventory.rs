@@ -8,7 +8,7 @@ use starbase_utils::{fs, json, path};
 use std::path::PathBuf;
 use std::time::{Duration, SystemTime};
 use tracing::instrument;
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 #[derive(Clone, Debug, Default)]
 pub struct Inventory {

@@ -2,10 +2,10 @@ use crate::patterns::merge_plugin_partials;
 use crate::shapes::OneOrMany;
 use crate::toolchains_config::ToolchainPluginConfig;
 use crate::{config_enum, config_struct};
-use moon_common::{Id, IdExt};
+use rex_common::{Id, IdExt};
 use rustc_hash::FxHashMap;
 use schematic::Config;
-use version_spec::UnresolvedVersionSpec;
+use rex_version_spec::UnresolvedVersionSpec;
 
 config_enum!(
     /// Variants a project-level toolchain can be configured.

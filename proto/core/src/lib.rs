@@ -37,12 +37,12 @@ pub use tool_error::*;
 pub use tool_manifest::*;
 pub use tool_spec::*;
 pub use version_resolver::*;
-pub use version_spec::*;
+pub use rex_version_spec::*;
 
 // Only export things consumers will actually need
 pub use semver::{Version, VersionReq};
-pub use warpgate;
-pub use warpgate::{
+pub use rex_warpgate;
+pub use rex_warpgate::{
     FileLocator, GitHubLocator, PluginLocator, RegistryConfig, RegistryLocator, UrlLocator,
 };
 

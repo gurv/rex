@@ -1,7 +1,7 @@
 use crate::shapes::{FilePath, GlobPath, PortablePath};
 use crate::workspace::*;
 use crate::{config_enum, config_struct, config_unit_enum};
-use moon_common::Id;
+use rex_common::Id;
 use rustc_hash::FxHashMap;
 use schematic::{Config, ConfigEnum, PathSegment, ValidateError, env, validate};
 use semver::VersionReq;
@@ -81,7 +81,7 @@ config_struct!(
     #[derive(Config)]
     pub struct WorkspaceProjectsConfig {
         /// A list of glob patterns in which to locate project directories.
-        /// Can be suffixed with a `moon.*` config file to only find distinct projects.
+        /// Can be suffixed with a `rex.*` config file to only find distinct projects.
         pub globs: Vec<String>,
 
         /// The project identifier format for glob located projects.
@@ -102,7 +102,7 @@ config_enum!(
         #[setting(nested)]
         Both(WorkspaceProjectsConfig),
 
-        /// Using glob patterns. Suffix with `moon.*` to be distinct.
+        /// Using glob patterns. Suffix with `rex.*` to be distinct.
         Globs(Vec<String>),
 
         /// Using a map of identifiers to file source paths.
@@ -112,7 +112,7 @@ config_enum!(
 );
 
 config_struct!(
-    /// Configures all aspects of the moon workspace.
+    /// Configures all aspects of the rex workspace.
     /// Docs: https://moonrepo.dev/docs/config/workspace
     #[derive(Config)]
     pub struct WorkspaceConfig {
@@ -139,7 +139,7 @@ config_struct!(
         #[setting(nested)]
         pub docker: DockerConfig,
 
-        /// Configures experiments across the entire moon workspace.
+        /// Configures experiments across the entire rex workspace.
         /// @since 1.11.0
         #[setting(nested)]
         pub experiments: ExperimentsConfig,
@@ -177,8 +177,8 @@ config_struct!(
         #[setting(nested)]
         pub remote: RemoteConfig,
 
-        /// Collects anonymous usage information, and checks for new moon versions.
-        #[setting(default = true, env = "MOON_TELEMETRY", parse_env = env::parse_bool)]
+        /// Collects anonymous usage information, and checks for new rex versions.
+        #[setting(default = true, env = "REX_TELEMETRY", parse_env = env::parse_bool)]
         pub telemetry: bool,
 
         /// Configures the version control system (VCS). Also known as
@@ -186,7 +186,7 @@ config_struct!(
         #[setting(nested)]
         pub vcs: VcsConfig,
 
-        /// Requires a specific version of the `moon` binary.
+        /// Requires a specific version of the `rex` binary.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pub version_constraint: Option<VersionReq>,
     }

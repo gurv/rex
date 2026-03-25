@@ -1,4 +1,4 @@
-use moon_common::{Id, IdError};
+use rex_common::{Id, IdError};
 use schematic::ConfigEnum;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use std::str::FromStr;

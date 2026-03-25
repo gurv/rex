@@ -1,18 +1,18 @@
 use crate::context::*;
 use crate::host::*;
 use crate::is_false;
-use moon_config::{UnresolvedVersionSpec, Version, VersionSpec};
-use moon_project::ProjectFragment;
-use moon_task::TaskFragment;
+use rex_config::{UnresolvedVersionSpec, Version, VersionSpec};
+use rex_project::ProjectFragment;
+use rex_task::TaskFragment;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
-use warpgate_api::{VirtualPath, api_enum, api_struct};
+use rex_warpgate_api::{VirtualPath, api_enum, api_struct};
 
 api_struct!(
     /// Input passed to the `define_requirements` function.
     pub struct DefineRequirementsInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Workspace toolchain configuration.
         pub toolchain_config: serde_json::Value,
@@ -34,8 +34,8 @@ api_struct!(
 api_struct!(
     /// Input passed to the `setup_environment` function.
     pub struct SetupEnvironmentInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Virtual path to a global executables directory
         /// for the current toolchain.
@@ -77,8 +77,8 @@ api_struct!(
 api_struct!(
     /// Input passed to the `locate_dependencies_root` function.
     pub struct LocateDependenciesRootInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// The starting directory in which to locate the root.
         /// This is typically a project root.
@@ -111,8 +111,8 @@ api_struct!(
     /// Input passed to the `install_dependencies` function.
     /// Requires `locate_dependencies_root`.
     pub struct InstallDependenciesInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// List of packages to only install dependencies for.
         pub packages: Vec<String>,
@@ -158,8 +158,8 @@ api_struct!(
 api_struct!(
     /// Input passed to the `parse_manifest` function.
     pub struct ParseManifestInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Virtual path to the manifest file.
         pub path: VirtualPath,
@@ -294,8 +294,8 @@ impl ManifestDependency {
 api_struct!(
     /// Input passed to the `parse_lock` function.
     pub struct ParseLockInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Virtual path to the lockfile.
         pub path: VirtualPath,
@@ -341,8 +341,8 @@ api_struct!(
 api_struct!(
     /// Input passed to the `hash_task_contents` function.
     pub struct HashTaskContentsInput {
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Fragment of the project that the task belongs to.
         pub project: ProjectFragment,

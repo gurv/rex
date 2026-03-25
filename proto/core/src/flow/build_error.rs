@@ -31,7 +31,7 @@ pub enum ProtoBuildError {
     Process(#[from] Box<ProtoProcessError>),
 
     #[error(transparent)]
-    System(#[from] Box<system_env::Error>),
+    System(#[from] Box<rex_system_env::Error>),
 
     #[diagnostic(code(proto::install::build::parse_version_failed))]
     #[error("Failed to parse version from {}.", .value.style(Style::Symbol))]
@@ -94,8 +94,8 @@ impl From<ProtoProcessError> for ProtoBuildError {
     }
 }
 
-impl From<system_env::Error> for ProtoBuildError {
-    fn from(e: system_env::Error) -> ProtoBuildError {
+impl From<rex_system_env::Error> for ProtoBuildError {
+    fn from(e: rex_system_env::Error) -> ProtoBuildError {
         ProtoBuildError::System(Box::new(e))
     }
 }

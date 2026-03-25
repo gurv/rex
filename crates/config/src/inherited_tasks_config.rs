@@ -5,7 +5,7 @@ use crate::shapes::{FilePath, Input, OneOrMany};
 use crate::task_config::{TaskConfig, TaskDependency, validate_deps};
 use crate::task_options_config::{PartialTaskOptionsConfig, TaskOptionsConfig};
 use crate::{config_enum, config_struct};
-use moon_common::{Id, cacheable};
+use rex_common::{Id, cacheable};
 use rustc_hash::FxHashMap;
 use schematic::schema::indexmap::IndexMap;
 use schematic::{Config, merge, validate};

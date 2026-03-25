@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use warpgate_api::{FileLocator, GitHubLocator, PluginLocator, RegistryLocator, UrlLocator};
+use rex_warpgate_api::{FileLocator, GitHubLocator, PluginLocator, RegistryLocator, UrlLocator};
 
 mod locator {
     use super::*;

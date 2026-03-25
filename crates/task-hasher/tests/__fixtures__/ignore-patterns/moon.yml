@@ -1,9 +1,0 @@
-language: javascript
-
-tasks:
-  testPatterns:
-    command: noop
-    inputs:
-      - '**/*'
-    outputs:
-      - 'out'

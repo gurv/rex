@@ -2,7 +2,7 @@ use super::portable_path::{FilePath, GlobPath, PortablePath, is_glob_like};
 use super::*;
 use crate::{config_struct, generate_io_file_methods, generate_io_glob_methods, patterns};
 use deserialize_untagged_verbose_error::DeserializeUntaggedVerboseError;
-use moon_common::path::{
+use rex_common::path::{
     RelativeFrom, WorkspaceRelativePathBuf, expand_to_workspace_relative, standardize_separators,
 };
 use schematic::{Config, ParseError, Schema, SchemaBuilder, Schematic, schema::UnionType};

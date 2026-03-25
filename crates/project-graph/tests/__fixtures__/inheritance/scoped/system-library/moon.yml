@@ -1,9 +1,0 @@
-layer: library
-
-toolchains:
-  default: system
-
-tasks:
-  system-library:
-    command: system-library
-    toolchain: system

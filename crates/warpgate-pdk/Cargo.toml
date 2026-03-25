@@ -1,24 +1,21 @@
 [package]
-name = "warpgate_pdk"
-version = "0.16.2"
-edition = "2024"
-license = "MIT"
-description = "Reusable WASM macros and functions for plugin developer kits."
-homepage = "https://moonrepo.dev/proto"
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.85.0"
+name = "rex_warpgate_pdk"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-warpgate_api = { path = "../warpgate-api" }
+rex_warpgate_api = { path = "../warpgate-api" }
 extism-pdk = { workspace = true }
 serde = { workspace = true }
 tracing = { workspace = true, optional = true }
 tracing-subscriber = { workspace = true, optional = true, features = [
 	"registry",
 ] }
-
-[dev-dependencies]
-warpgate_pdk = { path = ".", features = ["tracing"] }
 
 [features]
 default = []

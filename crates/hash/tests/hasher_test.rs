@@ -1,4 +1,4 @@
-use moon_hash::{ContentHasher, hash_fingerprint};
+use rex_hash::{ContentHasher, hash_fingerprint};
 
 hash_fingerprint!(
     struct ContentOne<'l> {

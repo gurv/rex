@@ -1,4 +1,4 @@
-use moon_hash::ContentHasher;
+use rex_hash::ContentHasher;
 use serde::Serialize;
 use starbase_utils::fs;
 use std::path::{Path, PathBuf};
@@ -6,10 +6,10 @@ use tracing::debug;
 
 #[derive(Debug)]
 pub struct HashEngine {
-    /// The `.moon/cache/hashes` directory. Stores hash manifests.
+    /// The `.rex/cache/hashes` directory. Stores hash manifests.
     pub hashes_dir: PathBuf,
 
-    /// The `.moon/cache/outputs` directory. Stores task outputs as hashed archives.
+    /// The `.rex/cache/outputs` directory. Stores task outputs as hashed archives.
     pub outputs_dir: PathBuf,
 }
 

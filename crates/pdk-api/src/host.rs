@@ -1,13 +1,13 @@
 use crate::{is_false, is_zero};
 use derive_setters::*;
-use warpgate_api::{ExecCommandInput, VirtualPath, api_enum, api_struct};
+use rex_warpgate_api::{ExecCommandInput, VirtualPath, api_enum, api_struct};
 
 api_struct!(
     #[derive(Setters)]
     #[serde(default)]
     pub struct ExecCommand {
         /// When enabled, failed command executions will
-        /// not abort the moon process, and allow it to
+        /// not abort the rex process, and allow it to
         /// continue running.
         #[serde(skip_serializing_if = "is_false")]
         #[setters(bool)]

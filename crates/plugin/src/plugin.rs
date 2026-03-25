@@ -1,17 +1,17 @@
 use async_trait::async_trait;
-use moon_env::MoonEnvironment;
 use proto_core::ProtoEnvironment;
+use rex_env::RexEnvironment;
+use rex_warpgate::{Id, PluginContainer, PluginLocator};
 use std::fmt::Debug;
 use std::path::PathBuf;
 use std::sync::Arc;
-use warpgate::{Id, PluginContainer, PluginLocator};
 
 pub struct PluginRegistration {
     pub container: PluginContainer,
     pub id: Id,        // unstable_foo
     pub id_stable: Id, // foo
     pub locator: PluginLocator,
-    pub moon_env: Arc<MoonEnvironment>,
+    pub rex_env: Arc<RexEnvironment>,
     pub proto_env: Arc<ProtoEnvironment>,
     pub wasm_file: PathBuf,
 }

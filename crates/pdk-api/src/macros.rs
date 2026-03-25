@@ -16,7 +16,7 @@ macro_rules! shared_config {
         pub struct $container {
             pub data: $model,
             pub dirty: Vec<String>,
-            pub path: moon_pdk_api::VirtualPath,
+            pub path: rex_pdk_api::VirtualPath,
         }
 
         impl std::ops::Deref for $container {
@@ -34,7 +34,7 @@ macro_rules! shared_config {
         }
 
         impl $container {
-            pub fn new(path: moon_pdk_api::VirtualPath) -> Self {
+            pub fn new(path: rex_pdk_api::VirtualPath) -> Self {
                 Self {
                     data: Default::default(),
                     dirty: vec![],
@@ -52,10 +52,10 @@ macro_rules! shared_config {
 #[macro_export]
 macro_rules! json_config {
     ($container:ident, $model:ident) => {
-        moon_pdk_api::shared_config!($container, $model);
+        rex_pdk_api::shared_config!($container, $model);
 
         impl $container {
-            pub fn load(path: moon_pdk_api::VirtualPath) -> AnyResult<Self> {
+            pub fn load(path: rex_pdk_api::VirtualPath) -> AnyResult<Self> {
                 if path.exists() {
                     Ok(Self {
                         data: starbase_utils::json::read_file(path.any_path())?,
@@ -67,7 +67,7 @@ macro_rules! json_config {
                 }
             }
 
-            pub fn save(self) -> AnyResult<Option<moon_pdk_api::VirtualPath>> {
+            pub fn save(self) -> AnyResult<Option<rex_pdk_api::VirtualPath>> {
                 if self.dirty.is_empty() {
                     return Ok(None);
                 }
@@ -98,7 +98,7 @@ macro_rules! json_config {
                 Ok(Some(self.path))
             }
 
-            pub fn save_model(self) -> AnyResult<moon_pdk_api::VirtualPath> {
+            pub fn save_model(self) -> AnyResult<rex_pdk_api::VirtualPath> {
                 use starbase_utils::json;
 
                 #[cfg(feature = "wasm")]
@@ -117,10 +117,10 @@ macro_rules! json_config {
 #[macro_export]
 macro_rules! toml_config {
     ($container:ident, $model:ident) => {
-        moon_pdk_api::shared_config!($container, $model);
+        rex_pdk_api::shared_config!($container, $model);
 
         impl $container {
-            pub fn load(path: moon_pdk_api::VirtualPath) -> AnyResult<Self> {
+            pub fn load(path: rex_pdk_api::VirtualPath) -> AnyResult<Self> {
                 if path.exists() {
                     Ok(Self {
                         data: starbase_utils::toml::read_file(path.any_path())?,
@@ -132,7 +132,7 @@ macro_rules! toml_config {
                 }
             }
 
-            pub fn save(self) -> AnyResult<Option<moon_pdk_api::VirtualPath>> {
+            pub fn save(self) -> AnyResult<Option<rex_pdk_api::VirtualPath>> {
                 if self.dirty.is_empty() {
                     return Ok(None);
                 }
@@ -163,7 +163,7 @@ macro_rules! toml_config {
                 Ok(Some(self.path))
             }
 
-            pub fn save_model(self) -> AnyResult<moon_pdk_api::VirtualPath> {
+            pub fn save_model(self) -> AnyResult<rex_pdk_api::VirtualPath> {
                 use starbase_utils::toml;
 
                 #[cfg(feature = "wasm")]

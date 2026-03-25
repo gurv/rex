@@ -1,6 +1,0 @@
-inheritedBy:
-  toolchains: 'javascript'
-
-tasks:
-  global-javascript:
-    command: global-javascript

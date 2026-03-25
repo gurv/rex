@@ -1,8 +1,0 @@
-tasks:
-  parent:
-    env:
-      VAR1: 'local-parent'
-
-  child:
-    env:
-      VAR3: 'local-child'

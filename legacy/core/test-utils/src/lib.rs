@@ -11,8 +11,8 @@ pub use predicates;
 pub use pretty_assertions;
 pub use sandbox::*;
 
-use moon_common::path::{WorkspaceRelativePathBuf, clean_components};
-use moon_config::Input;
+use rex_common::path::{WorkspaceRelativePathBuf, clean_components};
+use rex_config::Input;
 use std::path::PathBuf;
 use std::str::FromStr;
 

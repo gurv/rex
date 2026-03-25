@@ -1,7 +1,0 @@
-inheritedBy:
-  toolchains: 'node'
-  layers: 'library'
-
-tasks:
-  node-library:
-    command: node-library

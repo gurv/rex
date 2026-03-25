@@ -1,4 +1,4 @@
-use moon_env_var::GlobalEnvBag;
+use rex_env_var::GlobalEnvBag;
 use std::fmt;
 use tracing::warn;
 
@@ -27,7 +27,7 @@ impl From<String> for CacheMode {
                         LOGGED_WARNING = true;
 
                         warn!(
-                            "Unknown MOON_CACHE environment variable value \"{}\", falling back to read-write mode",
+                            "Unknown REX_CACHE environment variable value \"{}\", falling back to read-write mode",
                             unknown
                         );
                     }
@@ -75,7 +75,7 @@ impl CacheMode {
 }
 
 pub fn get_cache_mode() -> CacheMode {
-    if let Some(var) = GlobalEnvBag::instance().get("MOON_CACHE") {
+    if let Some(var) = GlobalEnvBag::instance().get("REX_CACHE") {
         return CacheMode::from(var);
     }
 

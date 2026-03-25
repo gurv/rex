@@ -1,6 +1,0 @@
-inheritedBy:
-  tags: ['armor']
-
-tasks:
-  armor:
-    command: armor

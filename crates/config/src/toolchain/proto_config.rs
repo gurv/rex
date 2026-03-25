@@ -1,13 +1,13 @@
 use crate::config_struct;
 use schematic::{Config, DefaultValueResult};
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 fn default_version(_: &()) -> DefaultValueResult<VersionSpec> {
     Ok(VersionSpec::parse("0.55.4").ok())
 }
 
 config_struct!(
-    /// Configures how moon integrates with proto.
+    /// Configures how rex integrates with proto.
     #[derive(Config)]
     pub struct ProtoConfig {
         /// The version of proto to download and install,

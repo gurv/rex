@@ -23,9 +23,7 @@ pub fn is_ci() -> bool {
 
     *CI_CACHE.get_or_init(|| {
         has_env_var("CI") ||
-        has_env_var("CI_NAME") ||
-        // Azure doesn't set the `CI` var
-        has_env_var("AZURE_PIPELINES")
+        has_env_var("CI_NAME")
     })
 }
 
@@ -65,7 +63,7 @@ pub fn is_test_env() -> bool {
     static TEST_CACHE: OnceLock<bool> = OnceLock::new();
 
     *TEST_CACHE.get_or_init(|| {
-        has_env_var("MOON_TEST") || has_env_var("STARBASE_TEST") || has_env_var("NEXTEST")
+        has_env_var("REX_TEST") || has_env_var("STARBASE_TEST") || has_env_var("NEXTEST")
     })
 }
 

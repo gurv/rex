@@ -1,4 +1,4 @@
-use warpgate_api::VirtualPath;
+use rex_warpgate_api::VirtualPath;
 
 mod virtual_path {
     use super::*;

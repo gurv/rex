@@ -1,6 +1,0 @@
-inheritedBy:
-  tags: ['camelCase']
-
-tasks:
-  tag:
-    command: camelCase

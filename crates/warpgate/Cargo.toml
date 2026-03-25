@@ -1,15 +1,16 @@
 [package]
-name = "warpgate"
-version = "0.29.3"
-edition = "2024"
-license = "MIT"
-description = "Download, resolve, and manage Extism WASM plugins."
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.89.0"
+name = "rex_warpgate"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-system_env = { path = "../../crates/system-env" }
-warpgate_api = { path = "../warpgate-api" }
+rex_system_env = { path = "../../crates/system-env" }
+rex_warpgate_api = { path = "../warpgate-api" }
 async-trait = { workspace = true }
 compact_str = { workspace = true }
 docker_credential = { workspace = true }
@@ -38,14 +39,9 @@ starbase_utils = { workspace = true, features = ["glob", "net"] }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-
-# Enabling certs for extism!
 ureq = { version = "3.2.0", features = ["rustls", "platform-verifier"] }
-
-[dev-dependencies]
-starbase_sandbox = { workspace = true }
 
 [features]
 default = []
 miette = ["dep:miette"]
-schematic = ["dep:schematic", "system_env/schematic", "warpgate_api/schematic"]
+schematic = ["dep:schematic", "rex_system_env/schematic", "rex_warpgate_api/schematic"]

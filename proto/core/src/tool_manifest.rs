@@ -9,7 +9,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use tracing::{debug, instrument};
-use version_spec::*;
+use rex_version_spec::*;
 
 pub const MANIFEST_NAME: &str = "manifest.json";
 

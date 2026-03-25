@@ -1,6 +1,0 @@
-inheritedBy:
-  tags: ['normal']
-
-tasks:
-  tag:
-    command: normal

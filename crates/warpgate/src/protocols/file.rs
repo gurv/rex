@@ -1,7 +1,7 @@
 use super::{LoadFrom, LoaderProtocol};
 use crate::loader_error::WarpgateLoaderError;
 use tracing::trace;
-use warpgate_api::{FileLocator, Id};
+use rex_warpgate_api::{FileLocator, Id};
 
 #[derive(Clone)]
 pub struct FileLoader {}

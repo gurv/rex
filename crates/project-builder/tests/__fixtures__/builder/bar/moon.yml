@@ -1,9 +1,0 @@
-language: 'rust'
-
-fileGroups:
-  other:
-    - 'bar'
-
-tasks:
-  bar:
-    command: bar

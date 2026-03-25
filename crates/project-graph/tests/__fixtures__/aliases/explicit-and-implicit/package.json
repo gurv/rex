@@ -1,6 +1,0 @@
-{
-  "name": "explicit-and-implicit",
-  "dependencies": {
-    "three": "workspace:*"
-  }
-}

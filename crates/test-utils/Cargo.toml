@@ -1,32 +1,22 @@
 [package]
-name = "moon_test_utils2"
-version = "0.0.1"
-edition = "2024"
-license = "MIT"
-description = "Testing utilities."
-homepage = "https://moonrepo.dev/moon"
-repository = "https://github.com/moonrepo/moon"
+name = "rex_test_utils2"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_app_context = { path = "../app-context" }
-moon_action_graph = { path = "../action-graph" }
-moon_action_pipeline = { path = "../action-pipeline" }
-moon_cache = { path = "../cache" }
-moon_common = { path = "../common" }
-moon_config = { path = "../config", features = ["loader", "proto"] }
-moon_console = { path = "../console" }
-moon_env = { path = "../env" }
-moon_extension_plugin = { path = "../extension-plugin" }
-moon_plugin = { path = "../plugin" }
-moon_project_builder = { path = "../project-builder" }
-moon_project_graph = { path = "../project-graph" }
-moon_task_builder = { path = "../task-builder" }
-moon_task_graph = { path = "../task-graph" }
-moon_toolchain_plugin = { path = "../toolchain-plugin" }
-moon_vcs = { path = "../vcs" }
-moon_workspace = { path = "../workspace" }
-moon_workspace_graph = { path = "../workspace-graph" }
+rex_app_context = { path = "../app-context" }
+rex_cache = { path = "../cache" }
+rex_common = { path = "../common" }
+rex_config = { path = "../config", features = ["loader", "proto"] }
+rex_console = { path = "../console" }
+rex_env = { path = "../env" }
+rex_extension_plugin = { path = "../extension-plugin" }
+rex_plugin = { path = "../plugin" }
 extism = { workspace = true }
 proto_core = { path = "../../proto/core" }
 starbase_sandbox = { workspace = true }

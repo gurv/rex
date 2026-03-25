@@ -1,5 +1,5 @@
 use iocraft::prelude::*;
-use moon_console::ui::{Stack, Style, StyledText, View};
+use rex_console::ui::{Stack, Style, StyledText, View};
 use schematic::{Schema, SchemaType};
 
 #[derive(Default, Props)]

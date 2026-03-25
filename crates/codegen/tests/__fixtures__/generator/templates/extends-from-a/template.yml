@@ -1,5 +1,0 @@
-title: 'Template title'
-description: 'Template description'
-variables:
-  a:
-    type: string

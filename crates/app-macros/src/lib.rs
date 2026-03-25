@@ -21,7 +21,7 @@ pub fn with_shared_exec_args(attr: TokenStream, item: TokenStream) -> TokenStrea
             #[arg(
                 long,
                 short = 'f',
-                env = "MOON_FORCE",
+                env = "REX_FORCE",
                 help = "Force run and bypass cache, ignore changed files, and skip affected checks"
             )]
             pub force: bool
@@ -33,7 +33,7 @@ pub fn with_shared_exec_args(attr: TokenStream, item: TokenStream) -> TokenStrea
         quote! {
             #[arg(
                 long,
-                env = "MOON_NO_ACTIONS",
+                env = "REX_NO_ACTIONS",
                 help = "Run the pipeline without sync and setup related actions",
                 help_heading = super::HEADING_WORKFLOW,
             )]
@@ -43,7 +43,7 @@ pub fn with_shared_exec_args(attr: TokenStream, item: TokenStream) -> TokenStrea
             #[arg(
                 long,
                 short = 's',
-                env = "MOON_SUMMARY",
+                env = "REX_SUMMARY",
                 help = "Print a summary of all actions that were ran in the pipeline"
             )]
             pub summary: Option<Option<crate::app_options::SummaryOption>>
@@ -71,7 +71,7 @@ pub fn with_shared_exec_args(attr: TokenStream, item: TokenStream) -> TokenStrea
         quote! {
             #[arg(
                 long,
-                env = "MOON_JOB",
+                env = "REX_JOB",
                 help = "Index of the current job",
                 help_heading = super::HEADING_PARALLELISM,
             )]
@@ -80,7 +80,7 @@ pub fn with_shared_exec_args(attr: TokenStream, item: TokenStream) -> TokenStrea
         quote! {
             #[arg(
                 long,
-                env = "MOON_JOB_TOTAL",
+                env = "REX_JOB_TOTAL",
                 help = "Total amount of jobs to run",
                 help_heading = super::HEADING_PARALLELISM,
             )]
@@ -157,7 +157,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                  #[arg(
                     long,
-                    env = "MOON_BASE",
+                    env = "REX_BASE",
                     help = "Base branch, commit, or revision to compare against",
                     help_heading = super::HEADING_AFFECTED,
                 )]
@@ -166,7 +166,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #[arg(
                     long,
-                    env = "MOON_HEAD",
+                    env = "REX_HEAD",
                     help = "Current branch, commit, or revision to compare with",
                     help_heading = super::HEADING_AFFECTED,
                 )]
@@ -176,7 +176,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
                 #[arg(
                     long,
                     short = 'g',
-                    env = "MOON_INCLUDE_RELATIONS",
+                    env = "REX_INCLUDE_RELATIONS",
                     help = "Include graph relations for affected checks, instead of just changed files",
                     help_heading = super::HEADING_AFFECTED,
                 )]
@@ -188,7 +188,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
                     help = "Filter changed files based on a changed status",
                     help_heading = super::HEADING_AFFECTED,
                 )]
-                pub status: Vec<moon_vcs::ChangedStatus>
+                pub status: Vec<rex_vcs::ChangedStatus>
             },
             quote! {
                 #[arg(
@@ -204,7 +204,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #[arg(
                     long,
-                    env = "MOON_AFFECTED",
+                    env = "REX_AFFECTED",
                     help = "Only run tasks if affected by changed files",
                     help_heading = super::HEADING_AFFECTED,
                     group = "affected-args"
@@ -214,7 +214,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                  #[arg(
                     long,
-                    env = "MOON_BASE",
+                    env = "REX_BASE",
                     help = "Base branch, commit, or revision to compare against",
                     help_heading = super::HEADING_AFFECTED,
                     requires = "affected-args",
@@ -224,7 +224,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
             quote! {
                 #[arg(
                     long,
-                    env = "MOON_HEAD",
+                    env = "REX_HEAD",
                     help = "Current branch, commit, or revision to compare with",
                     help_heading = super::HEADING_AFFECTED,
                     requires = "affected-args",
@@ -235,7 +235,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
                 #[arg(
                     long,
                     short = 'g',
-                    env = "MOON_INCLUDE_RELATIONS",
+                    env = "REX_INCLUDE_RELATIONS",
                     help = "Include graph relations for affected checks, instead of just changed files",
                     help_heading = super::HEADING_AFFECTED,
                     requires = "affected-args",
@@ -249,7 +249,7 @@ pub fn with_affected_args(attr: TokenStream, item: TokenStream) -> TokenStream {
                     help_heading = super::HEADING_AFFECTED,
                     requires = "affected-args",
                 )]
-                pub status: Vec<moon_vcs::ChangedStatus>
+                pub status: Vec<rex_vcs::ChangedStatus>
             },
             quote! {
                 #[arg(

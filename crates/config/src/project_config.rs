@@ -2,7 +2,7 @@ use crate::project::*;
 use crate::shapes::Input;
 use crate::task_config::{EnvMap, TaskConfig};
 use crate::{config_enum, config_struct, config_unit_enum};
-use moon_common::Id;
+use rex_common::Id;
 use rustc_hash::FxHashMap;
 use schematic::{Config, ConfigEnum, ValidateError};
 use std::collections::BTreeMap;

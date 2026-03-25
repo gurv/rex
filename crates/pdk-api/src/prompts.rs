@@ -1,6 +1,6 @@
 use crate::is_false;
 use serde_json::Value as JsonValue;
-use warpgate_api::{api_enum, api_struct};
+use rex_warpgate_api::{api_enum, api_struct};
 
 api_enum!(
     /// The type of prompt to render to receive an answer.

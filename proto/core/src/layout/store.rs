@@ -5,7 +5,7 @@ use crate::layout::ShimRegistry;
 use crate::tool_manifest::ToolManifest;
 use once_cell::sync::OnceCell;
 use proto_pdk_api::ToolInventoryOptions;
-use proto_shim::{create_shim, locate_proto_exe};
+use rex_proto_shim::{create_shim, locate_proto_exe};
 use serde::Serialize;
 use starbase_styles::color;
 use starbase_utils::{envx, fs, path};

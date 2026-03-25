@@ -1,8 +1,0 @@
-language: typescript
-layer: library
-
-tags: [two, three, five]
-
-tasks:
-  lint:
-    command: lint

@@ -5,7 +5,6 @@ use starbase_styles::color;
 use std::hash::Hasher;
 use std::path::{Path, PathBuf};
 
-// Named types for better readability
 pub type ProjectRelativePath = RelativePath;
 pub type ProjectRelativePathBuf = RelativePathBuf;
 pub type WorkspaceRelativePath = RelativePath;
@@ -47,11 +46,8 @@ pub fn expand_to_workspace_relative<P: AsRef<str>>(
 
     match from_format {
         RelativeFrom::Project(source) => {
-            // Root-level project
             if is_root_level_source(source) {
                 WorkspaceRelativePathBuf::from(path)
-
-                // Project-level, prefix with source path
             } else {
                 let project_source = standardize_separators(source);
 

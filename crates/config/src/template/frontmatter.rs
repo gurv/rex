@@ -26,7 +26,7 @@ config_struct!(
 #[cfg(feature = "loader")]
 impl TemplateFrontmatterConfig {
     pub fn parse<T: AsRef<str>>(content: T) -> miette::Result<TemplateFrontmatterConfig> {
-        use moon_common::color;
+        use rex_common::color;
         use schematic::ConfigLoader;
 
         let mut content = content.as_ref();

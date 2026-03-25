@@ -1,6 +1,0 @@
-title: 'Template title'
-description: 'Template description'
-extends: [extends-from-c]
-variables:
-  b:
-    type: number

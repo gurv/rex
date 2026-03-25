@@ -1,9 +1,9 @@
-use crate::cli::{SandboxAssert, create_moon_command, output_to_string};
+use crate::cli::{SandboxAssert, create_rex_command, output_to_string};
 use crate::get_fixtures_path;
 use assert_cmd::Command;
 pub use assert_fs::TempDir;
 use assert_fs::prelude::*;
-use moon_config::{PartialInheritedTasksConfig, PartialToolchainsConfig, PartialWorkspaceConfig};
+use rex_config::{PartialInheritedTasksConfig, PartialToolchainsConfig, PartialWorkspaceConfig};
 use starbase_utils::{glob, yaml::serde_yaml};
 use std::fs;
 use std::path::Path;
@@ -28,7 +28,7 @@ impl Sandbox {
     }
 
     pub fn debug_configs(&self) -> &Self {
-        for cfg in glob::walk_files(self.path(), [".moon/**/*.pkl", ".moon/**/*.yml"]).unwrap() {
+        for cfg in glob::walk_files(self.path(), [".rex/**/*.pkl", ".rex/**/*.yml"]).unwrap() {
             if cfg.exists() {
                 println!("{:?}:\n{}", &cfg, fs::read_to_string(&cfg).unwrap());
             }
@@ -77,9 +77,9 @@ impl Sandbox {
     {
         let mut cmd = StdCommand::new(if cfg!(windows) { "git.exe" } else { "git" });
         cmd.current_dir(self.path())
-            .env("GIT_AUTHOR_NAME", "moon tests")
+            .env("GIT_AUTHOR_NAME", "rex tests")
             .env("GIT_AUTHOR_EMAIL", "fakeemail@moonrepo.dev")
-            .env("GIT_COMMITTER_NAME", "moon tests")
+            .env("GIT_COMMITTER_NAME", "rex tests")
             .env("GIT_COMMITTER_EMAIL", "fakeemail@moonrepo.dev");
 
         handler(&mut cmd);
@@ -96,11 +96,11 @@ impl Sandbox {
         self
     }
 
-    pub fn run_moon<C>(&self, handler: C) -> SandboxAssert<'_>
+    pub fn run_rex<C>(&self, handler: C) -> SandboxAssert<'_>
     where
         C: FnOnce(&mut Command),
     {
-        let mut cmd = create_moon_command(self.path());
+        let mut cmd = create_rex_command(self.path());
 
         handler(&mut cmd);
 
@@ -137,18 +137,18 @@ pub fn create_sandbox_with_config<T: AsRef<str>>(
     let sandbox = create_sandbox(fixture);
 
     sandbox.create_file(
-        ".moon/workspace.yml",
+        ".rex/workspace.yml",
         serde_yaml::to_string(&workspace_config.unwrap_or_default()).unwrap(),
     );
 
     sandbox.create_file(
-        ".moon/toolchains.yml",
+        ".rex/toolchains.yml",
         serde_yaml::to_string(&toolchain_config.unwrap_or_default()).unwrap(),
     );
 
     if let Some(config) = tasks_config {
         sandbox.create_file(
-            ".moon/tasks/all.yml",
+            ".rex/tasks/all.yml",
             serde_yaml::to_string(&config).unwrap(),
         );
     }

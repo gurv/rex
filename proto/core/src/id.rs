@@ -1,1 +1,1 @@
-pub use warpgate::{Id, IdError};
+pub use rex_warpgate::{Id, IdError};

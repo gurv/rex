@@ -10,7 +10,7 @@ use starbase_utils::glob::GlobError;
 use starbase_utils::net::NetError;
 use std::path::PathBuf;
 use thiserror::Error;
-use warpgate_api::Id;
+use rex_warpgate_api::Id;
 
 /// Loader errors.
 #[derive(Debug, Error)]

@@ -2,8 +2,8 @@ use crate::shapes::{Input, OneOrMany, Output};
 use crate::task_options_config::{PartialTaskOptionsConfig, TaskOptionsConfig};
 use crate::{config_enum, config_struct, config_unit_enum};
 use indexmap::IndexMap;
-use moon_common::Id;
-use moon_target::{Target, TargetScope};
+use rex_common::Id;
+use rex_target::{Target, TargetScope};
 use schematic::{Config, ConfigEnum, ValidateError, merge};
 
 pub type EnvMap = IndexMap<String, Option<String>>;

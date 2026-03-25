@@ -1,5 +1,5 @@
 use crate::{config_enum, config_struct, is_false};
-use moon_common::Id;
+use rex_common::Id;
 use schematic::Config;
 
 config_enum!(

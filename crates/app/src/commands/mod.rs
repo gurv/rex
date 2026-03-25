@@ -1,10 +1,5 @@
-pub mod ext;
-pub mod extension;
-pub mod generate;
-pub mod mcp;
-pub mod template;
-pub mod templates;
-pub mod upgrade;
+pub mod run;
+pub mod plugin;
 
 pub const HEADING_AFFECTED: &str = "Affected options";
 pub const HEADING_GRAPH: &str = "Graph options";

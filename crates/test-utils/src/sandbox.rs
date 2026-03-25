@@ -1,6 +1,6 @@
 #![allow(clippy::disallowed_types)]
 
-use moon_config::{
+use rex_config::{
     PartialExtensionsConfig, PartialToolchainsConfig, PartialWorkspaceConfig,
     PartialWorkspaceProjects, PartialWorkspaceProjectsConfig,
 };
@@ -9,11 +9,11 @@ use starbase_utils::yaml;
 use std::collections::HashMap;
 use std::ops::Deref;
 
-pub struct MoonSandbox {
+pub struct RexSandbox {
     pub sandbox: Sandbox,
 }
 
-impl MoonSandbox {
+impl RexSandbox {
     pub fn new(mut sandbox: Sandbox, create: bool) -> Self {
         apply_settings(&mut sandbox);
 
@@ -35,7 +35,7 @@ impl MoonSandbox {
     }
 
     pub fn update_extensions_config(&self, op: impl FnOnce(&mut PartialExtensionsConfig)) {
-        let path = self.path().join(".moon/extensions.yml");
+        let path = self.path().join(".rex/extensions.yml");
 
         let mut config: PartialExtensionsConfig = if path.exists() {
             yaml::read_file(&path).unwrap()
@@ -49,7 +49,7 @@ impl MoonSandbox {
     }
 
     pub fn update_toolchains_config(&self, op: impl FnOnce(&mut PartialToolchainsConfig)) {
-        let path = self.path().join(".moon/toolchains.yml");
+        let path = self.path().join(".rex/toolchains.yml");
 
         let mut config: PartialToolchainsConfig = if path.exists() {
             yaml::read_file(&path).unwrap()
@@ -63,7 +63,7 @@ impl MoonSandbox {
     }
 
     pub fn update_workspace_config(&self, op: impl FnOnce(&mut PartialWorkspaceConfig)) {
-        let path = self.path().join(".moon/workspace.yml");
+        let path = self.path().join(".rex/workspace.yml");
 
         let mut config: PartialWorkspaceConfig = if path.exists() {
             yaml::read_file(&path).unwrap()
@@ -82,13 +82,13 @@ impl MoonSandbox {
                 globs: Some(vec![
                     "*".into(),
                     "!.home".into(),
-                    "!.moon".into(),
+                    "!.rex".into(),
                     "!.proto".into(),
                 ]),
                 ..Default::default()
             };
 
-            if self.path().join("moon.yml").exists() {
+            if self.path().join("rex.yml").exists() {
                 projects
                     .sources
                     .get_or_insert_default()
@@ -100,7 +100,7 @@ impl MoonSandbox {
     }
 }
 
-impl Deref for MoonSandbox {
+impl Deref for RexSandbox {
     type Target = Sandbox;
 
     fn deref(&self) -> &Self::Target {
@@ -109,7 +109,7 @@ impl Deref for MoonSandbox {
 }
 
 fn apply_settings(sandbox: &mut Sandbox) {
-    let moon_dir = sandbox.path().join(".moon");
+    let rex_dir = sandbox.path().join(".rex");
 
     let mut env = HashMap::new();
     env.insert("RUST_BACKTRACE", "1");
@@ -117,24 +117,24 @@ fn apply_settings(sandbox: &mut Sandbox) {
     env.insert("NO_COLOR", "1");
     env.insert("COLUMNS", "150");
     // Store plugins in the sandbox
-    env.insert("MOON_HOME", moon_dir.to_str().unwrap());
+    env.insert("REX_HOME", rex_dir.to_str().unwrap());
     // env.insert("PROTO_HOME", path.join(".proto"));
     // Let our code know we're running tests
-    env.insert("MOON_TEST", "true");
+    env.insert("REX_TEST", "true");
     env.insert("STARBASE_TEST", "true");
     // Don't exhaust all cores on the machine
-    env.insert("MOON_CONCURRENCY", "2");
+    env.insert("REX_CONCURRENCY", "2");
     // Hide install output as it disrupts testing snapshots
-    env.insert("MOON_TEST_HIDE_INSTALL_OUTPUT", "true");
+    env.insert("REX_TEST_HIDE_INSTALL_OUTPUT", "true");
     // Standardize file system paths for testing snapshots
-    env.insert("MOON_TEST_STANDARDIZE_PATHS", "true");
+    env.insert("REX_TEST_STANDARDIZE_PATHS", "true");
     // Enable logging for code coverage
-    env.insert("MOON_LOG", "trace");
+    env.insert("REX_LOG", "trace");
     // Advanced debugging
     // env.insert("PROTO_LOG", "trace");
-    // env.insert("MOON_DEBUG_WASM", "true");
+    // env.insert("REX_DEBUG_WASM", "true");
 
-    sandbox.settings.bin = "moon".into();
+    sandbox.settings.bin = "rex".into();
 
     sandbox
         .settings
@@ -143,19 +143,19 @@ fn apply_settings(sandbox: &mut Sandbox) {
 }
 
 fn create_workspace_files(sandbox: &Sandbox) {
-    if !sandbox.path().join(".moon/workspace.yml").exists() {
-        sandbox.create_file(".moon/workspace.yml", "projects: ['*']");
+    if !sandbox.path().join(".rex/workspace.yml").exists() {
+        sandbox.create_file(".rex/workspace.yml", "projects: ['*']");
     }
 }
 
-pub fn create_empty_sandbox() -> MoonSandbox {
-    MoonSandbox::new(starbase_sandbox::create_empty_sandbox(), false)
+pub fn create_empty_sandbox() -> RexSandbox {
+    RexSandbox::new(starbase_sandbox::create_empty_sandbox(), false)
 }
 
-pub fn create_empty_moon_sandbox() -> MoonSandbox {
-    MoonSandbox::new(starbase_sandbox::create_empty_sandbox(), true)
+pub fn create_empty_rex_sandbox() -> RexSandbox {
+    RexSandbox::new(starbase_sandbox::create_empty_sandbox(), true)
 }
 
-pub fn create_moon_sandbox<N: AsRef<str>>(fixture: N) -> MoonSandbox {
-    MoonSandbox::new(starbase_sandbox::create_sandbox(fixture), true)
+pub fn create_rex_sandbox<N: AsRef<str>>(fixture: N) -> RexSandbox {
+    RexSandbox::new(starbase_sandbox::create_sandbox(fixture), true)
 }

@@ -1,7 +1,0 @@
-inheritedBy:
-  toolchains: 'node'
-  layers: 'application'
-
-tasks:
-  node-application:
-    command: node-application

@@ -1,5 +1,0 @@
-id: 'baz-renamed'
-
-tasks:
-  noop:
-    command: noop

@@ -7,8 +7,8 @@ use derive_setters::Setters;
 use rustc_hash::FxHashMap;
 use schematic::Schema;
 use std::path::PathBuf;
-use version_spec::{CalVer, SemVer, SpecError, UnresolvedVersionSpec, VersionSpec};
-use warpgate_api::*;
+use rex_version_spec::{CalVer, SemVer, SpecError, UnresolvedVersionSpec, VersionSpec};
+use rex_warpgate_api::*;
 
 pub use build::*;
 pub use checksum::*;

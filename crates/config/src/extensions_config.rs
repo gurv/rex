@@ -1,10 +1,10 @@
 use crate::config_struct;
 use crate::patterns::{merge_iter, merge_plugin_partials};
-use moon_common::Id;
+use rex_common::Id;
 use rustc_hash::FxHashMap;
 use schematic::{Config, validate};
 use serde_json::Value;
-use warpgate_api::PluginLocator;
+use rex_warpgate_api::PluginLocator;
 
 config_struct!(
     /// Configures an individual extension.
@@ -61,8 +61,8 @@ impl ExtensionsConfig {
 
 #[cfg(feature = "proto")]
 impl ExtensionsConfig {
-    pub fn get_plugin_locator(id: &Id) -> Option<warpgate_api::PluginLocator> {
-        use warpgate::find_debug_locator_with_url_fallback as locate;
+    pub fn get_plugin_locator(id: &Id) -> Option<rex_warpgate_api::PluginLocator> {
+        use rex_warpgate::find_debug_locator_with_url_fallback as locate;
 
         match id.as_str() {
             "download" => Some(locate("download_extension", "1.0.2")),
@@ -112,7 +112,7 @@ impl ExtensionsConfig {
                 }
                 #[cfg(debug_assertions)]
                 "ext-sync" | "ext-task" => {
-                    use warpgate::find_debug_locator;
+                    use rex_warpgate::find_debug_locator;
 
                     config.plugin = Some(
                         find_debug_locator(&id.replace("-", "_"))
@@ -121,7 +121,7 @@ impl ExtensionsConfig {
                 }
                 other => {
                     return Err(ConfigError::Validator {
-                        location: ".moon/extensions.*".into(),
+                        location: ".rex/extensions.*".into(),
                         error: Box::new(ValidatorError {
                             errors: vec![ValidateError {
                                 message:

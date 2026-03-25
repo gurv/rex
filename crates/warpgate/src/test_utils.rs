@@ -4,7 +4,7 @@ use starbase_utils::fs;
 use std::collections::HashMap;
 use std::env;
 use std::path::{Path, PathBuf};
-use warpgate_api::{HostArch, HostEnvironment, HostLibc, HostOS, TestEnvironment, VirtualPath};
+use rex_warpgate_api::{HostArch, HostEnvironment, HostLibc, HostOS, TestEnvironment, VirtualPath};
 
 fn traverse_target_dir<T: AsRef<Path>, F: AsRef<str>>(
     search_dir: T,

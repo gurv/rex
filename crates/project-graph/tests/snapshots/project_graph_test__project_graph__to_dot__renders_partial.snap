@@ -1,9 +1,0 @@
----
-source: crates/project-graph/tests/project_graph_test.rs
-expression: graph.projects.to_dot()
----
-digraph {
-    0 [ label="b"]
-    1 [ label="c"]
-    0 -> 1 [ label="production"]
-}

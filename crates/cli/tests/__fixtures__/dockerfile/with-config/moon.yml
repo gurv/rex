@@ -1,9 +1,0 @@
-docker:
-  file:
-    image: 'oven/bun:latest'
-    buildTask: 'compile'
-    startTask: 'serve'
-
-tasks:
-  compile: {}
-  serve: {}

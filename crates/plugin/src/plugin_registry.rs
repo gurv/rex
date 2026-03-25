@@ -1,8 +1,12 @@
 use crate::host::*;
 use crate::plugin::*;
 use crate::plugin_error::PluginError;
-use moon_common::{Id, IdExt, is_offline};
-use moon_pdk_api::{MoonContext, Operation};
+use rex_common::{Id, IdExt, is_offline};
+use rex_pdk_api::{Operation, RexContext};
+use rex_warpgate::{
+    PluginContainer, PluginLoader, PluginLocator, PluginManifest, VirtualPath, Wasm,
+    from_virtual_path, host::HostData, inject_default_manifest_config, to_virtual_path,
+};
 use scc::hash_map::Entry;
 use starbase_utils::fs;
 use std::collections::BTreeMap;
@@ -11,13 +15,9 @@ use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tracing::{debug, instrument};
-use warpgate::{
-    PluginContainer, PluginLoader, PluginLocator, PluginManifest, VirtualPath, Wasm,
-    from_virtual_path, host::HostData, inject_default_manifest_config, to_virtual_path,
-};
 
 pub struct PluginRegistry<T: Plugin> {
-    pub host_data: MoonHostData,
+    pub host_data: RexHostData,
 
     loader: PluginLoader,
     plugins: Arc<scc::HashMap<Id, Arc<T>>>,
@@ -26,7 +26,7 @@ pub struct PluginRegistry<T: Plugin> {
 }
 
 impl<T: Plugin> PluginRegistry<T> {
-    pub fn new(type_of: PluginType, host_data: MoonHostData) -> Self {
+    pub fn new(type_of: PluginType, host_data: RexHostData) -> Self {
         debug!(
             plugin_type = type_of.get_label(),
             "Creating plugin registry"
@@ -34,16 +34,16 @@ impl<T: Plugin> PluginRegistry<T> {
 
         // Create the loader
         let mut loader = PluginLoader::new(
-            host_data.moon_env.plugins_dir.join(type_of.get_dir_name()),
-            &host_data.moon_env.temp_dir,
+            host_data.rex_env.plugins_dir.join(type_of.get_dir_name()),
+            &host_data.rex_env.temp_dir,
         );
 
         loader.set_offline_checker(is_offline);
 
-        // Merge proto and moon virtual paths
+        // Merge proto and rex virtual paths
         let mut paths = BTreeMap::new();
         paths.extend(host_data.proto_env.get_virtual_paths());
-        paths.extend(host_data.moon_env.get_virtual_paths());
+        paths.extend(host_data.rex_env.get_virtual_paths());
 
         Self {
             loader,
@@ -54,10 +54,10 @@ impl<T: Plugin> PluginRegistry<T> {
         }
     }
 
-    pub fn create_context(&self) -> MoonContext {
-        MoonContext {
-            working_dir: self.to_virtual_path(&self.host_data.moon_env.working_dir),
-            workspace_root: self.to_virtual_path(&self.host_data.moon_env.workspace_root),
+    pub fn create_context(&self) -> RexContext {
+        RexContext {
+            working_dir: self.to_virtual_path(&self.host_data.rex_env.working_dir),
+            workspace_root: self.to_virtual_path(&self.host_data.rex_env.workspace_root),
         }
     }
 
@@ -75,7 +75,7 @@ impl<T: Plugin> PluginRegistry<T> {
         // will communicate with. Far too many to account for.
         manifest = manifest.with_allowed_host("*");
 
-        // Inherit moon and proto virtual paths.
+        // Inherit rex and proto virtual paths.
         manifest = manifest.with_allowed_paths(
             self.virtual_paths
                 .iter()
@@ -88,7 +88,7 @@ impl<T: Plugin> PluginRegistry<T> {
         manifest.timeout_ms = None;
 
         // Inherit default configs, like host environment and ID.
-        inject_default_manifest_config(id, &self.host_data.moon_env.home_dir, &mut manifest)?;
+        inject_default_manifest_config(id, &self.host_data.rex_env.home_dir, &mut manifest)?;
 
         // Ensure virtual host paths exist, otherwise WASI (via extism)
         // will throw a cryptic file/directory not found error.
@@ -152,14 +152,13 @@ impl<T: Plugin> PluginRegistry<T> {
                 // Load the WASM file (this must happen first because of async)
                 let plugin_file = self.loader.load_plugin(entry.key(), locator).await?;
 
-                // Create host functions (provided by warpgate)
                 let functions = create_host_functions(
                     self.host_data.clone(),
                     HostData {
-                        cache_dir: self.host_data.moon_env.cache_dir.clone(),
+                        cache_dir: self.host_data.rex_env.cache_dir.clone(),
                         http_client: self.loader.get_http_client()?.clone(),
                         virtual_paths: self.virtual_paths.clone(),
-                        working_dir: self.host_data.moon_env.working_dir.clone(),
+                        working_dir: self.host_data.rex_env.working_dir.clone(),
                     },
                 );
 
@@ -187,7 +186,7 @@ impl<T: Plugin> PluginRegistry<T> {
                     locator: locator.to_owned(),
                     id: entry.key().to_owned(),
                     id_stable: stable_id,
-                    moon_env: Arc::clone(&self.host_data.moon_env),
+                    rex_env: Arc::clone(&self.host_data.rex_env),
                     proto_env: Arc::clone(&self.host_data.proto_env),
                     wasm_file: plugin_file,
                 })

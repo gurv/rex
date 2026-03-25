@@ -1,7 +1,7 @@
 use crate::target_error::TargetError;
 use crate::target_scope::TargetScope;
 use compact_str::CompactString;
-use moon_common::{ID_CHARS, ID_SYMBOLS, Id, Style, Stylize, color};
+use rex_common::{ID_CHARS, ID_SYMBOLS, Id, Style, Stylize, color};
 use regex::Regex;
 use schematic::{Schema, SchemaBuilder, Schematic};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de};

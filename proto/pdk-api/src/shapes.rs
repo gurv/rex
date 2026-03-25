@@ -1,4 +1,4 @@
-use warpgate_api::api_enum;
+use rex_warpgate_api::api_enum;
 
 api_enum!(
     /// Either a string, or a list of strings.

@@ -79,7 +79,6 @@ pub use unix::*;
 mod windows {
     use super::*;
     use std::os::raw::c_void;
-    // use windows_sys::Win32::System::Console::{CTRL_BREAK_EVENT, GenerateConsoleCtrlEvent};
     use windows_sys::Win32::System::Threading::TerminateProcess;
 
     pub async fn wait_for_signal(sender: Sender<SignalType>) {

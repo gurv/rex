@@ -1,9 +1,9 @@
 use miette::IntoDiagnostic;
-use moon_cache::{CacheEngine, cache_item};
-use moon_common::{is_ci, is_test_env};
-use moon_env::MoonEnvironment;
-use moon_env_var::GlobalEnvBag;
-use moon_time::now_millis;
+use rex_cache::{CacheEngine, cache_item};
+use rex_common::{is_ci, is_test_env};
+use rex_env::RexEnvironment;
+use rex_env_var::GlobalEnvBag;
+use rex_time::now_millis;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use starbase_utils::{fs, json};
@@ -56,7 +56,7 @@ fn create_anonymous_rid(workspace_root: &Path) -> String {
         "{:x}",
         md5::compute(
             GlobalEnvBag::instance()
-                .get("MOON_VCS_REPO_SLUG")
+                .get("REX_VCS_REPO_SLUG")
                 .unwrap_or_else(|| fs::file_name(workspace_root)),
         )
     )
@@ -71,24 +71,24 @@ pub struct VersionCheck {
 
 pub struct Launchpad {
     #[allow(dead_code)]
-    moon_env: Arc<MoonEnvironment>,
-    moon_version: String,
+    rex_env: Arc<RexEnvironment>,
+    rex_version: String,
     user_id: String,
     repo_id: String,
 }
 
 impl Launchpad {
-    pub fn register(moon_env: Arc<MoonEnvironment>) -> miette::Result<()> {
-        let user_id = load_or_create_anonymous_uid(&moon_env.id_file)?;
-        let repo_id = create_anonymous_rid(&moon_env.workspace_root);
+    pub fn register(rex_env: Arc<RexEnvironment>) -> miette::Result<()> {
+        let user_id = load_or_create_anonymous_uid(&rex_env.id_file)?;
+        let repo_id = create_anonymous_rid(&rex_env.workspace_root);
 
-        let moon_version = GlobalEnvBag::instance()
-            .get("MOON_VERSION")
+        let rex_version = GlobalEnvBag::instance()
+            .get("REX_VERSION")
             .unwrap_or_default();
 
         let _ = INSTANCE.set(Arc::new(Self {
-            moon_env,
-            moon_version,
+            rex_env,
+            rex_version,
             user_id,
             repo_id,
         }));
@@ -107,13 +107,13 @@ impl Launchpad {
         bypass_cache: bool,
         manifest_url: &str,
     ) -> miette::Result<Option<VersionCheck>> {
-        if is_test_env() || moon_common::is_offline() {
+        if is_test_env() || rex_common::is_offline() {
             return Ok(None);
         }
 
         let mut state = cache_engine
             .state
-            .load_state::<CurrentVersionCacheState>("moonVersionCheck.json")?;
+            .load_state::<CurrentVersionCacheState>("rexVersionCheck.json")?;
         let now = now_millis();
 
         if let Some(last_check) = state.data.last_check_time
@@ -139,26 +139,26 @@ impl Launchpad {
         &self,
         manifest_url: &str,
     ) -> miette::Result<Option<VersionCheck>> {
-        if is_test_env() || moon_common::is_offline() {
+        if is_test_env() || rex_common::is_offline() {
             return Ok(None);
         }
 
-        let version = &self.moon_version;
+        let version = &self.rex_version;
 
         debug!(
             current_version = &version,
             manifest_url = manifest_url,
-            "Checking for a new version of moon"
+            "Checking for a new version of rex"
         );
 
         let request = self
             .create_request(manifest_url)?
             .header(
-                "X-Moon-CI-Provider",
+                "X-Rex-CI-Provider",
                 format!("{:?}", ci_env::detect_provider()),
             )
             .header(
-                "X-Moon-CD-Provider",
+                "X-Rex-CD-Provider",
                 format!("{:?}", cd_env::detect_provider()),
             );
 
@@ -194,12 +194,12 @@ impl Launchpad {
         &self,
         toolchains: BTreeMap<String, String>,
     ) -> miette::Result<()> {
-        if !is_ci() || is_test_env() || moon_common::is_offline() {
+        if !is_ci() || is_test_env() || rex_common::is_offline() {
             return Ok(());
         }
 
         let request = self
-            .create_request("https://launch.moonrepo.app/moon/toolchain_usage")?
+            .create_request("https://launch.moonrepo.app/rex/toolchain_usage")?
             .json(&ToolchainUsage { toolchains });
 
         let _response = request.send().await.into_diagnostic()?;
@@ -210,13 +210,13 @@ impl Launchpad {
     fn create_request(&self, url: &str) -> miette::Result<reqwest::RequestBuilder> {
         let client = reqwest::Client::new()
             .post(url)
-            .header("X-Moon-OS", consts::OS.to_owned())
-            .header("X-Moon-Arch", consts::ARCH.to_owned())
-            .header("X-Moon-Version", self.moon_version.clone())
-            .header("X-Moon-CI", ci_env::is_ci().to_string())
-            .header("X-Moon-CD", cd_env::is_cd().to_string())
-            .header("X-Moon-UID", self.user_id.clone())
-            .header("X-Moon-RID", self.repo_id.clone());
+            .header("X-Rex-OS", consts::OS.to_owned())
+            .header("X-Rex-Arch", consts::ARCH.to_owned())
+            .header("X-Rex-Version", self.rex_version.clone())
+            .header("X-Rex-CI", ci_env::is_ci().to_string())
+            .header("X-Rex-CD", cd_env::is_cd().to_string())
+            .header("X-Rex-UID", self.user_id.clone())
+            .header("X-Rex-RID", self.repo_id.clone());
 
         Ok(client)
     }

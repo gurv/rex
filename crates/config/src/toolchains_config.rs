@@ -2,14 +2,14 @@ use crate::patterns::{merge_iter, merge_plugin_partials};
 use crate::toolchain::*;
 use crate::{config_enum, config_struct};
 use miette::IntoDiagnostic;
-use moon_common::{Id, IdExt};
+use rex_common::{Id, IdExt};
+use rex_version_spec::UnresolvedVersionSpec;
+use rex_warpgate_api::PluginLocator;
 use rustc_hash::FxHashMap;
 use schematic::{Config, Schematic, validate};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::env;
-use version_spec::UnresolvedVersionSpec;
-use warpgate_api::PluginLocator;
 
 config_enum!(
     /// The strategy in which to inherit a version from `.prototools`.
@@ -79,11 +79,11 @@ config_struct!(
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pub extends: Option<schematic::ExtendsFrom>,
 
-        /// Configures moon itself.
+        /// Configures rex itself.
         #[setting(nested)]
-        pub moon: MoonConfig,
+        pub rex: RexConfig,
 
-        /// Configures how moon integrates with proto.
+        /// Configures how rex integrates with proto.
         #[setting(nested)]
         pub proto: ProtoConfig,
 
@@ -111,7 +111,7 @@ impl ToolchainsConfig {
 
     pub fn inherit_versions_from_env_vars(&mut self) -> miette::Result<()> {
         for (id, config) in &mut self.plugins {
-            if let Ok(version) = env::var(format!("MOON_{}_VERSION", id.to_env_var())) {
+            if let Ok(version) = env::var(format!("REX_{}_VERSION", id.to_env_var())) {
                 config.version = Some(UnresolvedVersionSpec::parse(version).into_diagnostic()?);
             }
         }
@@ -132,8 +132,8 @@ impl ToolchainsConfig {
         false
     }
 
-    pub fn get_plugin_locator(id: &Id) -> Option<warpgate_api::PluginLocator> {
-        use warpgate::find_debug_locator_with_url_fallback as locate;
+    pub fn get_plugin_locator(id: &Id) -> Option<rex_warpgate_api::PluginLocator> {
+        use rex_warpgate::find_debug_locator_with_url_fallback as locate;
 
         match id.as_str() {
             "bun" => Some(locate("bun_toolchain", "1.0.2")),
@@ -169,8 +169,8 @@ impl ToolchainsConfig {
         &mut self,
         proto_config: &proto_core::ProtoConfig,
     ) -> miette::Result<()> {
-        use moon_common::color;
         use proto_core::ToolContext;
+        use rex_common::color;
         use tracing::trace;
 
         for (id, config) in &mut self.plugins {
@@ -261,7 +261,7 @@ impl ToolchainsConfig {
                 #[cfg(debug_assertions)]
                 "tc-tier1" | "tc-tier2" | "tc-tier2-reqs" | "tc-tier2-setup-env" | "tc-tier3"
                 | "tc-tier3-reqs" => {
-                    use warpgate::find_debug_locator;
+                    use rex_warpgate::find_debug_locator;
 
                     config.plugin = Some(
                         find_debug_locator(&id.replace("-", "_"))
@@ -274,7 +274,7 @@ impl ToolchainsConfig {
                 }
                 other => {
                     return Err(ConfigError::Validator {
-                        location: ".moon/toolchains.*".into(),
+                        location: ".rex/toolchains.*".into(),
                         error: Box::new(ValidatorError {
                             errors: vec![ValidateError {
                                 message:

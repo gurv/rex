@@ -4,34 +4,34 @@ use std::path::{Path, PathBuf};
 use tracing::debug;
 
 #[derive(Debug, Default, Clone)]
-pub struct MoonEnvironment {
+pub struct RexEnvironment {
     pub id_file: PathBuf,
     pub cache_dir: PathBuf,
     pub plugins_dir: PathBuf,
     pub temp_dir: PathBuf,
     pub templates_dir: PathBuf,
     pub home_dir: PathBuf,   // ~
-    pub store_root: PathBuf, // ~/.moon
+    pub store_root: PathBuf, // ~/.rex
     pub test_only: bool,
     pub working_dir: PathBuf,
     pub workspace_root: PathBuf,
 }
 
-impl MoonEnvironment {
+impl RexEnvironment {
     pub fn new() -> miette::Result<Self> {
-        Self::from(envx::vendor_home_var("MOON_HOME", |user_dir| {
+        Self::from(envx::vendor_home_var("REX_HOME", |user_dir| {
             envx::path_var("XDG_DATA_HOME")
-                .map(|xdg| xdg.join("moon"))
-                .unwrap_or_else(|| user_dir.join(".moon"))
+                .map(|xdg| xdg.join("rex"))
+                .unwrap_or_else(|| user_dir.join(".rex"))
         }))
     }
 
     pub fn from<P: AsRef<Path>>(root: P) -> miette::Result<Self> {
         let store_root = root.as_ref();
 
-        debug!(store = ?store_root, "Creating moon environment, detecting store");
+        debug!(store = ?store_root, "Creating rex environment, detecting store");
 
-        Ok(MoonEnvironment {
+        Ok(RexEnvironment {
             id_file: store_root.join("id"),
             cache_dir: store_root.join("cache"),
             plugins_dir: store_root.join("plugins"),
@@ -46,7 +46,7 @@ impl MoonEnvironment {
     }
 
     pub fn new_testing(sandbox: &Path) -> Self {
-        let mut env = Self::from(sandbox.join(".moon")).unwrap();
+        let mut env = Self::from(sandbox.join(".rex")).unwrap();
         env.working_dir = sandbox.to_path_buf();
         env.workspace_root = sandbox.to_path_buf();
         env.home_dir = sandbox.join(".home");
@@ -56,15 +56,15 @@ impl MoonEnvironment {
 
     pub fn get_virtual_paths(&self) -> BTreeMap<PathBuf, PathBuf> {
         BTreeMap::from_iter([
-            (self.store_root.clone(), "/moon".into()),
+            (self.store_root.clone(), "/rex".into()),
             (self.home_dir.clone(), "/userhome".into()),
             (self.workspace_root.clone(), "/workspace".into()),
         ])
     }
 }
 
-impl AsRef<MoonEnvironment> for MoonEnvironment {
-    fn as_ref(&self) -> &MoonEnvironment {
+impl AsRef<RexEnvironment> for RexEnvironment {
+    fn as_ref(&self) -> &RexEnvironment {
         self
     }
 }

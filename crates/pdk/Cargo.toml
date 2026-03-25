@@ -1,18 +1,16 @@
 [package]
-name = "moon_pdk"
-version = "2.0.1"
-edition = "2024"
-license = "MIT"
-description = "A plugin development kit for creating moon WASM plugins."
-homepage = "https://moonrepo.dev/moon"
-repository = "https://github.com/moonrepo/moon"
+name = "rex_pdk"
+version = "0.1.0"
 publish = true
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_common = { version = "2.0.2", path = "../common" }
-moon_pdk_api = { version = "2.0.1", path = "../pdk-api" }
-moon_project = { version = "2.0.2", path = "../project" }
-moon_task = { version = "2.0.2", path = "../task" }
+rex_common = { path = "../common" }
+rex_pdk_api = { path = "../pdk-api" }
 clap = { workspace = true }
 extism-pdk = { workspace = true }
 schematic = { workspace = true, optional = true, features = [
@@ -22,7 +20,7 @@ schematic = { workspace = true, optional = true, features = [
 ] }
 serde = { workspace = true }
 rustc-hash = { workspace = true }
-warpgate_pdk = { path = "../warpgate-pdk" }
+rex_warpgate_pdk = { path = "../warpgate-pdk" }
 
 [features]
 default = []

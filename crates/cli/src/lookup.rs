@@ -1,4 +1,4 @@
-use moon_app::commands::upgrade::is_musl;
+use rex_common::is_musl;
 use starbase_utils::fs;
 use std::env;
 use std::env::consts::{ARCH, OS};
@@ -37,7 +37,7 @@ fn get_core_package_triple() -> String {
 fn get_global_lookups(home_dir: &Path) -> Vec<PathBuf> {
     vec![
         "/usr/local/bin".into(),
-        home_dir.join(".moon"),
+        home_dir.join(".rex"),
         home_dir.join(".proto"),
         // Node
         home_dir.join(".nvm/versions/node"),
@@ -52,7 +52,7 @@ fn get_global_lookups(home_dir: &Path) -> Vec<PathBuf> {
 #[cfg(windows)]
 fn get_global_lookups(home_dir: &Path) -> Vec<PathBuf> {
     vec![
-        home_dir.join(".moon"),
+        home_dir.join(".rex"),
         home_dir.join(".proto"),
         // Node
         home_dir.join(".nvm\\versions\\node"),
@@ -103,8 +103,8 @@ pub fn has_locally_installed(home_dir: &Path, current_dir: &Path) -> Option<Path
             }
         }
 
-        if dir.join(".moon").exists()
-            || dir.join(".config").join("moon").exists()
+        if dir.join(".rex").exists()
+            || dir.join(".config").join("rex").exists()
             || dir == home_dir
         {
             break;
@@ -136,7 +136,7 @@ pub fn has_locally_installed(home_dir: &Path, current_dir: &Path) -> Option<Path
     // };
 
     // while let Some(dir) = current_dir {
-    //     if dir.join(".moon").exists() || dir.join(".config").join("moon").exists() {
+    //     if dir.join(".rex").exists() || dir.join(".config").join("rex").exists() {
     //         let cli_dir = dir.join("node_modules").join("@moonrepo").join("cli");
 
     //         if cli_dir.exists() {

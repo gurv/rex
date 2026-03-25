@@ -1,5 +1,0 @@
-language: typescript
-layer: application
-
-toolchains:
-  typescript: null

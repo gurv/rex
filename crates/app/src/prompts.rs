@@ -1,84 +1,80 @@
-use crate::app_error::AppError;
 use iocraft::prelude::element;
-use miette::IntoDiagnostic;
-use moon_common::Id;
-use moon_console::{Console, ui::*};
-use moon_pdk_api::{
+use rex_console::{Console, ui::*};
+use rex_pdk_api::{
     ConditionType, InitializePluginOutput, PromptType, SettingCondition, SettingPrompt,
 };
-use moon_process::ProcessRegistry;
 use starbase_utils::json::{JsonMap, JsonValue};
 use std::collections::VecDeque;
 
-async fn select_identifiers_internal<'a, T: Clone>(
-    console: &Console,
-    ids: Vec<&T>,
-    input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
-    output: impl Fn(String) -> miette::Result<T>,
-) -> miette::Result<Vec<T>> {
-    if !ids.is_empty() {
-        return Ok(ids.into_iter().cloned().collect());
-    }
+// async fn select_identifiers_internal<'a, T: Clone>(
+//     console: &Console,
+//     ids: Vec<&T>,
+//     input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
+//     output: impl Fn(String) -> miette::Result<T>,
+// ) -> miette::Result<Vec<T>> {
+//     if !ids.is_empty() {
+//         return Ok(ids.into_iter().cloned().collect());
+//     }
 
-    if !console.out.is_terminal() {
-        return Err(AppError::RequiredIdNonTTY.into());
-    }
+//     if !console.out.is_terminal() {
+//         return Err(AppError::RequiredIdNonTTY.into());
+//     }
 
-    let mut index = 0;
-    let mut indexes = vec![];
-    let mut props = input()?;
+//     let mut index = 0;
+//     let mut indexes = vec![];
+//     let mut props = input()?;
 
-    props.options.sort_by(|a, d| {
-        let av = a.label.as_ref().unwrap_or(&a.value);
-        let dv = d.label.as_ref().unwrap_or(&d.value);
+//     props.options.sort_by(|a, d| {
+//         let av = a.label.as_ref().unwrap_or(&a.value);
+//         let dv = d.label.as_ref().unwrap_or(&d.value);
 
-        av.cmp(dv)
-    });
+//         av.cmp(dv)
+//     });
 
-    console
-        .render_prompt(element! {
-            Select(
-                label: props.label,
-                description: props.description,
-                options: props.options.clone(),
-                multiple: props.multiple,
-                on_index: &mut index,
-                on_indexes: &mut indexes,
-            )
-        })
-        .await?;
+//     console
+//         .render_prompt(element! {
+//             Select(
+//                 label: props.label,
+//                 description: props.description,
+//                 options: props.options.clone(),
+//                 multiple: props.multiple,
+//                 on_index: &mut index,
+//                 on_indexes: &mut indexes,
+//             )
+//         })
+//         .await?;
 
-    if let Ok(signal) = ProcessRegistry::instance().receive_signal().try_recv() {
-        std::process::exit(128 + signal.get_code());
-    }
+//     if let Ok(signal) = ProcessRegistry::instance().receive_signal().try_recv() {
+//         std::process::exit(128 + signal.get_code());
+//     }
 
-    let mut ids = vec![];
+//     let mut ids = vec![];
 
-    if props.multiple {
-        for index in indexes {
-            ids.push(output(props.options.get(index).cloned().unwrap().value)?);
-        }
-    } else {
-        ids.push(output(props.options.remove(index).value)?);
-    }
+//     if props.multiple {
+//         for index in indexes {
+//             ids.push(output(props.options.get(index).cloned().unwrap().value)?);
+//         }
+//     } else {
+//         ids.push(output(props.options.remove(index).value)?);
+//     }
 
-    Ok(ids)
-}
+//     Ok(ids)
+// }
 
-pub async fn select_identifier<'a>(
-    console: &Console,
-    id: &'a Option<Id>,
-    input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
-) -> miette::Result<Id> {
-    select_identifiers_internal(
-        console,
-        id.as_ref().map_or(vec![], |id| vec![id]),
-        input,
-        |value| Id::new(value).into_diagnostic(),
-    )
-    .await
-    .map(|mut ids| ids.remove(0))
-}
+// pub async fn select_identifier<'a>(
+//     console: &Console,
+//     id: &'a Option<Id>,
+//     input: impl FnOnce() -> miette::Result<SelectProps<'a>>,
+// ) -> miette::Result<Id> {
+//     select_identifiers_internal(
+//         console,
+//         id.as_ref().map_or(vec![], |id| vec![id]),
+//         input,
+//         |value| Id::new(value).into_diagnostic(),
+//     )
+//     .await
+//     .map(|mut ids| ids.remove(0))
+// }
 
 pub async fn render_prompt(
     console: &Console,

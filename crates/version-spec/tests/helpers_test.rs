@@ -1,4 +1,4 @@
-use version_spec::{clean_version_req_string, clean_version_string, is_alias_name};
+use rex_version_spec::{clean_version_req_string, clean_version_string, is_alias_name};
 
 #[test]
 fn checks_alias() {

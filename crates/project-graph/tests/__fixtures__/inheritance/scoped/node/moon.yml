@@ -1,7 +1,0 @@
-toolchains:
-  default: node
-
-tasks:
-  node:
-    command: node
-    toolchain: node

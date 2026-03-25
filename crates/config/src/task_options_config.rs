@@ -337,7 +337,7 @@ config_struct!(
         pub os: Option<OneOrMany<TaskOperatingSystem>>,
 
         /// The style in which task output will be printed to the console.
-        #[setting(env = "MOON_OUTPUT_STYLE")]
+        #[setting(env = "REX_OUTPUT_STYLE")]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub output_style: Option<TaskOutputStyle>,
 
@@ -353,7 +353,7 @@ config_struct!(
         pub priority: Option<TaskPriority>,
 
         /// The number of times a failing task will be retried to succeed.
-        #[setting(env = "MOON_RETRY_COUNT")]
+        #[setting(env = "REX_RETRY_COUNT")]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub retry_count: Option<u8>,
 
@@ -362,8 +362,8 @@ config_struct!(
         #[serde(skip_serializing_if = "Option::is_none")]
         pub run_deps_in_parallel: Option<bool>,
 
-        /// Whether to run the task in CI or not, when executing `moon ci`,
-        /// `moon check`, or `moon run`.
+        /// Whether to run the task in CI or not, when executing `rex ci`,
+        /// `rex check`, or `rex run`.
         #[setting(rename = "runInCI")]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub run_in_ci: Option<TaskOptionRunInCI>,

@@ -1,8 +1,8 @@
 use crate::context::*;
 use crate::is_false;
-use moon_config::{UnresolvedVersionSpec, VersionSpec};
+use rex_config::{UnresolvedVersionSpec, VersionSpec};
+use rex_warpgate_api::api_struct;
 use std::path::PathBuf;
-use warpgate_api::api_struct;
 
 pub use proto_pdk_api::{
     DownloadPrebuiltInput, DownloadPrebuiltOutput, LoadVersionsInput, LoadVersionsOutput,
@@ -18,8 +18,8 @@ api_struct!(
         /// configured with via the `version` setting.
         pub configured_version: Option<UnresolvedVersionSpec>,
 
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Workspace toolchain configuration.
         pub toolchain_config: serde_json::Value,
@@ -56,8 +56,8 @@ api_struct!(
         /// configured with via the `version` setting.
         pub configured_version: Option<UnresolvedVersionSpec>,
 
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
 
         /// Workspace toolchain configuration.
         pub toolchain_config: serde_json::Value,

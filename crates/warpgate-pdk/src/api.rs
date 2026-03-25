@@ -1,5 +1,5 @@
 use extism_pdk::{MemoryHandle, memory::internal::load};
-use warpgate_api::SendRequestOutput;
+use rex_warpgate_api::SendRequestOutput;
 
 #[doc(hidden)]
 pub fn populate_send_request_output(output: &mut SendRequestOutput) {

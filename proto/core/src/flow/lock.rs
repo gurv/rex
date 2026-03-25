@@ -3,7 +3,7 @@ use crate::lockfile::LockRecord;
 use crate::tool::Tool;
 use crate::tool_spec::ToolSpec;
 use tracing::{debug, instrument};
-use version_spec::VersionSpec;
+use rex_version_spec::VersionSpec;
 
 // [x] install many
 //      [x] resolve version from lockfile

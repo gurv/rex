@@ -19,7 +19,7 @@ use std::fmt::{self, Debug};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tracing::{debug, instrument};
-use warpgate::{
+use rex_warpgate::{
     PluginContainer, PluginLocator, PluginManifest, VirtualPath, Wasm,
     host::{HostData, create_host_functions},
 };

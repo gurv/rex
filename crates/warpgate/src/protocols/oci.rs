@@ -5,7 +5,7 @@ use crate::registry::*;
 use oci_client::{Reference, errors::OciDistributionError};
 use std::sync::Arc;
 use tracing::trace;
-use warpgate_api::{Id, RegistryLocator};
+use rex_warpgate_api::{Id, RegistryLocator};
 
 #[derive(Clone)]
 pub struct OciLoader {

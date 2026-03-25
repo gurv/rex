@@ -1,8 +1,0 @@
-dependsOn:
-  - dep-bar
-  - dep-baz
-
-layer: application
-language: javascript
-
-tags: ['react']

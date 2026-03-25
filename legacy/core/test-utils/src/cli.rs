@@ -6,35 +6,35 @@ use assert_cmd::cargo::cargo_bin;
 use starbase_utils::dirs::home_dir;
 use std::path::Path;
 
-pub fn create_moon_command_std<T: AsRef<Path>>(path: T) -> std::process::Command {
+pub fn create_rex_command_std<T: AsRef<Path>>(path: T) -> std::process::Command {
     let path = path.as_ref();
 
-    let mut cmd = std::process::Command::new(cargo_bin("moon"));
+    let mut cmd = std::process::Command::new(cargo_bin("rex"));
     cmd.current_dir(path);
     cmd.env("RUST_BACKTRACE", "1");
     cmd.env("NO_COLOR", "1");
     // Store plugins in the sandbox
-    cmd.env("MOON_HOME", path.join(".moon-home"));
+    cmd.env("REX_HOME", path.join(".rex-home"));
     // Let our code know we're running tests
-    cmd.env("MOON_TEST", "true");
+    cmd.env("REX_TEST", "true");
     cmd.env("STARBASE_TEST", "true");
     // Hide install output as it disrupts testing snapshots
-    cmd.env("MOON_TEST_HIDE_INSTALL_OUTPUT", "true");
+    cmd.env("REX_TEST_HIDE_INSTALL_OUTPUT", "true");
     // Standardize file system paths for testing snapshots
-    cmd.env("MOON_TEST_STANDARDIZE_PATHS", "true");
+    cmd.env("REX_TEST_STANDARDIZE_PATHS", "true");
     // Enable logging for code coverage
-    cmd.env("MOON_LOG", "trace");
+    cmd.env("REX_LOG", "trace");
     // Advanced debugging
     // cmd.env("PROTO_LOG", "trace");
-    // cmd.env("MOON_DEBUG_WASM", "true");
-    // cmd.env("MOON_DEBUG_PROCESS_ENV", "true");
+    // cmd.env("REX_DEBUG_WASM", "true");
+    // cmd.env("REX_DEBUG_PROCESS_ENV", "true");
     cmd
 }
 
-pub fn create_moon_command<T: AsRef<Path>>(path: T) -> assert_cmd::Command {
+pub fn create_rex_command<T: AsRef<Path>>(path: T) -> assert_cmd::Command {
     let path = path.as_ref();
 
-    let mut cmd = assert_cmd::Command::from_std(create_moon_command_std(path));
+    let mut cmd = assert_cmd::Command::from_std(create_rex_command_std(path));
     cmd.timeout(std::time::Duration::from_secs(120));
     cmd
 }
@@ -60,7 +60,7 @@ pub fn get_assert_stderr_output(assert: &Assert) -> String {
             && !line.starts_with("[ INFO")
             && !line.starts_with("[DEBUG")
             && !line.starts_with("[TRACE")
-            && !line.starts_with("  MOON_")
+            && !line.starts_with("  REX_")
             && !line.starts_with("  NODE_")
             && !line.starts_with("  PROTO_")
         {

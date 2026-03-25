@@ -7,8 +7,8 @@ pub use api::*;
 pub use error::*;
 pub use hooks::*;
 pub use shapes::*;
-pub use system_env::{
+pub use rex_system_env::{
     DependencyConfig, DependencyName, SystemDependency, SystemPackageManager as HostPackageManager,
 };
-pub use version_spec::*;
-pub use warpgate_api::*;
+pub use rex_version_spec::*;
+pub use rex_warpgate_api::*;

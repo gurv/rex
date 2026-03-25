@@ -1,5 +1,0 @@
-fileGroups:
-  sources:
-    - 'src/**/*'
-  tests:
-    - 'tests/**/*'

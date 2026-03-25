@@ -10,18 +10,18 @@ pub use starbase_console::ConsoleError;
 pub use starbase_console::ui;
 pub use theme::*;
 
-pub type MoonConsole = starbase_console::Console<MoonReporter>;
+pub type RexConsole = starbase_console::Console<RexReporter>;
 
 #[derive(Clone, Debug)]
-pub struct Console(MoonConsole);
+pub struct Console(RexConsole);
 
 impl Console {
     pub fn new(quiet: bool) -> Self {
-        Self(MoonConsole::new(quiet))
+        Self(RexConsole::new(quiet))
     }
 
     pub fn new_testing() -> Self {
-        Self(MoonConsole::new_testing())
+        Self(RexConsole::new_testing())
     }
 
     pub async fn render_prompt<T: Component>(
@@ -41,7 +41,7 @@ impl Console {
 }
 
 impl Deref for Console {
-    type Target = MoonConsole;
+    type Target = RexConsole;
 
     fn deref(&self) -> &Self::Target {
         &self.0

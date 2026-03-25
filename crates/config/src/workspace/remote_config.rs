@@ -39,7 +39,7 @@ config_struct!(
         pub headers: FxHashMap<String, String>,
 
         /// The name of an environment variable to use as a bearer token.
-        #[setting(env = "MOON_REMOTE_AUTH_TOKEN")]
+        #[setting(env = "REX_REMOTE_AUTH_TOKEN")]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pub token: Option<String>,
     }
@@ -68,14 +68,14 @@ config_struct!(
     /// Configures the action cache (AC) and content addressable cache (CAS).
     /// @since 1.30.0
     #[derive(Config)]
-    #[config(env_prefix = "MOON_REMOTE_CACHE_")]
+    #[config(env_prefix = "REX_REMOTE_CACHE_")]
     pub struct RemoteCacheConfig {
         /// The compression format to use when uploading/downloading blobs.
         /// @since 1.31.0
         pub compression: RemoteCompression,
 
         /// Unique instance name for blobs. Will be used as a folder name.
-        #[setting(default = "moon-outputs")]
+        #[setting(default = "rex-outputs")]
         pub instance_name: String,
 
         /// When local, only download matching blobs and do not upload new
@@ -99,11 +99,11 @@ config_struct!(
     /// Configures for server-only authentication with TLS.
     /// @since 1.30.0
     #[derive(Config)]
-    #[config(env_prefix = "MOON_REMOTE_TLS_")]
+    #[config(env_prefix = "REX_REMOTE_TLS_")]
     pub struct RemoteTlsConfig {
         /// If true, assume that the server supports HTTP/2,
         /// even if it doesn't provide protocol negotiation via ALPN.
-        #[setting(env = "MOON_REMOTE_TLS_HTTP2", parse_env = env::parse_bool)]
+        #[setting(env = "REX_REMOTE_TLS_HTTP2", parse_env = env::parse_bool)]
         #[serde(default, skip_serializing_if = "is_false")]
         pub assume_http2: bool,
 
@@ -122,11 +122,11 @@ config_struct!(
     /// Configures for both server and client authentication with mTLS.
     /// @since 1.30.0
     #[derive(Config)]
-    #[config(env_prefix = "MOON_REMOTE_MTLS_")]
+    #[config(env_prefix = "REX_REMOTE_MTLS_")]
     pub struct RemoteMtlsConfig {
         /// If true, assume that the server supports HTTP/2,
         /// even if it doesn't provide protocol negotiation via ALPN.
-        #[setting(env = "MOON_REMOTE_MTLS_HTTP", parse_env = env::parse_bool)]
+        #[setting(env = "REX_REMOTE_MTLS_HTTP", parse_env = env::parse_bool)]
         #[serde(default, skip_serializing_if = "is_false")]
         pub assume_http2: bool,
 
@@ -158,7 +158,7 @@ config_struct!(
     pub struct RemoteConfig {
         /// The API format of the remote service.
         /// @since 1.32.0
-        #[setting(env = "MOON_REMOTE_API")]
+        #[setting(env = "REX_REMOTE_API")]
         pub api: RemoteApi,
 
         /// Connect to the host using basic HTTP authentication.
@@ -173,7 +173,7 @@ config_struct!(
 
         /// The remote host to connect and send requests to.
         /// Supports gRPC protocols.
-        #[setting(env = "MOON_REMOTE_HOST")]
+        #[setting(env = "REX_REMOTE_HOST")]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         pub host: Option<String>,
 

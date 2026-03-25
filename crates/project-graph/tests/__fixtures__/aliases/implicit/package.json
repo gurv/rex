@@ -1,9 +1,0 @@
-{
-  "name": "implicit",
-  "peerDependencies": {
-    "one": "workspace:*"
-  },
-  "optionalDependencies": {
-    "three": "workspace:*"
-  }
-}

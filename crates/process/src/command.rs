@@ -1,7 +1,7 @@
 use crate::shell::Shell;
-use moon_common::{color, is_test_env};
-use moon_console::Console;
-use moon_env_var::GlobalEnvBag;
+use rex_common::{color, is_test_env};
+use rex_console::Console;
+use rex_env_var::GlobalEnvBag;
 use rustc_hash::{FxHashMap, FxHasher};
 use std::collections::VecDeque;
 use std::ffi::{OsStr, OsString};

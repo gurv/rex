@@ -10,7 +10,7 @@ use starbase_utils::{json, toml, yaml};
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use tracing::{debug, instrument, trace, warn};
-use warpgate::{PluginLocator, PluginManifest, Wasm, inject_default_manifest_config};
+use rex_warpgate::{PluginLocator, PluginManifest, Wasm, inject_default_manifest_config};
 
 #[instrument(skip(proto, manifest))]
 pub fn inject_proto_manifest_config(

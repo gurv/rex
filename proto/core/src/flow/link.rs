@@ -4,7 +4,7 @@ use crate::layout::{Shim, ShimRegistry, ShimsMap};
 use crate::tool::Tool;
 use crate::tool_spec::ToolSpec;
 use proto_pdk_api::*;
-use proto_shim::*;
+use rex_proto_shim::*;
 use serde::Serialize;
 use starbase_utils::{fs, path};
 use std::collections::BTreeMap;

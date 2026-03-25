@@ -1,6 +1,6 @@
 #![allow(clippy::from_over_into)]
 
-use moon_common::path::RelativePathBuf;
+use rex_common::path::RelativePathBuf;
 use schematic::{ParseError, Schema, SchemaBuilder, Schematic};
 use serde::{Deserialize, Serialize};
 use std::fmt;

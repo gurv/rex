@@ -20,7 +20,7 @@ use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 use toml_edit::DocumentMut;
 use tracing::{debug, instrument, trace};
-use warpgate::{Id, PluginLocator, find_debug_locator_with_url_fallback};
+use rex_warpgate::{Id, PluginLocator, find_debug_locator_with_url_fallback};
 
 // Re-export settings from here!
 pub use crate::settings::*;
@@ -174,10 +174,10 @@ impl ProtoConfig {
             );
         }
 
-        if !tools.contains_key("moon") && is_allowed("moon") {
+        if !tools.contains_key("rex") && is_allowed("rex") {
             tools.insert(
-                Id::raw("moon"),
-                find_debug_locator_with_url_fallback("moon_tool", "0.4.1"),
+                Id::raw("rex"),
+                find_debug_locator_with_url_fallback("rex_tool", "0.4.1"),
             );
         }
 
@@ -242,11 +242,11 @@ impl ProtoConfig {
 
         #[cfg(all(any(debug_assertions, test), feature = "test-plugins"))]
         {
-            let locator = warpgate::find_debug_locator("proto_mocked_tool")
+            let locator = rex_warpgate::find_debug_locator("proto_mocked_tool")
                 .expect("Test plugins not available. Run `just build-wasm` to build them!");
 
-            tools.insert(Id::raw("moonbase"), locator.clone());
-            tools.insert(Id::raw("moonstone"), locator.clone());
+            tools.insert(Id::raw("rexbase"), locator.clone());
+            tools.insert(Id::raw("rexstone"), locator.clone());
             tools.insert(Id::raw("protoform"), locator.clone());
             tools.insert(Id::raw("protostar"), locator);
         }

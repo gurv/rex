@@ -1,6 +1,6 @@
 use crate::command::{Command, CommandExecutable};
-use moon_common::color;
-use moon_env_var::GlobalEnvBag;
+use rex_common::color;
+use rex_env_var::GlobalEnvBag;
 use std::ffi::{OsStr, OsString};
 use std::fmt::{self, Display};
 use std::path::Path;
@@ -29,8 +29,6 @@ impl CommandLine {
             command_line.push(shell.bin.as_os_str().to_owned());
             command_line.extend(shell.command.shell_args.clone());
 
-            // Within a shell, the command is a string. For arguments,
-            // use the original quoted value if available!
             let mut shell_command = OsString::new();
 
             match &command.exe {

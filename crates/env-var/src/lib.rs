@@ -39,7 +39,7 @@ pub fn contains_env_var(value: impl AsRef<str>) -> bool {
 // Env inheritance in order of priority:
 //
 //  1) Global/shell vars
-//      - So that `KEY=value moon ...` works
+//      - So that `KEY=value rex ...` works
 //      - Cannot access task/dotenv vars
 //  2) Task vars
 //      - Can substitute with globals/self

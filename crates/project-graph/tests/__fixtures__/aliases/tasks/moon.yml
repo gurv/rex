@@ -1,6 +1,0 @@
-tasks:
-  with-aliases:
-    deps:
-      - 'one:global'
-      - 'three:global'
-      - 'implicit:global'

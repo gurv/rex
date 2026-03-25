@@ -1,4 +1,0 @@
-workspace:
-  inheritedTasks:
-    include: ['global-build', 'global-run']
-    exclude: ['global-build']

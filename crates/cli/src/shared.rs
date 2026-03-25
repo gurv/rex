@@ -1,9 +1,9 @@
 use crate::lookup::*;
 use clap::Parser;
 use mimalloc::MiMalloc;
-use moon_app::commands::extension::ExtensionCommands;
-use moon_app::{Cli, Commands, MoonSession, commands};
-use moon_env_var::GlobalEnvBag;
+use rex_app::commands::plugin::PluginCommands;
+use rex_app::{Cli, Commands, RexSession, commands};
+use rex_env_var::GlobalEnvBag;
 use starbase::diagnostics::IntoDiagnostic;
 use starbase::tracing::TracingOptions;
 use starbase::{App, MainResult};
@@ -20,7 +20,7 @@ static GLOBAL: MiMalloc = MiMalloc;
 fn get_version() -> String {
     let version = env!("CARGO_PKG_VERSION");
 
-    GlobalEnvBag::instance().set("MOON_VERSION", version);
+    GlobalEnvBag::instance().set("REX_VERSION", version);
 
     version.to_owned()
 }
@@ -28,14 +28,10 @@ fn get_version() -> String {
 fn get_tracing_modules() -> Vec<String> {
     let bag = GlobalEnvBag::instance();
     let mut modules = string_vec![
-        "moon", "proto", // "schematic",
+        "rex",
+        "proto",
         "starbase",
-        "warpgate",
-        // Remote testing
-        // "h2",
-        // "hyper",
-        // "tonic",
-        // "rustls",
+        "rex_warpgate",
     ];
 
     if bag.should_debug_mcp() {
@@ -77,21 +73,18 @@ fn exec_local_bin(mut command: Command) -> std::io::Result<u8> {
 pub async fn run_cli(args: Vec<OsString>) -> MainResult {
     sigpipe::reset();
 
-    // Detect info about the current process
     let version = get_version();
 
-    // Create the CLI
     let cli = Cli::parse_from(&args);
     cli.setup_env_vars();
 
-    // Setup diagnostics and tracing
     let app = App::default();
     app.setup_diagnostics();
 
     let _guard = app.setup_tracing(TracingOptions {
         dump_trace: cli.dump,
         filter_modules: get_tracing_modules(),
-        log_env: "STARBASE_LOG".into(), // Don't conflict with proto
+        log_env: "STARBASE_LOG".into(),
         log_file: cli.log_file.clone(),
         show_spans: cli.log.is_verbose(),
         ..TracingOptions::default()
@@ -100,15 +93,14 @@ pub async fn run_cli(args: Vec<OsString>) -> MainResult {
     if let Ok(exe) = env::current_exe() {
         debug!(
             args = ?args,
-            "Running moon v{} (with {})",
+            "Running rex v{} (with {})",
             version,
             color::path(exe),
         );
     } else {
-        debug!(args = ?args, "Running moon v{}", version);
+        debug!(args = ?args, "Running rex v{}", version);
     }
 
-    // Detect if we've been installed globally
     if let (Some(home_dir), Ok(current_dir)) = (dirs::home_dir(), env::current_dir())
         && is_globally_installed(&home_dir)
         && let Some(local_bin) = has_locally_installed(&home_dir, &current_dir)
@@ -125,24 +117,18 @@ pub async fn run_cli(args: Vec<OsString>) -> MainResult {
         return Ok(ExitCode::from(exit_code));
     }
 
-    // Otherwise just run the CLI
     let exit_code = app
-        .run(MoonSession::new(cli, version), |session| async {
+        .run(RexSession::new(cli, version), |session| async {
             match session.cli.command.clone() {
-                Commands::Ext(args) => commands::ext::ext(session, args).await,
-                Commands::Extension { command } => match command {
-                    ExtensionCommands::Add(args) => {
-                        commands::extension::add::add(session, args).await
+                Commands::Run(args) => commands::run::run(session, args).await,
+                Commands::Plugin { command } => match command {
+                    PluginCommands::Add(args) => {
+                        commands::plugin::add::add(session, args).await
                     }
-                    ExtensionCommands::Info(args) => {
-                        commands::extension::info::info(session, args).await
+                    PluginCommands::Info(args) => {
+                        commands::plugin::info::info(session, args).await
                     }
                 },
-                Commands::Generate(args) => commands::generate::generate(session, args).await,
-                Commands::Mcp(args) => commands::mcp::mcp(session, args).await,
-                Commands::Template(args) => commands::template::template(session, args).await,
-                Commands::Templates(args) => commands::templates::templates(session, args).await,
-                Commands::Upgrade => commands::upgrade::upgrade(session).await,
             }
         })
         .await?;

@@ -1,6 +1,6 @@
 use crate::config_struct;
 use crate::shapes::{FilePath, GlobPath};
-use moon_common::Id;
+use rex_common::Id;
 use schematic::Config;
 
 config_struct!(
@@ -19,13 +19,13 @@ config_struct!(
         #[serde(skip_serializing_if = "Option::is_none")]
         pub image: Option<String>,
 
-        /// Run the `moon docker prune` command after building the
+        /// Run the `rex docker prune` command after building the
         /// project, but before starting it.
         /// @since 2.0.0
         #[serde(skip_serializing_if = "Option::is_none")]
         pub run_prune: Option<bool>,
 
-        /// Run the `moon docker setup` command after scaffolding,
+        /// Run the `rex docker setup` command after scaffolding,
         /// but before building the project.
         /// @since 2.0.0
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,7 +51,7 @@ config_struct!(
     pub struct DockerPruneConfig {
         /// Automatically delete vendor directories (package manager
         /// dependencies, build targets, etc) while pruning. This is
-        /// handled by each toolchain plugin and not moon directly.
+        /// handled by each toolchain plugin and not rex directly.
         #[setting(default = true)]
         pub delete_vendor_directories: bool,
 

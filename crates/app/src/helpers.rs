@@ -1,15 +1,8 @@
-use crate::session::MoonSession;
-use iocraft::prelude::element;
 use miette::IntoDiagnostic;
-use moon_common::Id;
-use moon_console::ui::{OwnedOrShared, Progress, ProgressDisplay, ProgressReporter};
-use moon_console::{Console, ConsoleError};
-use moon_workspace::WorkspaceBuilderContext;
+use rex_common::Id;
 use serde::Serialize;
 use starbase_utils::{fs, json, toml, yaml};
-use std::ops::Deref;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 pub fn serialize_config_based_on_extension(
     plugin_id: &Id,
@@ -63,72 +56,4 @@ pub fn append_plugin_to_config_file(
     )?;
 
     Ok(path.to_path_buf())
-}
-
-pub async fn create_workspace_graph_context(
-    session: &MoonSession,
-) -> miette::Result<WorkspaceBuilderContext<'_>> {
-    let context = WorkspaceBuilderContext {
-        config_loader: &session.config_loader,
-        enabled_toolchains: session.toolchains_config.get_enabled(),
-        extensions_config: &session.extensions_config,
-        extension_registry: session.get_extension_registry().await?,
-        inherited_tasks: &session.tasks_config,
-        toolchains_config: &session.toolchains_config,
-        toolchain_registry: session.get_toolchain_registry().await?,
-        vcs: Some(session.get_vcs_adapter()?),
-        working_dir: &session.working_dir,
-        workspace_config: &session.workspace_config,
-        workspace_root: &session.workspace_root,
-    };
-
-    Ok(context)
-}
-
-pub async fn create_progress_loader(
-    console: Arc<Console>,
-    message: impl AsRef<str>,
-) -> ProgressInstance {
-    let reporter = Arc::new(ProgressReporter::default());
-    let reporter_clone = OwnedOrShared::Shared(reporter.clone());
-    let message = message.as_ref().to_owned();
-
-    let handle = tokio::task::spawn(async move {
-        console
-            .render_prompt(element! {
-                Progress(
-                    default_message: message,
-                    display: ProgressDisplay::Loader,
-                    reporter: reporter_clone,
-                )
-            })
-            .await
-    });
-
-    // Wait a bit for the component to be rendered
-    tokio::time::sleep(std::time::Duration::from_millis(50)).await;
-
-    ProgressInstance { handle, reporter }
-}
-
-pub struct ProgressInstance {
-    pub handle: tokio::task::JoinHandle<Result<(), ConsoleError>>,
-    pub reporter: Arc<ProgressReporter>,
-}
-
-impl ProgressInstance {
-    pub async fn stop(self) -> miette::Result<()> {
-        self.reporter.exit();
-        self.handle.await.into_diagnostic()??;
-
-        Ok(())
-    }
-}
-
-impl Deref for ProgressInstance {
-    type Target = ProgressReporter;
-
-    fn deref(&self) -> &Self::Target {
-        &self.reporter
-    }
 }

@@ -8,4 +8,4 @@ pub use api::*;
 pub use funcs::*;
 #[cfg(feature = "tracing")]
 pub use tracing::*;
-pub use warpgate_api::*;
+pub use rex_warpgate_api::*;

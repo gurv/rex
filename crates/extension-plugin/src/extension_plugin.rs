@@ -1,10 +1,9 @@
 use async_trait::async_trait;
-use moon_common::Id;
-use moon_pdk_api::*;
-use moon_plugin::{Plugin, PluginContainer, PluginRegistration, PluginType};
+use rex_common::Id;
+use rex_pdk_api::*;
+use rex_plugin::{Plugin, PluginContainer, PluginRegistration, PluginType};
 use std::fmt;
 use std::ops::Deref;
-use std::path::PathBuf;
 use std::sync::Arc;
 use tracing::instrument;
 
@@ -50,15 +49,15 @@ impl Plugin for ExtensionPlugin {
 }
 
 impl ExtensionPlugin {
-    fn handle_output_file(&self, file: &mut PathBuf) {
-        *file = self.plugin.from_virtual_path(&file);
-    }
+    // fn handle_output_file(&self, file: &mut PathBuf) {
+    //     *file = self.plugin.from_virtual_path(&file);
+    // }
 
-    fn handle_output_files(&self, files: &mut [PathBuf]) {
-        for file in files {
-            self.handle_output_file(file);
-        }
-    }
+    // fn handle_output_files(&self, files: &mut [PathBuf]) {
+    //     for file in files {
+    //         self.handle_output_file(file);
+    //     }
+    // }
 
     #[instrument(skip(self))]
     pub async fn define_extension_config(&self) -> miette::Result<DefineExtensionConfigOutput> {
@@ -69,7 +68,7 @@ impl ExtensionPlugin {
     }
 
     #[instrument(skip(self, context))]
-    pub async fn execute(&self, args: Vec<String>, context: MoonContext) -> miette::Result<()> {
+    pub async fn execute(&self, args: Vec<String>, context: RexContext) -> miette::Result<()> {
         self.plugin
             .call_func_without_output("execute_extension", ExecuteExtensionInput { args, context })
             .await?;
@@ -88,46 +87,46 @@ impl ExtensionPlugin {
         Ok(output)
     }
 
-    #[instrument(skip(self))]
-    pub async fn extend_project_graph(
-        &self,
-        input: ExtendProjectGraphInput,
-    ) -> miette::Result<ExtendProjectGraphOutput> {
-        let mut output: ExtendProjectGraphOutput = self
-            .plugin
-            .cache_func_with("extend_project_graph", input)
-            .await?;
+    // #[instrument(skip(self))]
+    // pub async fn extend_project_graph(
+    //     &self,
+    //     input: ExtendProjectGraphInput,
+    // ) -> miette::Result<ExtendProjectGraphOutput> {
+    //     let mut output: ExtendProjectGraphOutput = self
+    //         .plugin
+    //         .cache_func_with("extend_project_graph", input)
+    //         .await?;
 
-        self.handle_output_files(&mut output.input_files);
+    //     self.handle_output_files(&mut output.input_files);
 
-        Ok(output)
-    }
+    //     Ok(output)
+    // }
 
-    #[instrument(skip(self))]
-    pub async fn extend_task_command(
-        &self,
-        input: ExtendTaskCommandInput,
-    ) -> miette::Result<ExtendCommandOutput> {
-        let output: ExtendCommandOutput = self
-            .plugin
-            .cache_func_with("extend_task_command", input)
-            .await?;
+    // #[instrument(skip(self))]
+    // pub async fn extend_task_command(
+    //     &self,
+    //     input: ExtendTaskCommandInput,
+    // ) -> miette::Result<ExtendCommandOutput> {
+    //     let output: ExtendCommandOutput = self
+    //         .plugin
+    //         .cache_func_with("extend_task_command", input)
+    //         .await?;
 
-        Ok(output)
-    }
+    //     Ok(output)
+    // }
 
-    #[instrument(skip(self))]
-    pub async fn extend_task_script(
-        &self,
-        input: ExtendTaskScriptInput,
-    ) -> miette::Result<ExtendTaskScriptOutput> {
-        let output: ExtendTaskScriptOutput = self
-            .plugin
-            .cache_func_with("extend_task_script", input)
-            .await?;
+    // #[instrument(skip(self))]
+    // pub async fn extend_task_script(
+    //     &self,
+    //     input: ExtendTaskScriptInput,
+    // ) -> miette::Result<ExtendTaskScriptOutput> {
+    //     let output: ExtendTaskScriptOutput = self
+    //         .plugin
+    //         .cache_func_with("extend_task_script", input)
+    //         .await?;
 
-        Ok(output)
-    }
+    //     Ok(output)
+    // }
 
     #[instrument(skip(self))]
     pub async fn initialize_extension(
@@ -142,23 +141,23 @@ impl ExtensionPlugin {
         Ok(output)
     }
 
-    #[instrument(skip(self))]
-    pub async fn sync_project(&self, input: SyncProjectInput) -> miette::Result<SyncOutput> {
-        let mut output: SyncOutput = self.plugin.call_func_with("sync_project", input).await?;
+    // #[instrument(skip(self))]
+    // pub async fn sync_project(&self, input: SyncProjectInput) -> miette::Result<SyncOutput> {
+    //     let mut output: SyncOutput = self.plugin.call_func_with("sync_project", input).await?;
 
-        self.handle_output_files(&mut output.changed_files);
+    //     self.handle_output_files(&mut output.changed_files);
 
-        Ok(output)
-    }
+    //     Ok(output)
+    // }
 
-    #[instrument(skip(self))]
-    pub async fn sync_workspace(&self, input: SyncWorkspaceInput) -> miette::Result<SyncOutput> {
-        let mut output: SyncOutput = self.plugin.call_func_with("sync_workspace", input).await?;
+    // #[instrument(skip(self))]
+    // pub async fn sync_workspace(&self, input: SyncWorkspaceInput) -> miette::Result<SyncOutput> {
+    //     let mut output: SyncOutput = self.plugin.call_func_with("sync_workspace", input).await?;
 
-        self.handle_output_files(&mut output.changed_files);
+    //     self.handle_output_files(&mut output.changed_files);
 
-        Ok(output)
-    }
+    //     Ok(output)
+    // }
 }
 
 impl Deref for ExtensionPlugin {

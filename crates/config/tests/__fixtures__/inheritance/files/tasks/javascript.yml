@@ -1,6 +1,0 @@
-inheritedBy:
-  toolchains: 'javascript'
-
-tasks:
-  javascript:
-    command: javascript

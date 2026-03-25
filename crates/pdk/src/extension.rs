@@ -1,10 +1,10 @@
 use extism_pdk::{config, json};
 use serde::de::DeserializeOwned;
-use warpgate_pdk::AnyResult;
+use rex_warpgate_pdk::AnyResult;
 
 /// Get configuration for the current extension plugin.
 pub fn get_extension_config<T: Default + DeserializeOwned>() -> AnyResult<T> {
-    let config: T = if let Some(value) = config::get("moon_extension_config")? {
+    let config: T = if let Some(value) = config::get("rex_extension_config")? {
         json::from_str(&value)?
     } else {
         T::default()
@@ -28,7 +28,7 @@ pub fn parse_extension_config<T: Default + DeserializeOwned>(value: json::Value)
 /// using `schematic`. Will run any validation rules.
 #[cfg(feature = "schematic")]
 pub fn parse_extension_config_schema<T: schematic::Config>(value: json::Value) -> AnyResult<T> {
-    use moon_pdk_api::anyhow;
+    use rex_pdk_api::anyhow;
     use schematic::ConfigLoader;
 
     match ConfigLoader::<T>::new()

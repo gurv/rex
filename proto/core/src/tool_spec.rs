@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::str::FromStr;
-use version_spec::{UnresolvedVersionSpec, VersionSpec};
+use rex_version_spec::{UnresolvedVersionSpec, VersionSpec};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(into = "String", try_from = "String")]

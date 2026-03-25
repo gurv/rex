@@ -1,17 +1,17 @@
 [package]
 name = "proto_pdk_api"
-version = "0.31.8"
-edition = "2024"
-license = "MIT"
-description = "Core APIs for creating proto WASM plugins."
-homepage = "https://moonrepo.dev/proto"
-repository = "https://github.com/moonrepo/proto"
-rust-version = "1.85.0"
+version = "0.1.0"
+publish = false
+
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-system_env = { path = "../../crates/system-env" }
-version_spec = { path = "../../crates/version-spec" }
-warpgate_api = { path = "../../crates/warpgate-api" }
+rex_system_env = { path = "../../crates/system-env" }
+rex_version_spec = { path = "../../crates/version-spec" }
+rex_warpgate_api = { path = "../../crates/warpgate-api" }
 derive_setters = { workspace = true }
 rustc-hash = { workspace = true }
 schematic = { workspace = true, features = [
@@ -27,11 +27,7 @@ thiserror = { workspace = true }
 [features]
 default = []
 schematic = [
-	"system_env/schematic",
-	"version_spec/schematic",
-	"warpgate_api/schematic",
+	"rex_system_env/schematic",
+	"rex_version_spec/schematic",
+	"rex_warpgate_api/schematic",
 ]
-
-# Ensures everything still works with schematic
-[dev-dependencies]
-proto_pdk_api = { path = ".", features = ["schematic"] }

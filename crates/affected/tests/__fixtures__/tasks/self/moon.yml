@@ -1,6 +1,0 @@
-tasks:
-  a:
-    deps: ['~:b']
-  b: {}
-  c:
-    deps: ['a', 'b']

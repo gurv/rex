@@ -23,7 +23,7 @@ pub fn is_stale(timestamp: u128, duration: Duration) -> bool {
 }
 
 pub fn elapsed_opt(duration: Duration) -> Option<String> {
-    if env::var("MOON_TEST").is_ok() {
+    if env::var("REX_TEST").is_ok() {
         return Some("100ms".into()); // Snapshots
     }
 

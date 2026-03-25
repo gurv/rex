@@ -17,7 +17,7 @@ use starbase_utils::net::DownloadOptions;
 use starbase_utils::{fs, net, path};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use system_env::System;
+use rex_system_env::System;
 use tokio::process::Command;
 use tracing::{debug, instrument, warn};
 

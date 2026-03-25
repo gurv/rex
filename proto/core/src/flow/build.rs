@@ -25,15 +25,15 @@ use starbase_utils::{envx::is_ci, fs, net, path};
 use std::env;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
-use system_env::{
+use rex_system_env::{
     DependencyConfig, DependencyName, System, SystemPackageManager, find_command_on_path,
     is_command_on_path,
 };
 use tokio::process::Command;
 use tokio::sync::{Mutex, OwnedMutexGuard};
 use tracing::{debug, error};
-use version_spec::{VersionSpec, get_semver_regex};
-use warpgate::HttpClient;
+use rex_version_spec::{VersionSpec, get_semver_regex};
+use rex_warpgate::HttpClient;
 
 static BUILD_LOCKS: OnceLock<scc::HashMap<String, Arc<Mutex<()>>>> = OnceLock::new();
 

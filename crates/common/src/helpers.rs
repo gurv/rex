@@ -155,3 +155,10 @@ pub fn write_json_file_with_lock<T: Serialize>(
 
     Ok(())
 }
+
+pub fn is_musl() -> bool {
+    match std::process::Command::new("ldd").arg("--version").output() {
+        Ok(output) => String::from_utf8(output.stdout).is_ok_and(|out| out.contains("musl")),
+        Err(_) => false,
+    }
+}

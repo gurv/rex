@@ -48,7 +48,7 @@ macro_rules! handle_io_error {
             // If we receive an "Access is denied" error, we should
             // exit early as there's no way around this, as this exe
             // may be currently in use by another process. This happens
-            // consistently when ran through task runners (like moon).
+            // consistently when ran through task runners (like rex).
             if error.raw_os_error().is_some_and(|code| code == 5) {
                 return Ok(());
             } else {

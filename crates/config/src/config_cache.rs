@@ -1,4 +1,4 @@
-use moon_common::path::hash_component;
+use rex_common::path::hash_component;
 use rustc_hash::FxHashMap;
 use schematic::{Cacher, HandlerError};
 use std::fs;

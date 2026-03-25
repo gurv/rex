@@ -1,8 +1,8 @@
 use crate::common::{InitializePluginInput, InitializePluginOutput};
-use crate::context::MoonContext;
-use moon_common::Id;
+use crate::context::RexContext;
+use rex_common::Id;
+use rex_warpgate_api::*;
 use schematic::Schema;
-use warpgate_api::*;
 
 pub type InitializeExtensionInput = InitializePluginInput;
 pub type InitializeExtensionOutput = InitializePluginOutput;
@@ -47,7 +47,7 @@ api_struct!(
         /// Custom arguments passed on the command line.
         pub args: Vec<String>,
 
-        /// Current moon context.
-        pub context: MoonContext,
+        /// Current rex context.
+        pub context: RexContext,
     }
 );

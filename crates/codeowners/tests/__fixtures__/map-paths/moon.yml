@@ -1,6 +1,0 @@
-owners:
-  defaultOwner: '@backend'
-  requiredApprovals: 3
-  paths:
-    '*.rs': ['@rust-dev', '@api-team']
-    'config/': []

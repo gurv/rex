@@ -1,7 +1,0 @@
-inheritedBy:
-  toolchains: 'javascript'
-  layers: 'library'
-
-tasks:
-  javascript-library:
-    command: javascript-library

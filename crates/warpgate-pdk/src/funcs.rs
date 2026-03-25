@@ -5,7 +5,7 @@ use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::vec;
-use warpgate_api::{
+use rex_warpgate_api::{
     AnyResult, ExecCommandInput, ExecCommandOutput, HostEnvironment, HostOS, Id, SendRequestInput,
     SendRequestOutput, TestEnvironment, VirtualPath, anyhow,
 };

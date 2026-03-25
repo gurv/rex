@@ -1,20 +1,19 @@
 [package]
-name = "moon_plugin"
-version = "0.0.1"
-edition = "2024"
-license = "MIT"
-description = "Plugin registry and system."
-homepage = "https://moonrepo.dev/moon"
-repository = "https://github.com/moonrepo/moon"
+name = "rex_plugin"
+version = "0.1.0"
 publish = false
 
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
 [dependencies]
-moon_common = { path = "../common" }
-moon_config = { path = "../config" }
-moon_env = { path = "../env" }
-moon_pdk_api = { path = "../pdk-api" }
-moon_target = { path = "../target" }
-moon_workspace_graph = { path = "../workspace-graph" }
+rex_common = { path = "../common" }
+rex_config = { path = "../config" }
+rex_env = { path = "../env" }
+rex_pdk_api = { path = "../pdk-api" }
+rex_target = { path = "../target" }
 async-trait = { workspace = true }
 convert_case = { workspace = true }
 extism = { workspace = true }
@@ -28,11 +27,7 @@ starbase_styles = { workspace = true }
 starbase_utils = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
-warpgate = { path = "../warpgate" }
-
-[dev-dependencies]
-starbase_sandbox = { workspace = true }
-tokio = { workspace = true }
+rex_warpgate = { path = "../warpgate" }
 
 [lints]
 workspace = true
