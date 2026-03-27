@@ -9,7 +9,6 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-rex_cache = { path = "../cache" }
 rex_common = { path = "../common" }
 rex_env = { path = "../env" }
 rex_env_var = { path = "../env-var" }
@@ -18,7 +17,6 @@ cd_env = { workspace = true }
 ci_env = { workspace = true }
 md5 = { workspace = true }
 miette = { workspace = true }
-proto_core = { path = "../../proto/core" }
 reqwest = { workspace = true, features = ["json", "multipart", "stream"] }
 semver = { workspace = true }
 serde = { workspace = true }

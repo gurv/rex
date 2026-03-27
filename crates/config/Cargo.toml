@@ -13,8 +13,10 @@ features = ["loader"]
 
 [dependencies]
 rex_common = { path = "../common" }
-rex_target = { path = "../target" }
-rex_warpgate = { path = "../warpgate" }
+rex_warpgate = { path = "../warpgate", features = [
+    "miette",
+    "schematic",
+] }
 rex_warpgate_api = { path = "../warpgate-api" }
 deserialize_untagged_verbose_error = "0.1.5"
 hcl-rs = "0.19.6"
@@ -43,13 +45,12 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 serde_path_to_error = "0.1.20"
 rex_version_spec = { path = "../version-spec", features = ["schematic"] }
-proto_core = { path = "../../proto/core", optional = true }
 tracing = { workspace = true, optional = true }
 
 [features]
 default = []
 loader = ["schematic/url"]
-proto = ["loader", "tracing", "dep:proto_core"]
+proto = ["loader", "tracing"]
 tracing = ["dep:tracing"]
 
 [lints]

@@ -134,36 +134,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d92bec98840b8f03a5ff5413de5293bfcd8bf96467cf5452609f939ec6f5de16"
 
 [[package]]
-name = "assert_cmd"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a686bbee5efb88a82df0621b236e74d925f470e5445d3220a5648b892ec99c9"
-dependencies = [
- "anstyle",
- "bstr",
- "libc",
- "predicates",
- "predicates-core",
- "predicates-tree",
- "wait-timeout",
-]
-
-[[package]]
-name = "assert_fs"
-version = "1.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a652f6cb1f516886fcfee5e7a5c078b9ade62cfcb889524efe5a64d682dd27a9"
-dependencies = [
- "anstyle",
- "doc-comment",
- "globwalk",
- "predicates",
- "predicates-core",
- "predicates-tree",
- "tempfile",
-]
-
-[[package]]
 name = "async-recursion"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -695,18 +665,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "console"
-version = "0.15.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "054ccb5b10f9f2cbf51eb355ca1d05c2d279ce1804688d0db74b4733a5aeafd8"
-dependencies = [
- "encode_unicode",
- "libc",
- "once_cell",
- "windows-sys 0.59.0",
-]
-
-[[package]]
 name = "const_format"
 version = "0.2.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1210,12 +1168,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
 
 [[package]]
-name = "difflib"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
-
-[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1279,12 +1231,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "doc-comment"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "780955b8b195a21ab8e4ac6b60dd1dbdcec1dc6c51c0617964b08c81785e12c9"
-
-[[package]]
 name = "docker_credential"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1294,12 +1240,6 @@ dependencies = [
  "serde",
  "serde_json",
 ]
-
-[[package]]
-name = "dotenvy"
-version = "0.15.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
 
 [[package]]
 name = "dunce"
@@ -1330,12 +1270,6 @@ name = "embedded-io"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
-
-[[package]]
-name = "encode_unicode"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
 
 [[package]]
 name = "encoding_rs"
@@ -1509,15 +1443,6 @@ dependencies = [
  "crc32fast",
  "miniz_oxide",
  "zlib-rs",
-]
-
-[[package]]
-name = "float-cmp"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b09cf3155332e944990140d967ff5eceb70df778b34f77d8075db46e4704e6d8"
-dependencies = [
- "num-traits",
 ]
 
 [[package]]
@@ -2300,18 +2225,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "insta"
-version = "1.46.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e82db8c87c7f1ccecb34ce0c24399b8a73081427f3c7c50a5d597925356115e4"
-dependencies = [
- "console",
- "once_cell",
- "similar",
- "tempfile",
-]
-
-[[package]]
 name = "io-extras"
 version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2831,12 +2744,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
-name = "minisign-verify"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22f9645cb765ea72b8111f36c522475d2daa0d22c957a9826437e97534bc4e9e"
-
-[[package]]
 name = "miniz_oxide"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2884,12 +2791,6 @@ dependencies = [
  "memchr",
  "minimal-lexical",
 ]
-
-[[package]]
-name = "normalize-line-endings"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61807f77802ff30975e01f4f071c8ba10c022052f98b3294119f3e615d13e5be"
 
 [[package]]
 name = "ntapi"
@@ -3330,46 +3231,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17e0a4425d076f0718b820673a38fbf3747080c61017eeb0dd79bc7e472b8bb8"
 
 [[package]]
-name = "predicates"
-version = "3.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ada8f2932f28a27ee7b70dd6c1c39ea0675c55a36879ab92f3a715eaa1e63cfe"
-dependencies = [
- "anstyle",
- "difflib",
- "float-cmp",
- "normalize-line-endings",
- "predicates-core",
- "regex",
-]
-
-[[package]]
-name = "predicates-core"
-version = "1.0.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cad38746f3166b4031b1a0d39ad9f954dd291e7854fcc0eed52ee41a0b50d144"
-
-[[package]]
-name = "predicates-tree"
-version = "1.0.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0de1b847b39c8131db0467e9df1ff60e6d0562ab8e9a16e568ad0fdb372e2f2"
-dependencies = [
- "predicates-core",
- "termtree",
-]
-
-[[package]]
-name = "pretty_assertions"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ae130e2f271fbc2ac3a40fb1d07180839cdbbe443c7a27e1e3c13c5cac0116d"
-dependencies = [
- "diff",
- "yansi",
-]
-
-[[package]]
 name = "prettyplease"
 version = "0.2.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3475,64 +3336,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.117",
-]
-
-[[package]]
-name = "proto_core"
-version = "0.1.0"
-dependencies = [
- "clap",
- "convert_case",
- "docker_credential",
- "dotenvy",
- "indexmap",
- "iocraft",
- "miette 7.6.0",
- "minisign-verify",
- "oci-client",
- "once_cell",
- "proto_pdk_api",
- "regex",
- "reqwest",
- "rex_proto_shim",
- "rex_system_env",
- "rex_version_spec",
- "rex_warpgate",
- "rustc-hash",
- "scc",
- "schematic",
- "semver",
- "serde",
- "serde_json",
- "sha2",
- "shell-words",
- "starbase_archive",
- "starbase_console",
- "starbase_shell",
- "starbase_styles",
- "starbase_utils",
- "thiserror 2.0.18",
- "tokio",
- "toml_edit 0.23.10+spec-1.0.0",
- "tracing",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "proto_pdk_api"
-version = "0.1.0"
-dependencies = [
- "derive_setters",
- "rex_system_env",
- "rex_version_spec",
- "rex_warpgate_api",
- "rustc-hash",
- "schematic",
- "semver",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -3883,20 +3686,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rex_action"
-version = "0.1.0"
-dependencies = [
- "indexmap",
- "miette 7.6.0",
- "rex_common",
- "rex_target",
- "rex_time",
- "rex_version_spec",
- "rustc-hash",
- "serde",
-]
-
-[[package]]
 name = "rex_api"
 version = "0.1.0"
 dependencies = [
@@ -3904,9 +3693,7 @@ dependencies = [
  "ci_env",
  "md5",
  "miette 7.6.0",
- "proto_core",
  "reqwest",
- "rex_cache",
  "rex_common",
  "rex_env",
  "rex_env_var",
@@ -3935,14 +3722,11 @@ dependencies = [
  "miette 7.6.0",
  "open",
  "petgraph",
- "proto_core",
  "regex",
  "reqwest",
- "rex_action",
  "rex_api",
  "rex_app_context",
  "rex_app_macros",
- "rex_cache",
  "rex_common",
  "rex_config",
  "rex_console",
@@ -3953,7 +3737,6 @@ dependencies = [
  "rex_pdk_api",
  "rex_plugin",
  "rex_process",
- "rex_process_augment",
  "rex_version_spec",
  "rex_warpgate_api",
  "rustc-hash",
@@ -3976,8 +3759,6 @@ dependencies = [
 name = "rex_app_context"
 version = "0.1.0"
 dependencies = [
- "proto_core",
- "rex_cache",
  "rex_config",
  "rex_console",
  "rex_env",
@@ -3995,33 +3776,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rex_cache"
-version = "0.1.0"
-dependencies = [
- "miette 7.6.0",
- "rex_cache_item",
- "rex_common",
- "rex_env_var",
- "rex_hash",
- "rex_target",
- "rex_time",
- "serde",
- "starbase_utils",
- "tracing",
-]
-
-[[package]]
-name = "rex_cache_item"
-version = "0.1.0"
-dependencies = [
- "miette 7.6.0",
- "rex_env_var",
- "serde",
- "starbase_utils",
- "tracing",
-]
-
-[[package]]
 name = "rex_cli"
 version = "0.1.0"
 dependencies = [
@@ -4032,7 +3786,6 @@ dependencies = [
  "rex_app",
  "rex_common",
  "rex_env_var",
- "rex_proto_shim",
  "sigpipe",
  "starbase",
  "starbase_styles",
@@ -4072,10 +3825,8 @@ dependencies = [
  "hcl-rs",
  "indexmap",
  "miette 7.6.0",
- "proto_core",
  "regex",
  "rex_common",
- "rex_target",
  "rex_version_spec",
  "rex_warpgate",
  "rex_warpgate_api",
@@ -4095,10 +3846,8 @@ version = "0.1.0"
 dependencies = [
  "iocraft",
  "miette 7.6.0",
- "rex_action",
  "rex_common",
  "rex_config",
- "rex_target",
  "rex_time",
  "starbase_console",
  "starbase_styles",
@@ -4151,17 +3900,6 @@ name = "rex_feature_flags"
 version = "0.1.0"
 
 [[package]]
-name = "rex_hash"
-version = "0.1.0"
-dependencies = [
- "miette 7.6.0",
- "serde",
- "sha2",
- "starbase_utils",
- "tracing",
-]
-
-[[package]]
 name = "rex_pdk"
 version = "0.1.0"
 dependencies = [
@@ -4180,7 +3918,6 @@ name = "rex_pdk_api"
 version = "0.1.0"
 dependencies = [
  "derive_setters",
- "proto_pdk_api",
  "rex_common",
  "rex_config",
  "rex_warpgate_api",
@@ -4191,21 +3928,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rex_pdk_test_utils"
-version = "0.1.0"
-dependencies = [
- "extism",
- "proto_core",
- "proto_pdk_api",
- "rex_pdk_api",
- "rex_target",
- "rex_warpgate",
- "serde",
- "serde_json",
- "starbase_sandbox",
-]
-
-[[package]]
 name = "rex_plugin"
 version = "0.1.0"
 dependencies = [
@@ -4213,12 +3935,10 @@ dependencies = [
  "convert_case",
  "extism",
  "miette 7.6.0",
- "proto_core",
  "rex_common",
  "rex_config",
  "rex_env",
  "rex_pdk_api",
- "rex_target",
  "rex_warpgate",
  "rustc-hash",
  "scc",
@@ -4250,27 +3970,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rex_process_augment"
-version = "0.1.0"
-dependencies = [
- "miette 7.6.0",
- "rex_app_context",
- "rex_common",
- "rex_env_var",
- "rex_pdk_api",
- "rex_process",
- "rustc-hash",
-]
-
-[[package]]
-name = "rex_proto_shim"
-version = "0.1.0"
-dependencies = [
- "dirs",
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "rex_system_env"
 version = "0.1.0"
 dependencies = [
@@ -4280,54 +3979,6 @@ dependencies = [
  "serde_json",
  "shell-words",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "rex_target"
-version = "0.1.0"
-dependencies = [
- "compact_str 0.9.0",
- "miette 7.6.0",
- "regex",
- "rex_common",
- "schematic",
- "serde",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "rex_test_utils"
-version = "0.1.0"
-dependencies = [
- "assert_cmd",
- "assert_fs",
- "insta",
- "predicates",
- "pretty_assertions",
- "rex_common",
- "rex_config",
- "rustc-hash",
- "serde_json",
- "starbase_utils",
-]
-
-[[package]]
-name = "rex_test_utils2"
-version = "0.1.0"
-dependencies = [
- "extism",
- "proto_core",
- "rex_app_context",
- "rex_cache",
- "rex_common",
- "rex_config",
- "rex_console",
- "rex_env",
- "rex_extension_plugin",
- "rex_plugin",
- "starbase_sandbox",
- "starbase_utils",
 ]
 
 [[package]]
@@ -4700,7 +4351,6 @@ dependencies = [
  "serde_json",
  "serde_norway",
  "toml 0.9.12+spec-1.1.0",
- "url",
 ]
 
 [[package]]
@@ -4992,12 +4642,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e320a6c5ad31d271ad523dcf3ad13e2767ad8b1cb8f047f75a8aeaf8da139da2"
 
 [[package]]
-name = "similar"
-version = "2.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbbb5d9659141646ae647b42fe094daf6c6192d1620870b449d9557f748b2daa"
-
-[[package]]
 name = "siphasher"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5134,20 +4778,6 @@ dependencies = [
  "schematic",
  "serde",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "starbase_sandbox"
-version = "0.10.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d64d431c247ea60a92d53549ec649038799079ac23cc79ae71ebf1c6d15d0d7f"
-dependencies = [
- "assert_cmd",
- "assert_fs",
- "insta",
- "predicates",
- "pretty_assertions",
- "starbase_utils",
 ]
 
 [[package]]
@@ -5402,12 +5032,6 @@ dependencies = [
  "rustix 1.1.4",
  "windows-sys 0.61.2",
 ]
-
-[[package]]
-name = "termtree"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f50febec83f5ee1df3015341d8bd429f2d1cc62bcba7ea2076759d315084683"
 
 [[package]]
 name = "textwrap"
@@ -5673,19 +5297,6 @@ dependencies = [
  "serde_spanned 0.6.9",
  "toml_datetime 0.6.11",
  "toml_write",
- "winnow 0.7.15",
-]
-
-[[package]]
-name = "toml_edit"
-version = "0.23.10+spec-1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84c8b9f757e028cee9fa244aea147aab2a9ec09d5325a9b01e0a49730c2b5269"
-dependencies = [
- "indexmap",
- "toml_datetime 0.7.5+spec-1.1.0",
- "toml_parser",
- "toml_writer",
  "winnow 0.7.15",
 ]
 
@@ -6025,15 +5636,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "wait-timeout"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09ac3b126d3914f9849036f826e054cbabdc8519970b8998ddaf3b5bd3c65f11"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "walkdir"
@@ -7219,12 +6821,6 @@ name = "xxhash-rust"
 version = "0.8.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdd20c5420375476fbd4394763288da7eb0cc0b8c11deed431a91562af7335d3"
-
-[[package]]
-name = "yansi"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfe53a6657fd280eaa890a3bc59152892ffa3e30101319d168b781ed6529b049"
 
 [[package]]
 name = "yoke"

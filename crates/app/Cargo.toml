@@ -9,11 +9,9 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-rex_action = { path = "../action" }
 rex_api = { path = "../api" }
 rex_app_context = { path = "../app-context" }
 rex_app_macros = { path = "../app-macros" }
-rex_cache = { path = "../cache" }
 rex_common = { path = "../common" }
 rex_config = { path = "../config", features = ["loader", "proto", "tracing"] }
 rex_console = { path = "../console" }
@@ -24,7 +22,6 @@ rex_feature_flags = { path = "../feature-flags" }
 rex_pdk_api = { path = "../pdk-api" }
 rex_plugin = { path = "../plugin" }
 rex_process = { path = "../process" }
-rex_process_augment = { path = "../process-augment" }
 rex_warpgate_api = { path = "../warpgate-api" }
 async-recursion = { workspace = true }
 async-trait = { workspace = true }
@@ -45,7 +42,6 @@ convert_case = { workspace = true }
 diff = "0.1.13"
 iocraft = { workspace = true }
 miette = { workspace = true }
-proto_core = { path = "../../proto/core" }
 regex = { workspace = true }
 reqwest = { workspace = true }
 rustc-hash = { workspace = true }

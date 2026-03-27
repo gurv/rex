@@ -26,20 +26,6 @@ impl RexContext {
 
         self.working_dir.join(path)
     }
-
-    // /// Return an absolute path for the provided project.
-    // pub fn get_project_root(&self, project: &ProjectFragment) -> VirtualPath {
-    //     self.get_project_root_from_source(&project.source)
-    // }
-
-    // /// Return an absolute path for the provided project file path source.
-    // pub fn get_project_root_from_source(&self, source: &str) -> VirtualPath {
-    //     if source.is_empty() || source == "." {
-    //         self.workspace_root.clone()
-    //     } else {
-    //         self.workspace_root.join(source)
-    //     }
-    // }
 }
 
 api_enum!(

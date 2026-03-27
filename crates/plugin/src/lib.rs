@@ -7,7 +7,6 @@ pub use host::*;
 pub use plugin::*;
 pub use plugin_error::*;
 pub use plugin_registry::*;
-pub use proto_core::ProtoEnvironment;
 pub use rex_env::RexEnvironment;
 pub use rex_warpgate::{PluginContainer, PluginLoader, PluginLocator, PluginManifest, Wasm};
 

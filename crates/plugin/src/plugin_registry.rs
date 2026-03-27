@@ -32,7 +32,6 @@ impl<T: Plugin> PluginRegistry<T> {
             "Creating plugin registry"
         );
 
-        // Create the loader
         let mut loader = PluginLoader::new(
             host_data.rex_env.plugins_dir.join(type_of.get_dir_name()),
             &host_data.rex_env.temp_dir,
@@ -40,9 +39,7 @@ impl<T: Plugin> PluginRegistry<T> {
 
         loader.set_offline_checker(is_offline);
 
-        // Merge proto and rex virtual paths
         let mut paths = BTreeMap::new();
-        paths.extend(host_data.proto_env.get_virtual_paths());
         paths.extend(host_data.rex_env.get_virtual_paths());
 
         Self {
@@ -187,7 +184,6 @@ impl<T: Plugin> PluginRegistry<T> {
                     id: entry.key().to_owned(),
                     id_stable: stable_id,
                     rex_env: Arc::clone(&self.host_data.rex_env),
-                    proto_env: Arc::clone(&self.host_data.proto_env),
                     wasm_file: plugin_file,
                 })
                 .await?;

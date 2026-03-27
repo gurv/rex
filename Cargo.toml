@@ -1,7 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "legacy/core/*", "proto/*"]
-exclude = ["tests/fixtures", "wasm/test-plugin"]
+members = ["crates/*"]
 default-members = ["crates/cli"]
 
 [workspace.package]

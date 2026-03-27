@@ -66,8 +66,6 @@ impl ExtensionsConfig {
 
         match id.as_str() {
             "download" => Some(locate("download_extension", "1.0.2")),
-            "migrate-nx" => Some(locate("migrate_nx_extension", "1.0.3")),
-            "migrate-turborepo" => Some(locate("migrate_turborepo_extension", "1.0.3")),
             "unpack" => Some(locate("unpack_extension", "1.0.2")),
             _ => None,
         }
@@ -84,16 +82,8 @@ impl ExtensionsConfig {
         // N/A
     }
 
-    pub fn inherit_test_plugins(&mut self) -> miette::Result<()> {
-        for id in ["ext-sync", "ext-task"] {
-            self.plugins.entry(Id::raw(id)).or_default();
-        }
-
-        Ok(())
-    }
-
     pub fn inherit_test_builtin_plugins(&mut self) {
-        for id in ["download", "migrate-nx", "migrate-turborepo"] {
+        for id in ["download"] {
             self.plugins.entry(Id::raw(id)).or_default();
         }
     }
@@ -107,17 +97,8 @@ impl ExtensionsConfig {
             }
 
             match id.as_str() {
-                "download" | "migrate-nx" | "migrate-turborepo" => {
+                "download" => {
                     config.plugin = Self::get_plugin_locator(id);
-                }
-                #[cfg(debug_assertions)]
-                "ext-sync" | "ext-task" => {
-                    use rex_warpgate::find_debug_locator;
-
-                    config.plugin = Some(
-                        find_debug_locator(&id.replace("-", "_"))
-                            .expect("Development plugins missing, build with `just build-wasm`!"),
-                    );
                 }
                 other => {
                     return Err(ConfigError::Validator {

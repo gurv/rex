@@ -1,5 +1,4 @@
 use regex::Regex;
-use semver::Version;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use starbase_archive::is_supported_archive_extension;
@@ -19,20 +18,6 @@ pub static ENV_VAR: LazyLock<Regex> =
 pub static ENV_VAR_SUB: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\$\{(?<name>[A-Z0-9_]+)\}").unwrap());
 
-pub fn get_proto_version() -> &'static Version {
-    static VERSION_CACHE: OnceLock<Version> = OnceLock::new();
-
-    VERSION_CACHE.get_or_init(|| {
-        Version::parse(
-            env::var("PROTO_VERSION")
-                .ok()
-                .as_deref()
-                .unwrap_or(env!("CARGO_PKG_VERSION")),
-        )
-        .unwrap()
-    })
-}
-
 pub fn is_offline() -> bool {
     static OFFLINE_CACHE: OnceLock<bool> = OnceLock::new();
 
@@ -45,17 +30,17 @@ pub fn is_offline() -> bool {
             };
         }
 
-        let override_default = envx::bool_var("PROTO_OFFLINE_OVERRIDE_HOSTS");
+        let override_default = envx::bool_var("REX_OFFLINE_OVERRIDE_HOSTS");
 
-        let timeout: u64 = env::var("PROTO_OFFLINE_TIMEOUT")
+        let timeout: u64 = env::var("REX_OFFLINE_TIMEOUT")
             .map(|value| value.parse().expect("Invalid offline timeout."))
             .unwrap_or(750);
 
-        let custom_hosts: Vec<String> = env::var("PROTO_OFFLINE_HOSTS")
+        let custom_hosts: Vec<String> = env::var("REX_OFFLINE_HOSTS")
             .map(|value| value.split(',').map(|v| v.trim().to_owned()).collect())
             .unwrap_or_default();
 
-        let ip_version = env::var("PROTO_OFFLINE_IP_VERSION").unwrap_or_default();
+        let ip_version = env::var("REX_OFFLINE_IP_VERSION").unwrap_or_default();
 
         net::is_offline_with_options(net::OfflineOptions {
             check_default_hosts: !override_default,
@@ -67,13 +52,6 @@ pub fn is_offline() -> bool {
             timeout,
         })
     })
-}
-
-pub fn is_cache_enabled() -> bool {
-    match env::var("PROTO_CACHE") {
-        Ok(value) => value != "0" && value != "false" && value != "no" && value != "off",
-        Err(_) => true,
-    }
 }
 
 pub fn is_archive_file<P: AsRef<Path>>(path: P) -> bool {

@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use proto_core::ProtoEnvironment;
 use rex_env::RexEnvironment;
 use rex_warpgate::{Id, PluginContainer, PluginLocator};
 use std::fmt::Debug;
@@ -12,7 +11,6 @@ pub struct PluginRegistration {
     pub id_stable: Id, // foo
     pub locator: PluginLocator,
     pub rex_env: Arc<RexEnvironment>,
-    pub proto_env: Arc<ProtoEnvironment>,
     pub wasm_file: PathBuf,
 }
 

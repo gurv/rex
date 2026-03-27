@@ -9,10 +9,8 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-rex_action = { path = "../action" }
 rex_common = { path = "../common" }
 rex_config = { path = "../config" }
-rex_target = { path = "../target" }
 rex_time = { path = "../time" }
 iocraft = { workspace = true }
 miette = { workspace = true }

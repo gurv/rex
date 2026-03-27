@@ -25,14 +25,6 @@ api_enum!(
     }
 );
 
-// api_struct!(
-//     pub struct Prompt {
-//         pub question: String,
-//         pub required: bool,
-//         pub ty: PromptType,
-//     }
-// );
-
 api_struct!(
     /// Represents a prompt (question) for a configuration setting.
     #[serde(default)]

@@ -1,9 +1,7 @@
-use rex_cache::CacheEngine;
 use rex_config::{ExtensionsConfig, Version};
 use rex_console::Console;
 use rex_env::RexEnvironment;
 use rex_extension_plugin::ExtensionRegistry;
-use proto_core::ProtoEnvironment;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -11,23 +9,9 @@ use std::sync::Arc;
 pub struct AppContext {
     pub cli_version: Version,
     pub rex_env: Arc<RexEnvironment>,
-    pub proto_env: Arc<ProtoEnvironment>,
-
-    // Components
-    pub cache_engine: Arc<CacheEngine>,
     pub console: Arc<Console>,
-    // pub vcs: Arc<BoxedVcs>,
-
-    // Configs
     pub extensions_config: Arc<ExtensionsConfig>,
-    // pub toolchains_config: Arc<ToolchainsConfig>,
-    // pub workspace_config: Arc<WorkspaceConfig>,
-
-    // Plugins
     pub extension_registry: Arc<ExtensionRegistry>,
-    // pub toolchain_registry: Arc<ToolchainRegistry>,
-
-    // Paths
     pub config_dir: PathBuf,
     pub working_dir: PathBuf,
     pub workspace_root: PathBuf,

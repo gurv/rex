@@ -1,5 +1,4 @@
 use rex_api::Launchpad;
-use rex_cache::CacheEngine;
 use rex_common::{color, is_formatted_output, is_test_env};
 use rex_console::{Checkpoint, Console};
 use starbase::AppResult;
@@ -8,7 +7,6 @@ use tracing::{debug, instrument};
 #[instrument(skip_all)]
 pub async fn check_for_new_version(
     console: &Console,
-    cache_engine: &CacheEngine,
     manifest_url: &str,
 ) -> AppResult {
     if is_test_env() || is_formatted_output() {
@@ -20,7 +18,7 @@ pub async fn check_for_new_version(
     };
 
     match launchpad
-        .check_version(cache_engine, false, manifest_url)
+        .check_version(manifest_url)
         .await
     {
         Ok(Some(result)) => {

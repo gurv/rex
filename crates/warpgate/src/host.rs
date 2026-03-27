@@ -212,7 +212,7 @@ fn exec_command(
     };
 
     // Determine the shell
-    let shell_type = match input.shell.or_else(|| env::var("PROTO_SHELL").ok()) {
+    let shell_type = match input.shell {
         Some(name) => Some(ShellType::from_str(&name)?),
         None => get_default_shell(),
     };

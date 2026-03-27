@@ -7,8 +7,9 @@
 ls -la ~/.rex*
 target/debug/rex plugin add unpack file:///Users/gurv/Downloads/unpack_extension.wasm --log verbose
 target/debug/rex plugin add download https://github.com/moonrepo/plugins/releases/download/download_extension-v1.0.2/download_extension.wasm --log verbose
+target/debug/rex run download --log verbose
 ls -laR /Users/gurv/.rex
-ls -laR /Users/gurv/.proto
+rm -rf /Users/gurv/.rex
 ```
 
 * run
@@ -22,7 +23,3 @@ ls -laR /Users/gurv/.proto
   * list
     * --filter
 * upgrade
-
-20260324: 114 МБт
-20260324: 94 МБт
-20260324: 40 МБт

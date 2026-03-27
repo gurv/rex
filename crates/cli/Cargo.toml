@@ -29,7 +29,6 @@ rex_common = { path = "../common" }
 rex_env_var = { path = "../env-var" }
 clap = { workspace = true }
 mimalloc = { version = "0.1.48", default-features = false }
-rex_proto_shim = { path = "../shim" }
 sigpipe = "0.1.3"
 starbase = { workspace = true }
 starbase_styles = { workspace = true }

@@ -1,12 +1,9 @@
 use crate::extension_plugin::ExtensionPlugin;
-use futures::StreamExt;
-use futures::stream::FuturesOrdered;
 use miette::IntoDiagnostic;
 use rex_common::Id;
 use rex_config::ExtensionsConfig;
-use rex_pdk_api::Operation;
 use rex_plugin::{
-    CallResult, PluginError, PluginRegistry, PluginType, RexHostData, serialize_config,
+    PluginError, PluginRegistry, PluginType, RexHostData, serialize_config,
 };
 use starbase_utils::json::JsonValue;
 use std::fmt::Debug;
@@ -141,71 +138,6 @@ impl ExtensionRegistry {
         }
 
         Ok(list)
-    }
-
-    // This method looks crazy, but it basically loads and executes each requested
-    // extension in parallel, and returns the results in the order they were
-    // requested. We had to utilize generics and factory functions to make this
-    // easy to use at each call site.
-    pub(crate) async fn call_func_all<I, Id, InFn, In, OutFn, OutFut, Out>(
-        &self,
-        func_name: &str,
-        plugin_ids: I,
-        input_factory: InFn,
-        output_factory: OutFn,
-    ) -> miette::Result<Vec<CallResult<ExtensionPlugin, Out>>>
-    where
-        I: IntoIterator<Item = Id>,
-        Id: AsRef<str> + Clone,
-        InFn: Fn(&ExtensionRegistry, &ExtensionPlugin) -> In,
-        OutFn: Fn(Arc<ExtensionPlugin>, In) -> OutFut,
-        OutFut: Future<Output = miette::Result<Out>> + Send + 'static,
-        Out: Debug + Send + 'static,
-    {
-        let mut results = vec![];
-
-        if !self.has_plugin_configs() {
-            return Ok(results);
-        }
-
-        let plugin_ids = plugin_ids.into_iter().collect::<Vec<_>>();
-
-        // Load the plugins on-demand when we need them
-        self.load_many(plugin_ids.clone()).await?;
-
-        // Use ordered futures because we need the results to
-        // be in a deterministic order for operations to work
-        // correct, like hashing
-        let mut futures = FuturesOrdered::new();
-
-        for plugin_id in plugin_ids {
-            let extension = self.load(plugin_id).await?;
-
-            if extension.has_func(func_name).await {
-                let mut operation = Operation::new(func_name).unwrap();
-                let id = extension.id.clone();
-                let input = input_factory(self, &extension);
-                let future = output_factory(extension.clone(), input);
-
-                futures.push_back(tokio::spawn(Box::pin(async move {
-                    let result = future.await;
-                    operation.finish_with_result(&result);
-
-                    Ok::<_, miette::Report>(CallResult {
-                        id,
-                        operation,
-                        output: result?,
-                        plugin: extension,
-                    })
-                })));
-            }
-        }
-
-        while let Some(result) = futures.next().await {
-            results.push(result.into_diagnostic()??);
-        }
-
-        Ok(results)
     }
 }
 

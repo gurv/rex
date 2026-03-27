@@ -1,30 +1,11 @@
 use crate::app_error::AppError;
-use miette::IntoDiagnostic;
-use proto_core::ProtoEnvironment;
-use rex_config::{
-    ConfigLoader, ExtensionsConfig, InheritedTasksManager, ToolchainsConfig, WorkspaceConfig,
-};
 use rex_env::RexEnvironment;
 use rex_env_var::GlobalEnvBag;
-use rex_feature_flags::FeatureFlags;
 use starbase_styles::color;
 use starbase_utils::dirs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use tokio::spawn;
-use tokio::task::{JoinError, block_in_place};
 use tracing::{debug, instrument};
-
-// We need to load configuration in a blocking task, because config
-// loading is synchronous but uses `reqwest::blocking` under the hood,
-// which triggers a panic when used in an async context...
-async fn load_config_blocking<F, R>(func: F) -> Result<R, JoinError>
-where
-    F: FnOnce() -> R + Send + 'static,
-    R: Send + 'static,
-{
-    spawn(async { block_in_place(func) }).await
-}
 
 /// Recursively attempt to find the workspace root by locating the ".rex"
 /// configuration folder, starting from the current working directory.
@@ -94,119 +75,4 @@ pub fn detect_rex_environment(
     env.workspace_root = workspace_root.to_path_buf();
 
     Ok(Arc::new(env))
-}
-
-/// Detect information for proto from the environment.
-#[instrument]
-pub fn detect_proto_environment(
-    working_dir: &Path,
-    _workspace_root: &Path,
-) -> miette::Result<Arc<ProtoEnvironment>> {
-    let mut env = ProtoEnvironment::new()?;
-    env.working_dir = working_dir.to_path_buf();
-
-    Ok(Arc::new(env))
-}
-
-/// Load the workspace configuration file from the `.rex` directory in the workspace root.
-/// This file is required to exist, so error if not found.
-#[instrument(skip(config_loader))]
-pub async fn load_workspace_config(
-    config_loader: ConfigLoader,
-    workspace_root: &Path,
-) -> miette::Result<Arc<WorkspaceConfig>> {
-    let config_name = config_loader.get_debug_label_root("workspace");
-
-    debug!("Loading {} (required)", color::file(&config_name));
-
-    let config_files = config_loader.get_workspace_files();
-
-    if config_files.iter().all(|file| !file.exists()) {
-        return Err(AppError::MissingConfigFile(config_name).into());
-    }
-
-    let root = workspace_root.to_owned();
-    let config = load_config_blocking(move || config_loader.load_workspace_config(root))
-        .await
-        .into_diagnostic()??;
-
-    Ok(Arc::new(config))
-}
-
-/// Load the toolchain configuration file from the `.rex` directory if it exists.
-#[instrument(skip(config_loader, proto_env))]
-pub async fn load_toolchains_config(
-    config_loader: ConfigLoader,
-    proto_env: Arc<ProtoEnvironment>,
-    workspace_root: &Path,
-    working_dir: &Path,
-) -> miette::Result<Arc<ToolchainsConfig>> {
-    debug!(
-        "Attempting to load {} (optional)",
-        color::file(config_loader.get_debug_label_root("toolchains")),
-    );
-
-    let root = workspace_root.to_owned();
-    let cwd = working_dir.to_owned();
-    let config = load_config_blocking(move || {
-        config_loader
-            .load_toolchains_config(root, proto_env.load_file_manager()?.get_local_config(&cwd)?)
-    })
-    .await
-    .into_diagnostic()??;
-
-    GlobalEnvBag::instance().set("PROTO_CLI_VERSION", config.proto.version.to_string());
-
-    Ok(Arc::new(config))
-}
-
-/// Load the extensions configuration file from the `.rex` directory if it exists.
-#[instrument(skip(config_loader))]
-pub async fn load_extensions_config(
-    config_loader: ConfigLoader,
-    workspace_root: &Path,
-) -> miette::Result<Arc<ExtensionsConfig>> {
-    debug!(
-        "Attempting to load {} (optional)",
-        color::file(config_loader.get_debug_label_root("extensions")),
-    );
-
-    let root = workspace_root.to_owned();
-    let config = load_config_blocking(move || config_loader.load_extensions_config(root))
-        .await
-        .into_diagnostic()??;
-
-    Ok(Arc::new(config))
-}
-
-/// Load the tasks configuration file from the `.rex` directory if it exists.
-/// Also load all scoped tasks from the `.rex/tasks` directory and load into the manager.
-#[instrument(skip(config_loader))]
-pub async fn load_tasks_configs(
-    config_loader: ConfigLoader,
-    workspace_root: &Path,
-) -> miette::Result<Arc<InheritedTasksManager>> {
-    debug!(
-        "Attempting to load {} (optional)",
-        color::file(config_loader.get_debug_label_root("tasks/**/*")),
-    );
-
-    let root = workspace_root.to_owned();
-    let manager = load_config_blocking(move || config_loader.load_tasks_manager(root))
-        .await
-        .into_diagnostic()??;
-
-    debug!(
-        "Loaded {} task configs for inheritance",
-        manager.configs.len()
-    );
-
-    Ok(Arc::new(manager))
-}
-
-#[instrument(skip_all)]
-pub fn register_feature_flags(_config: &WorkspaceConfig) -> miette::Result<()> {
-    FeatureFlags::default().register();
-
-    Ok(())
 }

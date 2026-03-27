@@ -13,12 +13,10 @@ rex_common = { path = "../common" }
 rex_config = { path = "../config" }
 rex_env = { path = "../env" }
 rex_pdk_api = { path = "../pdk-api" }
-rex_target = { path = "../target" }
 async-trait = { workspace = true }
 convert_case = { workspace = true }
 extism = { workspace = true }
 miette = { workspace = true }
-proto_core = { path = "../../proto/core" }
 rustc-hash = { workspace = true }
 scc = { workspace = true }
 serde = { workspace = true, features = ["rc"] }

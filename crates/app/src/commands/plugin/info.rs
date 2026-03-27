@@ -42,12 +42,7 @@ pub async fn info(session: RexSession, args: PluginInfoArgs) -> AppResult {
             "define_extension_config",
             "initialize_extension",
             "execute_extension",
-            "sync_project",
-            "sync_workspace",
             "extend_command",
-            "extend_project_graph",
-            "extend_task_command",
-            "extend_task_script",
         ],
         &["register_extension"],
     )

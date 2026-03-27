@@ -1,9 +1,7 @@
 use miette::IntoDiagnostic;
-use rex_cache::{CacheEngine, cache_item};
 use rex_common::{is_ci, is_test_env};
 use rex_env::RexEnvironment;
 use rex_env_var::GlobalEnvBag;
-use rex_time::now_millis;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use starbase_utils::{fs, json};
@@ -11,13 +9,10 @@ use std::collections::BTreeMap;
 use std::env::consts;
 use std::path::Path;
 use std::sync::{Arc, OnceLock};
-use std::time::Duration;
 use tracing::{debug, instrument};
 use uuid::Uuid;
 
 static INSTANCE: OnceLock<Arc<Launchpad>> = OnceLock::new();
-
-const ALERT_PAUSE_DURATION: Duration = Duration::from_secs(43200); // 12 hours
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 #[serde(default)]
@@ -25,14 +20,6 @@ pub struct CurrentVersion {
     pub current_version: String,
     pub message: Option<String>,
 }
-
-cache_item!(
-    pub struct CurrentVersionCacheState {
-        pub last_check_time: Option<u128>,
-        pub local_version: Option<Version>,
-        pub remote_version: Option<Version>,
-    }
-);
 
 #[derive(Serialize)]
 pub struct ToolchainUsage {
@@ -103,32 +90,13 @@ impl Launchpad {
     #[instrument(skip_all)]
     pub async fn check_version(
         &self,
-        cache_engine: &CacheEngine,
-        bypass_cache: bool,
         manifest_url: &str,
     ) -> miette::Result<Option<VersionCheck>> {
         if is_test_env() || rex_common::is_offline() {
             return Ok(None);
         }
 
-        let mut state = cache_engine
-            .state
-            .load_state::<CurrentVersionCacheState>("rexVersionCheck.json")?;
-        let now = now_millis();
-
-        if let Some(last_check) = state.data.last_check_time
-            && (last_check + ALERT_PAUSE_DURATION.as_millis()) > now
-            && !bypass_cache
-        {
-            return Ok(None);
-        }
-
         if let Some(result) = self.check_version_without_cache(manifest_url).await? {
-            state.data.last_check_time = Some(now);
-            state.data.local_version = Some(result.local_version.clone());
-            state.data.remote_version = Some(result.remote_version.clone());
-            state.save()?;
-
             return Ok(Some(result));
         }
 

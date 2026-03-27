@@ -1,5 +1,4 @@
 use extism::{CurrentPlugin, Error, Function, UserData, Val, ValType};
-use proto_core::ProtoEnvironment;
 use rex_common::{Id, color};
 use rex_config::ExtensionsConfig;
 use rex_env::RexEnvironment;
@@ -11,7 +10,6 @@ use tracing::{instrument, trace};
 #[derive(Clone, Default)]
 pub struct RexHostData {
     pub rex_env: Arc<RexEnvironment>,
-    pub proto_env: Arc<ProtoEnvironment>,
     pub extensions_config: Arc<ExtensionsConfig>,
 }
 
@@ -19,7 +17,6 @@ impl fmt::Debug for RexHostData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RexHostData")
             .field("rex_env", &self.rex_env)
-            .field("proto_env", &self.proto_env)
             .field("extensions_config", &self.extensions_config)
             .finish()
     }

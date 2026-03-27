@@ -4,7 +4,6 @@ use crate::commands::plugin::PluginCommands;
 use crate::systems::bootstrap;
 use clap::builder::styling::{Color, Style, Styles};
 use clap::{Parser, Subcommand};
-use rex_cache::CacheMode;
 use rex_env_var::GlobalEnvBag;
 use starbase_styles::color::Color as ColorType;
 use std::env;
@@ -73,7 +72,7 @@ fn create_styles() -> Styles {
 #[command(
     bin_name = EXE_NAME,
     name = "rex",
-    about = "Take your repo to the rex!",
+    about = "This is the rex CLI!",
     version = env::var("REX_VERSION").unwrap_or_default(),
     disable_help_subcommand = true,
     next_line_help = false,
@@ -84,31 +83,11 @@ pub struct Cli {
     #[arg(
         long,
         global = true,
-        env = "REX_CACHE",
-        help = "Mode for cache operations",
-        help_heading = "Global options",
-        default_value_t
-    )]
-    pub cache: CacheMode,
-
-    #[arg(
-        long,
-        global = true,
         env = "REX_COLOR",
         help = "Force colored output",
         help_heading = "Global options"
     )]
     pub color: bool,
-
-    #[arg(
-        long,
-        short = 'c',
-        global = true,
-        env = "REX_CONCURRENCY",
-        help = "Maximum number of threads to utilize",
-        help_heading = "Global options"
-    )]
-    pub concurrency: Option<usize>,
 
     #[arg(
         long,
@@ -172,10 +151,6 @@ impl Cli {
         bag.set("STARBASE_LOG", self.log.to_string());
         bag.set("STARBASE_THEME", self.theme.to_string());
 
-        if !bag.has("REX_CACHE") {
-            bag.set("REX_CACHE", self.cache.to_string());
-        }
-
         if !bag.has("REX_LOG") {
             bag.set("REX_LOG", self.log.to_string());
         }
@@ -184,13 +159,9 @@ impl Cli {
             bag.set("REX_THEME", self.theme.to_string());
         }
 
-        if matches!(self.cache, CacheMode::Off | CacheMode::Write) {
-            bag.set("PROTO_CACHE", "off");
-        }
-
         if bag.should_debug_wasm() {
-            bag.set("PROTO_WASM_LOG", "trace");
-            bag.set("PROTO_DEBUG_WASM", "true");
+            bag.set("REX_WASM_LOG", "trace");
+            bag.set("REX_DEBUG_WASM", "true");
             bag.set("EXTISM_DEBUG", "1");
             bag.set("EXTISM_ENABLE_WASI_OUTPUT", "1");
             bag.set("EXTISM_MEMDUMP", "wasm-plugin.mem");

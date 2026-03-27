@@ -12,7 +12,6 @@ rust-version.workspace = true
 rex_common = { path = "../common" }
 rex_config = { path = "../config" }
 derive_setters = "0.1.9"
-proto_pdk_api = { path = "../../proto/pdk-api" }
 rustc-hash = { workspace = true }
 schematic = { workspace = true, features = ["schema_serde"] }
 serde = { workspace = true }
